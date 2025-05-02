@@ -1,1 +1,21 @@
+/* Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 @import "tailwindcss";
+
+@theme {
+  --color-red-fatec: #c10007;
+  --color-gray-fatec: #43555f;
+}
+
+@layer base {
+  * {
+    font-family: "Inter", sans-serif;
+    color: var(--color-gray-fatec);
+  }
+
+  a {
+    color: var(--color-red-500);
+    font-weight: bold;
+  }
+}
