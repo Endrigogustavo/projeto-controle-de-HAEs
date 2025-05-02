@@ -27,7 +27,7 @@ export default function VerificationCode() {
 
             <button
               type="submit"
-              className="bg-red-fatec text-white p-2 rounded my-2 uppercase my-4"
+              className="bg-red-fatec text-white p-2 rounded my-2 uppercase"
             >
               Cadastrar
             </button>

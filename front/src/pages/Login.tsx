@@ -1,12 +1,7 @@
-import React from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { TextField, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from "@mui/material";
+import { TextField } from "@mui/material";
+import { PasswordField } from "@components/PasswordField";
 
 export default function Login() {
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
   return (
     <>
       <div className="flex flex-col items-center justify-center h-screen">
@@ -30,32 +25,7 @@ export default function Login() {
               required
             />
 
-            <FormControl>
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                type={showPassword ? "text" : "password"}
-                required
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={
-                        showPassword
-                          ? "Esconder a senha"
-                          : "Mostrar a senha"
-                      }
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Password"
-              />
-            </FormControl>
+            <PasswordField />
 
             <a href="">Esqueceu a senha?</a>
 
