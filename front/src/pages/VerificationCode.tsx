@@ -1,11 +1,6 @@
-import {
-  TextField,
-  FormControl,
-} from "@mui/material";
+import { TextField, FormControl } from "@mui/material";
 
 export default function VerificationCode() {
-
-
   return (
     <>
       <div className="flex flex-col items-center justify-center h-screen">
@@ -15,14 +10,13 @@ export default function VerificationCode() {
             <span className="text-red-fatec"> Cadastro</span>
           </h1>
           <p className="my-4">
-          Nós enviamos um código de confirmação para o seu <a href="/#">e-mail institucional.</a>
+            Nós enviamos um código de confirmação para o seu{" "}
+            <a href="/#">e-mail institucional.</a>
           </p>
 
           <form action="" className="flex flex-col ">
-            <FormControl >
-              <TextField required label="Código" 
-              placeholder="369777"
-              />
+            <FormControl>
+              <TextField required label="Código" placeholder="369777" />
             </FormControl>
 
             <button
