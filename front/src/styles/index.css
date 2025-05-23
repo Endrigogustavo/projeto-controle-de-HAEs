@@ -19,3 +19,11 @@
     font-weight: bold;
   }
 }
+
+@layer components {
+  .helperText{
+    color:var(--color-red-fatec);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+}
