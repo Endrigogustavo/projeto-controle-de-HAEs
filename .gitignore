@@ -1,20 +1,20 @@
 # Node modules
-/node_modules
+**/node_modules
 
 # Environment variables
-.env
+**/.env
 
 # Package lock
-package-lock.json
-yarn.lock
+**/package-lock.json
+**/yarn.lock
 
 # Prisma: arquivos gerados automaticamente
-/prisma/migrations/
-/prisma/dev.db
-/generated/
-/generated-prisma/
-/prisma/generated/
-/**/generated/prisma/
+**/prisma/migrations/
+**/prisma/dev.db
+**/generated/
+**/generated-prisma/
+**/prisma/generated/
+**/generated/prisma/
 
 # Prisma Client gerado (ajuste se estiver em outro caminho)
 **/generated/prisma/
