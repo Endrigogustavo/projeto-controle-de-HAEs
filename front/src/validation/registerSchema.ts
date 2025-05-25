@@ -5,6 +5,7 @@ export const registerSchema = yup
 		name: yup
 			.string()
 			.min(3, "Nome deve ter no mínimo 3 caracteres")
+			.matches(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome deve conter apenas letras.")
 			.required("Nome é obrigatório"),
 		email: yup
 			.string()
