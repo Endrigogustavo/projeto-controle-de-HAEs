@@ -1,11 +1,12 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { TextField, Snackbar, Alert } from "@mui/material";
-import { PasswordField } from "../components/PasswordField";
-import { registerSchema } from "../validation/registerSchema";
-import { register as registerApi } from "../api/auth";
+import { TextField } from "@mui/material";
+import { PasswordField } from "@components/PasswordField";
+import { ToastNotification } from "@components/ToastNotification";
+import { registerSchema } from "@/validation/registerSchema";
+import { register as registerApi } from "@api/auth";
+import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
-import {useState} from "react";
 
 type FormData = {
 	name: string;
@@ -15,6 +16,15 @@ type FormData = {
 
 export default function Register() {
 	const {
+		openSnackbar,
+		snackbarMessage,
+		snackbarSeverity,
+		handleCloseSnackbar,
+		handleRegister,
+	} = useAuthForms({ register: registerApi });
+	const navigate = useNavigate();
+
+	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting },
@@ -22,42 +32,11 @@ export default function Register() {
 		resolver: yupResolver(registerSchema),
 	});
 
-	const navigate = useNavigate();
-
-	// Estados para controlar o Snackbar
-	const [openSnackbar, setOpenSnackbar] = useState(false);
-	const [snackbarMessage, setSnackbarMessage] = useState("");
-	const [snackbarSeverity, setSnackbarSeverity] = useState<
-		"error" | "success" | "info" | "warning"
-	>("error");
-
-	const handleCloseSnackbar = (
-		event?: React.SyntheticEvent | Event,
-		reason?: string
-	) => {
-		if (reason === "clickaway") {
-			return;
-		}
-		setOpenSnackbar(false);
-	};
-
 	const onSubmit: SubmitHandler<FormData> = async (data) => {
-		try {
-			await registerApi(data);
-			setSnackbarMessage(
-				"Cadastro realizado com sucesso! Verifique seu e-mail."
-			);
-			navigate("/verificationCode");
-		} catch (error: any) {
-			console.error("Erro ao cadastrar:", error);
-			setSnackbarMessage(
-				error.response?.data?.message ||
-					error.message ||
-					"Erro desconhecido ao cadastrar."
-			);
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
-		}
+		await handleRegister(data);
+		setTimeout(() => {
+			navigate("/verificationCode", { state: { userEmail: data.email } });
+		}, 4000);
 	};
 
 	return (
@@ -118,20 +97,12 @@ export default function Register() {
 				</div>
 			</div>
 
-			<Snackbar
+			<ToastNotification
 				open={openSnackbar}
-				autoHideDuration={6000} 
+				message={snackbarMessage}
+				severity={snackbarSeverity}
 				onClose={handleCloseSnackbar}
-				anchorOrigin={{ vertical: "top", horizontal: "center" }}
-			>
-				<Alert
-					onClose={handleCloseSnackbar}
-					severity={snackbarSeverity}
-					sx={{ width: "100%" }}
-				>
-					{snackbarMessage}
-				</Alert>
-			</Snackbar>
+			/>
 		</>
 	);
 }
