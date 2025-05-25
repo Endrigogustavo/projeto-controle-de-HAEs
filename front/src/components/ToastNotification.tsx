@@ -17,7 +17,7 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({
 	autoHideDuration = 6000,
 }) => {
 	const handleClose = (
-		event?: React.SyntheticEvent | Event,
+		_event?: React.SyntheticEvent | Event,
 		reason?: string
 	) => {
 		if (reason === "clickaway") {
