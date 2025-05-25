@@ -1,18 +1,25 @@
-import { Hae } from "@prisma/client";;
+import { Hae, Status } from "@prisma/client";;
 import { repository } from "../../database/repository";
 
 const haeRepository = repository.hae;
 
-const createHae = async (name: string, email: string, password: string, createdAt: Date, updatedAt: Date) => {}
-const updateHaeInfo = async (id: string, name: string, email: string, password: string) => {}
-const deleteHae = async (id: string) => {}
-const defineHaeAprovedStatus = async (id: string, status: string) => {}
-const findHaeById = async (id: string) => {}
-const generateHaeRelatoryToDean = async (id: string) => {}
-const findAllStudentsIntoHae = async (id: string) => {}
-const findAllHaes = async () => {}
-const findAllHaesByProfessorEmail = async (email: string) => {}
+export const createHae = async (name: string, email: string, password: string, createdAt: Date, updatedAt: Date) => {}
+export const updateHaeInfo = async (id: string, name: string, email: string, password: string) => {}
+export const deleteHae = async (id: string) => {}
+export const defineHaeAprovedStatus = async (id: string, status: string) => {}
+export const findHaeById = async (id: string) => {}
+export const generateHaeRelatoryToDean = async (id: string) => {}
+export const findAllStudentsIntoHae = async (id: string) => {}
+export const findAllHaes = async () => {}
+export const findAllHaesByProfessorEmail = async (email: string) => {}
 
-export const haeRepositoryImpl = {
-
+export const changeHAEStatus = async (id: string, status: Status) => {
+  return await haeRepository.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: status,
+    },
+  });
 }
