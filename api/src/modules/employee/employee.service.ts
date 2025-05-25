@@ -1,4 +1,6 @@
 import * as employeeRepositoryImpl from "./employee.repository";
+import { Status } from '@prisma/client';
+
 
 export const createEmployee = async (
   name: string,
@@ -6,7 +8,7 @@ export const createEmployee = async (
   password: string
 ) => {
   try {
-    return await employeeRepositoryImpl.createProfessor(name, email, password);
+    return await employeeRepositoryImpl.createEmployee(name, email, password);
   } catch (error) {
     throw new Error("Error while creating the employee");
   }
@@ -23,7 +25,7 @@ export const updateEmployee = async (
 
     if (!record) throw new Error("Employee not found");
 
-    return await employeeRepositoryImpl.updateProfessorInfo(
+    return await employeeRepositoryImpl.updateEmployeeInfo(
       id,
       name,
       email,
@@ -40,7 +42,7 @@ export const deleteEmployeeById = async (id: string) => {
 
     if (!record) throw new Error("Employee not found");
 
-    return await employeeRepositoryImpl.deleteProfessor(id);
+    return await employeeRepositoryImpl.deleteEmployee(id);
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -57,3 +59,5 @@ export const findEmployeeById = async (id: string) => {
     throw new Error(error.message);
   }
 };
+
+

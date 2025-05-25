@@ -1,8 +1,9 @@
 import { repository } from "../../database/repository";
+import { Status } from '@prisma/client';
 
 const employeeRepository = repository.employee;
 
-export const createProfessor = async (
+export const createEmployee = async (
   name: string,
   email: string,
   password: string
@@ -28,7 +29,7 @@ export const findByEmailAndPassword = async (
   });
 };
 
-export const updateProfessorInfo = async (
+export const updateEmployeeInfo = async (
   id: string,
   name: string,
   email: string,
@@ -46,7 +47,7 @@ export const updateProfessorInfo = async (
   });
 };
 
-export const deleteProfessor = async (id: string) => {
+export const deleteEmployee = async (id: string) => {
   await employeeRepository.delete({
     where: {
       id: id,
@@ -69,3 +70,9 @@ export const findByEmail = async (email: string) => {
     },
   });
 };
+
+export const findAllEmployees = async () => {
+  return await employeeRepository.findMany();
+};
+
+

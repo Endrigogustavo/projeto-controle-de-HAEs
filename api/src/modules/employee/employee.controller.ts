@@ -47,3 +47,4 @@ export const findById = async (req: Request, res: Response) => {
       .json({ error: error.message });
   }
 };
+
