@@ -1,10 +1,45 @@
 openapi: 3.0.0
 info:
-  title: Authentication and Email Verification API
-  description: API for managing authentication and email verification.
+  title: HAE Management API
+  description: API for managing HAE and administrative functions
   version: 1.0.0
 
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
 components:
+  schemas:
+    HAE:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, COMPLETED]
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        employeeId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    RoleChange:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [PROFESSOR, COORDENADOR]
   securitySchemes:
     cookieAuth:
       type: apiKey
@@ -13,9 +48,13 @@ components:
 
 tags:
   - name: Auth
-    description: Operações relacionadas a autenticação dos funcionários
+    description: Authentication operations
   - name: Employee
-    description: Operações relacionadas ao funcionário
+    description: Employee management
+  - name: HAE
+    description: HAE (Horário de Atendimento Especial) management
+  - name: Admin
+    description: Administrative functions
 
 paths:
   /auth/send-email-code:
@@ -165,3 +204,72 @@ paths:
           description: Account updated successfully
         404:
           description: Account not found
+
+  /hae/change-status/{id}:
+    put:
+      summary: Change HAE status
+      tags:
+        - HAE
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: HAE ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                haeStatus:
+                  type: string
+                  enum: [PENDING, APPROVED, REJECTED, COMPLETED]
+                  example: APPROVED
+      responses:
+        200:
+          description: HAE status updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "HAE status updated"
+        400:
+          description: Invalid HAE status
+        401:
+          description: Unauthorized – invalid or missing token
+        500:
+          description: Internal server error
+
+  /admin/change-role/{id}:
+    put:
+      summary: Change employee role to Coordenador
+      tags:
+        - Admin
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Employee ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Role changed successfully
+        401:
+          description: Unauthorized – invalid or missing token
+        403:
+          description: Forbidden – insufficient permissions
+        404:
+          description: Employee not found
+        500:
+          description: Internal server error
