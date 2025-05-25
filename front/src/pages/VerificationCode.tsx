@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useLocation, useNavigate } from "react-router-dom"; // Importa useLocation para pegar o state
 import { ToastNotification } from "@/components/ToastNotification";
 import { verificationCodeSchema } from "@/validation/verificationCodeSchema";
-import { verifyEmailCode as verifyCodeApi } from "@/api/auth";
+import { verifyEmailCode as verifyCodeApi } from "@/services/auth";
 import { useAuthForms } from "@/hooks/useAuthForms";
 
 type VerificationFormData = {

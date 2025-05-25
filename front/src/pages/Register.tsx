@@ -4,7 +4,7 @@ import { TextField } from "@mui/material";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { registerSchema } from "@/validation/registerSchema";
-import { register as registerApi } from "@api/auth";
+import { register as registerApi } from "@/services/auth";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
 
