@@ -1,13 +1,27 @@
 import { Router } from "express";
-import { changeHAEStatus } from "./hae.controller";
+import * as HaeController from "./hae.controller";
 import { validateHAEStatus } from "../../shared/middleware/validateHAEStatus";
 
-const haeRoutes = Router();
+export const haeRoutes = Router();
 
 haeRoutes.put(
   "/change-status/:id",
   validateHAEStatus, 
-  changeHAEStatus    
+  HaeController.changeHAEStatus    
 );
 
-export { haeRoutes };
+haeRoutes.get("/:id", 
+  HaeController.findHaeById
+);
+
+haeRoutes.get("/employee/:id", 
+  HaeController.findAllHaesByProfessorId
+);
+
+haeRoutes.post("/", 
+  HaeController.createHae
+);
+
+haeRoutes.delete("/:id", 
+  HaeController.deleteHae
+);

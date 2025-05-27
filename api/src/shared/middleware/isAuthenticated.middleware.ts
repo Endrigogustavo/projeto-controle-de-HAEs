@@ -23,7 +23,7 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
   const jwtData = jwtUtils.verify(token);
 
   if (jwtData === "JWT_SECRET_NOT_FOUND") {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.BAD_REQUEST).json({
       errors: { default: "Error verifying token" },
     });
     return;
