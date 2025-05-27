@@ -52,7 +52,7 @@ tags:
   - name: Employee
     description: Employee management
   - name: HAE
-    description: HAE (Horário de Atendimento Especial) management
+    description: HAE management
   - name: Admin
     description: Administrative functions
 
@@ -225,11 +225,17 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - haeStatus
+                - coordenadorId
               properties:
                 haeStatus:
                   type: string
                   enum: [PENDING, APPROVED, REJECTED, COMPLETED]
                   example: APPROVED
+                coordenadorId:
+                  type: string
+                  example: 123e4567-e89b-12d3-a456-426614174000
       responses:
         200:
           description: HAE status updated successfully
@@ -242,11 +248,136 @@ paths:
                     type: string
                     example: "HAE status updated"
         400:
-          description: Invalid HAE status
+          description: Invalid HAE status or missing coordenadorId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid HAE status. Valid statuses are: PENDING, APPROVED, REJECTED."
         401:
           description: Unauthorized – invalid or missing token
         500:
           description: Internal server error
+
+  /hae/{id}:
+    get:
+      summary: Buscar HAE por ID
+      tags:
+        - HAE
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID do HAE
+      responses:
+        '200':
+          description: HAE encontrado
+        '404':
+          description: HAE não encontrado
+        '500':
+          description: Erro interno
+
+    delete:
+      summary: Deletar HAE
+      tags:
+        - HAE
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID do HAE
+      responses:
+        '200':
+          description: HAE deletado com sucesso
+        '500':
+          description: Erro interno
+
+  /hae/employee/{id}:
+    get:
+      summary: Buscar todos os HAEs por ID do professor
+      tags:
+        - HAE
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID do professor (employee)
+      responses:
+        '200':
+          description: Lista de HAEs
+        '500':
+          description: Erro interno
+
+  /hae:
+    post:
+      summary: Criar um novo HAE
+      tags:
+        - HAE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nameEmployee:
+                  type: string
+                course:
+                  type: string
+                projectTitle:
+                  type: string
+                weeklyHours:
+                  type: number
+                projectType:
+                  type: string
+                mainObjective:
+                  type: string
+                Periodo:
+                  type: string
+                  format: date
+                cronograma:
+                  type: string
+                projectDescription:
+                  type: string
+                Observations:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                employeeId:
+                  type: string
+              required:
+                - nameEmployee
+                - course
+                - projectTitle
+                - weeklyHours
+                - projectType
+                - mainObjective
+                - Periodo
+                - cronograma
+                - projectDescription
+                - Observations
+                - startDate
+                - endDate
+                - employeeId
+               
+      responses:
+        '201':
+          description: HAE criado com sucesso
+        '500':
+          description: Erro interno
 
   /admin/change-role/{id}:
     put:
@@ -273,3 +404,5 @@ paths:
           description: Employee not found
         500:
           description: Internal server error
+
+  
