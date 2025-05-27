@@ -35,6 +35,16 @@ export const createHae = async (data: {
   }
 };
 
+export const findAllHaes = async () => {
+  try {
+    const haes = await haeRepository.findMany();
+    return haes;
+  } catch (error) {
+    console.error('Erro ao encontrar todos os HAEs:', error);
+    throw new Error('Erro ao encontrar todos os HAEs');
+  }
+}
+
 export const deleteHae = async (id: string) => {
   try {
     await haeRepository.delete({
@@ -67,15 +77,6 @@ export const findHaeById = async (id: string) => {
   }
  }
 
-export const findAllHaes = async () => { 
-  try {
-    const haes = await haeRepository.findMany();
-    return haes;
-  } catch (error) {
-    console.error('Erro ao encontrar todos os HAEs:', error);
-    throw new Error('Erro ao encontrar todos os HAEs');
-  }
-}
 
 export const findAllHaesByProfessorId = async (id: string) => { 
   try {

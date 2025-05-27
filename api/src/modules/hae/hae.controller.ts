@@ -56,7 +56,7 @@ export const findHaeById = async (
 ) => {
   try {
     const { id } = req.params;
-    const hae = await haeService.findHaeById(id);
+    const hae = await haeService.findHaeWithId(id);
     res.status(StatusCodes.OK).json({ message: "HAE found", hae });
   } catch (error: any) {
     res

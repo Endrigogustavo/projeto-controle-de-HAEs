@@ -262,7 +262,7 @@ paths:
         500:
           description: Internal server error
 
-  /hae/{id}:
+  /hae/getHaeById/{id}:
     get:
       summary: Buscar HAE por ID
       tags:
@@ -282,6 +282,7 @@ paths:
         '500':
           description: Erro interno
 
+  /hae/delete/{id}:
     delete:
       summary: Deletar HAE
       tags:
@@ -404,5 +405,27 @@ paths:
           description: Employee not found
         500:
           description: Internal server error
+        
+  /hae/getAll:
+    get:
+      summary: Retrieve all HAEs
+      tags:
+        - HAE
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: List of all HAEs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HAE'
+        401:
+          description: Unauthorized – invalid or missing token
+        500:
+          description: Internal server error
+
 
   

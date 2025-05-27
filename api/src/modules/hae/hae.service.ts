@@ -29,7 +29,7 @@ export const deleteHae = async (id: string) => {
   }
 }
 
-export const findHaeById = async (id: string) => {
+export const findHaeWithId = async (id: string) => {
   try {
     const hae = await haeRepositoryImpl.findHaeById(id);
     if (!hae) throw new Error("Hae not found");

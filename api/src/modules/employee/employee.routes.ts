@@ -3,7 +3,7 @@ import { Router } from "express";
 import * as employeeController from "./employee.controller";
 import { isAuth } from "../../shared/middleware";
 
-const employeeRoutes = Router();
+export const employeeRoutes = Router();
 
 employeeRoutes.get(
   "/get-professor/:id",
@@ -23,4 +23,3 @@ employeeRoutes.put(
   employeeController.update
 );
 
-export { employeeRoutes };

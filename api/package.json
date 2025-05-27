@@ -4,7 +4,7 @@
   "main": "index.ts",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
+    "start": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "generate": "npx prisma generate --schema=src/database/prisma/schema.prisma",
     "migrate": "npx prisma migrate deploy --schema=src/database/prisma/schema.prisma",
     "reset-migrate": "npx prisma migrate reset"

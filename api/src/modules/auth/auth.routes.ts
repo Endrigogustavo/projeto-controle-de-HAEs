@@ -4,7 +4,7 @@ import * as authController from "./auth.controller";
 import * as emailController from "./email-verification/email-verification.controller";
 import * as requestRateLimit from "../../shared/middleware/request-rate-limit";
 
-const authRoutes = Router();
+export const authRoutes = Router();
 
 authRoutes.post(
   "/send-email-code",
@@ -27,4 +27,3 @@ authRoutes.post(
   authController.signIn
 );
 
-export { authRoutes };
