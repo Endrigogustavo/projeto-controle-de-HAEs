@@ -12,7 +12,7 @@ export const update = async (req: Request, res: Response) => {
       .json({ message: "Professor updated successfully" });
   } catch (error: any) {
     res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ error: error.message });
   }
 };
@@ -26,7 +26,7 @@ export const remove = async (req: Request, res: Response) => {
       .json({ message: "Professor deleted successfully" });
   } catch (error: any) {
     res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ error: error.message });
   }
 };
@@ -43,7 +43,7 @@ export const findById = async (req: Request, res: Response) => {
     res.status(StatusCodes.OK).json({ message: "Professor found", record });
   } catch (error: any) {
     res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ error: error.message });
   }
 };

@@ -75,7 +75,7 @@ export const sendVerificationEmailCode = async (
       .status(StatusCodes.OK)
       .json({ message: "Verification code sent successfully." });
   } catch (error: any) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.BAD_REQUEST).json({
       message: "An error occurred while processing the request.",
       error: error.message,
     });
@@ -111,7 +111,7 @@ export const verifyVerificationEmailCode = async (
       userId: user.record.id,
     });
   } catch (error: any) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.BAD_REQUEST).json({
       message: "An error occurred while processing the request.",
       error: error.message,
     });

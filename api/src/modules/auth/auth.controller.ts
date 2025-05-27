@@ -51,7 +51,7 @@ export const signIn = async (req: Request, res: Response) => {
     });
     return;
   } catch (error: any) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(StatusCodes.BAD_REQUEST).json({
       message: "Internal server error",
       error: error.message,
     });

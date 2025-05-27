@@ -28,7 +28,7 @@ export const changeEmployeeRoleToCoordenador = async (
     res.status(StatusCodes.OK).json({ message: "Role updated to Coordenador" });
   } catch (error: any) {
     res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ error: error.message });
   }
 }
