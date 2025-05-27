@@ -48,10 +48,24 @@ model EmailVerification {
 
 model Hae {
   id           String   @id @default(uuid())
-  name         String
+  nameEmployee String
+  course       String
+  projectTitle  String
+  weeklyHours Int
+  projectType  String
+  mainObjective String
+  resultAchieved String
+  Periodo      String
+  cronograma String
+  projectDescription String
+  Observations String
+
   status       Status   @default(PENDING)
-  startDate    DateTime
-  endDate      DateTime
+  coordenatorId String
+
+  startDate    String
+  endDate      String
+  comprovanteDoc String
 
   employee     Employee @relation(fields: [employeeId], references: [id])
   employeeId   String
