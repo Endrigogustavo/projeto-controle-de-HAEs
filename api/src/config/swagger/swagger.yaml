@@ -132,6 +132,32 @@ paths:
         401:
           description: Invalid credentials
 
+  /auth/logout:
+    post:
+      summary: Employee logout
+      tags:
+        - Auth
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: Logout successful
+        401:
+          description: Unauthorized – invalid or missing token
+  
+  /auth/check-cookie:
+    get:
+      summary: Check if user is logged in
+      tags:
+        - Auth
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: User is logged in
+        401:
+          description: Unauthorized – invalid or missing token
+
   /employee/get-professor/{id}:
     get:
       summary: Retrieve professor information by ID

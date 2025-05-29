@@ -52,9 +52,41 @@ export const signIn = async (req: Request, res: Response) => {
     return;
   } catch (error: any) {
     res.status(StatusCodes.BAD_REQUEST).json({
-      message: "Internal server error",
+      message: "Error with login",
       error: error.message,
     });
     return;
   }
 };
+
+export const signOut = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token");
+    res.status(StatusCodes.OK).json({ message: "Logout successful" });
+  } catch (error: any) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Error with logging out",
+      error: error.message,
+    });
+  }
+};
+
+export const getCookie = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies?.token;
+
+    if (!token) {
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Not authenticated",
+      });
+      return;
+    }
+
+    res.status(StatusCodes.OK).json({ token });
+  } catch (error: any) {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      message: "Error retrieving cookie",
+      error: error.message,
+    });
+  }
+}

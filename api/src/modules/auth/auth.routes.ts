@@ -27,3 +27,12 @@ authRoutes.post(
   authController.signIn
 );
 
+authRoutes.post(
+  "/logout",
+  authController.signOut
+);
+
+authRoutes.get(
+  "/check-cookie",
+  authController.getCookie
+);
