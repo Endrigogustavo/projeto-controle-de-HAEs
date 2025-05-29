@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSnackbar } from "./useSnackbar"; 
 
 export interface IAuthService {
 	register?(data: {
@@ -9,18 +9,11 @@ export interface IAuthService {
 	login?(data: { email: string; password: string }): Promise<any>;
 	verifyCode?(data: { email: string; code: string }): Promise<any>;
 	logout?(): Promise<any>;
+	checkCookie?(): Promise<any>;
 }
 
 export const useAuthForms = (authService: IAuthService) => {
-	const [openSnackbar, setOpenSnackbar] = useState(false);
-	const [snackbarMessage, setSnackbarMessage] = useState("");
-	const [snackbarSeverity, setSnackbarSeverity] = useState<
-		"error" | "success" | "info" | "warning"
-	>("error");
-
-	const handleCloseSnackbar = () => {
-		setOpenSnackbar(false);
-	};
+	const { open, message, severity, showSnackbar, hideSnackbar } = useSnackbar();
 
 	const handleRegister = async (data: {
 		name: string;
@@ -28,23 +21,21 @@ export const useAuthForms = (authService: IAuthService) => {
 		password: string;
 	}) => {
 		if (!authService.register) {
-			setSnackbarMessage("Funcionalidade de cadastro não disponível.");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			showSnackbar("Funcionalidade de cadastro não disponível.", "error");
 			return false;
 		}
 		try {
 			await authService.register(data);
-			setSnackbarMessage(
-				"Cadastro realizado com sucesso! Verifique seu e-mail."
+			showSnackbar(
+				"Cadastro realizado com sucesso! Verifique seu e-mail.",
+				"success"
 			);
-			setSnackbarSeverity("success");
-			setOpenSnackbar(true);
 			return true;
 		} catch (error) {
-			setSnackbarMessage("Erro ao cadastrar:");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			const errorMessage =
+				(error as any)?.response?.data?.message ||
+				"Erro ao cadastrar. Tente novamente.";
+			showSnackbar(errorMessage, "error");
 			return false;
 		}
 	};
@@ -52,22 +43,18 @@ export const useAuthForms = (authService: IAuthService) => {
 	const handleLogin = async (data: { email: string; password: string }) => {
 		if (!authService.login) {
 			console.error("Auth service does not provide a login function.");
-			setSnackbarMessage("Funcionalidade de login não disponível.");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			showSnackbar("Funcionalidade de login não disponível.", "error");
 			return false;
 		}
 		try {
 			await authService.login(data);
-			setSnackbarMessage("Login realizado com sucesso!");
-			setSnackbarSeverity("success");
-			setOpenSnackbar(true);
-
+			showSnackbar("Login realizado com sucesso!", "success");
 			return true;
 		} catch (error) {
-			setSnackbarMessage("Credenciais inválidas.");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			const errorMessage =
+				(error as any)?.response?.data?.message ||
+				"Credenciais inválidas. Verifique seu e-mail e senha.";
+			showSnackbar(errorMessage, "error");
 			return false;
 		}
 	};
@@ -75,56 +62,51 @@ export const useAuthForms = (authService: IAuthService) => {
 	const handleVerifyCode = async (data: { email: string; code: string }) => {
 		if (!authService.verifyCode) {
 			console.error("Auth service does not provide a verifyCode function.");
-			setSnackbarMessage(
-				"Funcionalidade de verificação de código não disponível."
+			showSnackbar(
+				"Funcionalidade de verificação de código não disponível.",
+				"error"
 			);
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
 			return false;
 		}
 		try {
 			await authService.verifyCode(data);
-			setSnackbarMessage(
-				"Código verificado com sucesso! Sua conta está ativa."
+			showSnackbar(
+				"Código verificado com sucesso! Sua conta está ativa.",
+				"success"
 			);
-			setSnackbarSeverity("success");
-			setOpenSnackbar(true);
 			return true;
 		} catch (error) {
-			setSnackbarMessage("Erro ao verificar código");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			const errorMessage =
+				(error as any)?.response?.data?.message ||
+				"Erro ao verificar código. Verifique se o código está correto.";
+			showSnackbar(errorMessage, "error");
 			return false;
 		}
 	};
 
 	const handleLogout = async () => {
 		if (!authService.logout) {
-			setSnackbarMessage("Funcionalidade de logout não disponível.");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			showSnackbar("Funcionalidade de logout não disponível.", "error");
 			return false;
 		}
 		try {
 			await authService.logout();
-			localStorage.removeItem("authToken"); // ou outro dado salvo
-			setSnackbarMessage("Logout realizado com sucesso!");
-			setSnackbarSeverity("success");
-			setOpenSnackbar(true);
+			showSnackbar("Logout realizado com sucesso!", "success");
 			return true;
 		} catch (error) {
-			setSnackbarMessage("Erro ao fazer logout.");
-			setSnackbarSeverity("error");
-			setOpenSnackbar(true);
+			const errorMessage =
+				(error as any)?.response?.data?.message ||
+				"Erro ao fazer logout. Tente novamente.";
+			showSnackbar(errorMessage, "error");
 			return false;
 		}
 	};
 
 	return {
-		openSnackbar,
-		snackbarMessage,
-		snackbarSeverity,
-		handleCloseSnackbar,
+		openSnackbar: open,
+		snackbarMessage: message,
+		snackbarSeverity: severity,
+		handleCloseSnackbar: hideSnackbar,
 		handleRegister,
 		handleLogin,
 		handleVerifyCode,
