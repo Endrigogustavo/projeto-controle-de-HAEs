@@ -1,8 +1,8 @@
 import { Sidebar } from "@components/Sidebar";
 import { Header } from "@components/Header";
-import { StepperForm } from "@components/StepperForm";
 import { MobileHeader } from "@components/MobileHeader";
 import { useState } from "react";
+import StepperForm from "@/components/StepperForm/StepperForm";
 import Drawer from "@mui/material/Drawer";
 
 export default function RequestHae() {

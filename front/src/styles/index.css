@@ -6,7 +6,7 @@
 @theme {
 	--color-red-fatec: #c10007;
 	--color-gray-fatec: #43555f;
-	--color-background: #F2F2F2;
+	--color-background: #f2f2f2;
 }
 
 @layer base {
@@ -31,11 +31,20 @@
 	.btnFatec {
 		background-color: var(--color-red-fatec);
 		border-radius: 15px;
-		padding: 0.5rem 0;
+		padding: 0.5rem 1.5rem;
 	}
 
-	.btnFatec > a, .btnFatec > p {
+	.btnFatec > a,
+	.btnFatec > p,
+	.btnFatecBack > a,
+	.btnFatecBack > p {
 		color: #f0f0f0;
+	}
+
+	.btnFatecBack {
+		background-color: var(--color-gray-fatec);
+		border-radius: 15px;
+		padding: 0.5rem 1.5rem;
 	}
 
 	aside a {
@@ -46,11 +55,11 @@
 		background-color: #35454d;
 	}
 
-	.title{
+	.title {
 		font-size: 2rem;
 	}
 
-	.subtitle{
+	.subtitle {
 		font-size: 1.6rem;
 	}
 }
