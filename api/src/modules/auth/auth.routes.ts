@@ -3,6 +3,7 @@ import { Router } from "express";
 import * as authController from "./auth.controller";
 import * as emailController from "./email-verification/email-verification.controller";
 import * as requestRateLimit from "../../shared/middleware/request-rate-limit";
+import * as  auth from "../../shared/middleware/isAuthenticated.middleware"
 
 export const authRoutes = Router();
 
@@ -34,5 +35,6 @@ authRoutes.post(
 
 authRoutes.get(
   "/check-cookie",
+  auth.isAuthenticated,
   authController.getCookie
 );
