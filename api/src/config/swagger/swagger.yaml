@@ -364,9 +364,13 @@ paths:
                   type: string
                 weeklyHours:
                   type: number
-                projectType:
+                dayOfWeek:
                   type: string
-                mainObjective:
+                  enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+                timeRange:
+                  type: string
+                  description: "Formato: HH:mm-HH:mm, ex: 08:00-12:00"
+                projectType:
                   type: string
                 Periodo:
                   type: string
@@ -391,7 +395,8 @@ paths:
                 - projectTitle
                 - weeklyHours
                 - projectType
-                - mainObjective
+                - dayOfWeek
+                - timeRange
                 - Periodo
                 - cronograma
                 - projectDescription
