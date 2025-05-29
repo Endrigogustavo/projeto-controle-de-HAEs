@@ -4,26 +4,53 @@
 @import "tailwindcss";
 
 @theme {
-  --color-red-fatec: #c10007;
-  --color-gray-fatec: #43555f;
+	--color-red-fatec: #c10007;
+	--color-gray-fatec: #43555f;
+	--color-background: #F2F2F2;
 }
 
 @layer base {
-  * {
-    font-family: "Inter", sans-serif;
-    color: var(--color-gray-fatec);
-  }
+	* {
+		font-family: "Inter", sans-serif;
+		color: var(--color-gray-fatec);
+	}
 
-  a {
-    color: var(--color-red-500);
-    font-weight: bold;
-  }
+	a {
+		color: var(--color-red-500);
+		font-weight: bold;
+	}
 }
 
 @layer components {
-  .helperText{
-    color:var(--color-red-fatec);
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-  }
+	.helperText {
+		color: var(--color-red-fatec);
+		font-size: 0.75rem;
+		margin-top: 0.25rem;
+	}
+
+	.btnFatec {
+		background-color: var(--color-red-fatec);
+		border-radius: 15px;
+		padding: 0.5rem 0;
+	}
+
+	.btnFatec > a, .btnFatec > p {
+		color: #f0f0f0;
+	}
+
+	aside a {
+		color: #f0f0f0;
+	}
+
+	aside li:hover {
+		background-color: #35454d;
+	}
+
+	.title{
+		font-size: 2rem;
+	}
+
+	.subtitle{
+		font-size: 1.6rem;
+	}
 }
