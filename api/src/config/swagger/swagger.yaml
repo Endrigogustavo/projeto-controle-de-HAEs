@@ -372,14 +372,11 @@ paths:
                   description: "Formato: HH:mm-HH:mm, ex: 08:00-12:00"
                 projectType:
                   type: string
-                Periodo:
-                  type: string
-                  format: date
                 cronograma:
                   type: string
                 projectDescription:
                   type: string
-                Observations:
+                observations:
                   type: string
                 startDate:
                   type: string

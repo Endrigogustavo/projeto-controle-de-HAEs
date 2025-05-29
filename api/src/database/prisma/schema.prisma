@@ -16,7 +16,7 @@ model Employee {
   name               String
   email              String   @unique
   password           String
-  role               Role     @default(PROFFESSOR)   
+  role               Role     @default(PROFESSOR)   
 
   haes               Hae[]
 
@@ -28,7 +28,7 @@ model Employee {
 
 enum Role {
   ADMIN
-  PROFFESSOR
+  PROFESSOR
   DIRETOR
   COORDENADOR
 }
@@ -56,10 +56,9 @@ model Hae {
   dayOfWeek   String
   timeRange String
   resultAchieved String
-  Periodo      String
-  cronograma String
+  cronograma String[]
   projectDescription String
-  Observations String
+  observations String
 
   status       Status   @default(PENDING)
   coordenatorId String
