@@ -3,7 +3,7 @@ import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
 
-const StepperForm: React.FC = () => {
+export const StepperForm: React.FC = () => {
 	const [step, setStep] = useState<number>(1);
 
 	const next = () => setStep((prev) => prev + 1);
@@ -16,7 +16,7 @@ const StepperForm: React.FC = () => {
 	];
 
 	return (
-		<div className="flex items-center justify-center min-h-screen">
+		<div className="flex items-center justify-center my-6">
 			<div className="p-8 rounded-xl w-full lg:max-w-lg">
 				<div className="flex justify-between mb-6">
 					{steps.map(({ id, label }) => (
@@ -40,5 +40,3 @@ const StepperForm: React.FC = () => {
 		</div>
 	);
 };
-
-export default StepperForm;
