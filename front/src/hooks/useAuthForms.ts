@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AxiosError } from "axios";
 
 export interface IAuthService {
 	register?(data: {
@@ -42,14 +41,7 @@ export const useAuthForms = (authService: IAuthService) => {
 			setOpenSnackbar(true);
 			return true;
 		} catch (error) {
-			const axiosError = error as AxiosError;
-			console.error("Erro ao cadastrar:", error);
-			const errorMessage =
-				(axiosError.response?.data as { message?: string })?.message ||
-				axiosError.message ||
-				"Erro desconhecido ao cadastrar.";
-
-			setSnackbarMessage(errorMessage);
+			setSnackbarMessage("Erro ao cadastrar:");
 			setSnackbarSeverity("error");
 			setOpenSnackbar(true);
 			return false;
@@ -72,14 +64,7 @@ export const useAuthForms = (authService: IAuthService) => {
 
 			return true;
 		} catch (error) {
-			const axiosError = error as AxiosError;
-			console.error("Erro ao fazer login:", error);
-			const errorMessage =
-				(axiosError.response?.data as { message?: string })?.message ||
-				axiosError.message ||
-				"Erro desconhecido ao fazer login. Verifique suas credenciais.";
-
-			setSnackbarMessage(errorMessage);
+			setSnackbarMessage("Credenciais inválidas.");
 			setSnackbarSeverity("error");
 			setOpenSnackbar(true);
 			return false;
@@ -105,14 +90,7 @@ export const useAuthForms = (authService: IAuthService) => {
 			setOpenSnackbar(true);
 			return true;
 		} catch (error) {
-			const axiosError = error as AxiosError;
-			console.error("Erro ao verificar código:", error);
-			const errorMessage =
-				(axiosError.response?.data as { message?: string })?.message ||
-				axiosError.message ||
-				"Erro desconhecido ao verificar o código. Por favor, tente novamente.";
-
-			setSnackbarMessage(errorMessage);
+			setSnackbarMessage("Erro ao verificar código");
 			setSnackbarSeverity("error");
 			setOpenSnackbar(true);
 			return false;
