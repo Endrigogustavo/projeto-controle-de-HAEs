@@ -1,4 +1,4 @@
-import { HaeDataType } from "@components/types";
+import { HaeDataType } from "@components/StepperForm/types/haeFormTypes";
 import api from "./index";
 
 export const createHae = async (data: HaeDataType) => {
