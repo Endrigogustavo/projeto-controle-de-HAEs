@@ -1,5 +1,5 @@
 import { getProfessor } from "./employee";
-import { IAuthService } from "@/hooks/useAuthForms";
+import { IAuthService } from "@/hooks/useLoggedEmployee";
 
 const employeeService: IAuthService = {
 	getProfessor: async (data) => {
