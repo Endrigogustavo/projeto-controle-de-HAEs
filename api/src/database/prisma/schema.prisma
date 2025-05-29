@@ -53,7 +53,8 @@ model Hae {
   projectTitle  String
   weeklyHours Int
   projectType  String
-  mainObjective String
+  dayOfWeek   String
+  timeRange String
   resultAchieved String
   Periodo      String
   cronograma String

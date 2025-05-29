@@ -9,7 +9,8 @@ export const createHae = async (data: {
   projectTitle: string;
   weeklyHours: number;
   projectType: string;
-  mainObjective: string;
+  dayOfWeek:   string;
+  timeRange: string;
   Periodo: string;
   cronograma: string;
   projectDescription: string;
