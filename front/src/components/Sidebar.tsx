@@ -5,7 +5,7 @@ import { logout } from "@/services/auth";
 
 export const Sidebar = () => {
 	const navigate = useNavigate();
-	const { handleLogout } = useAuthForms({ logout });
+	const { handleLogout } = useAuthForms({ logout: logout });
 
 	const onLogout = async () => {
 		const result = await handleLogout();
