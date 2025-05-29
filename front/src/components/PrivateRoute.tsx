@@ -11,9 +11,13 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
 
 	useEffect(() => {
 		api
-			.get("/ROTA PARA VERIFICAR TOKEN", { withCredentials: true })
-			.then(() => setIsAuthenticated(true))
-			.catch(() => setIsAuthenticated(false));
+			.get("/auth/check-cookie")
+			.then(() => {
+				setIsAuthenticated(true)
+			})
+			.catch(() => {
+				setIsAuthenticated(false)
+			});
 	}, []);
 
 	if (isAuthenticated === null) {

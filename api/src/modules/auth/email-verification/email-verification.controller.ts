@@ -101,7 +101,7 @@ export const verifyVerificationEmailCode = async (
     res.cookie("token", user.acessUserToken, {
       httpOnly: true,
       secure: false,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 3600000,
     });
 

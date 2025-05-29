@@ -45,3 +45,12 @@ export const login = async (data: Login) => {
 		throw error;
 	}
 };
+
+export const logout = async () => {
+	try {
+		await api.post("/auth/logout");
+	} catch (error) {
+		console.log("Erro ao fazer logout." + error);
+		throw error;
+	}
+};

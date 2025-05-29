@@ -12,6 +12,7 @@ const server = express();
 server.use(
   cors({
     origin: process.env.ENABLED_CORS?.split(";") || [],
+    credentials: true
   })
 );
 

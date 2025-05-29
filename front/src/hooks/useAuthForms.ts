@@ -8,6 +8,7 @@ export interface IAuthService {
 	}): Promise<any>;
 	login?(data: { email: string; password: string }): Promise<any>;
 	verifyCode?(data: { email: string; code: string }): Promise<any>;
+	logout?(): Promise<any>;
 }
 
 export const useAuthForms = (authService: IAuthService) => {
@@ -97,6 +98,28 @@ export const useAuthForms = (authService: IAuthService) => {
 		}
 	};
 
+	const handleLogout = async () => {
+		if (!authService.logout) {
+			setSnackbarMessage("Funcionalidade de logout não disponível.");
+			setSnackbarSeverity("error");
+			setOpenSnackbar(true);
+			return false;
+		}
+		try {
+			await authService.logout();
+			localStorage.removeItem("authToken"); // ou outro dado salvo
+			setSnackbarMessage("Logout realizado com sucesso!");
+			setSnackbarSeverity("success");
+			setOpenSnackbar(true);
+			return true;
+		} catch (error) {
+			setSnackbarMessage("Erro ao fazer logout.");
+			setSnackbarSeverity("error");
+			setOpenSnackbar(true);
+			return false;
+		}
+	};
+
 	return {
 		openSnackbar,
 		snackbarMessage,
@@ -105,5 +128,6 @@ export const useAuthForms = (authService: IAuthService) => {
 		handleRegister,
 		handleLogin,
 		handleVerifyCode,
+		handleLogout,
 	};
 };
