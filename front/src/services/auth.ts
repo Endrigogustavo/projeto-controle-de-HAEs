@@ -54,3 +54,13 @@ export const logout = async () => {
 		throw error;
 	}
 };
+
+export const checkCookie = async () => {
+	try {
+		const response = await api.get("/auth/check-cookie");
+		return response.data.userId;
+	} catch (error) {
+		console.error("Erro ao verificar cookie");
+		throw error;
+	}
+};
