@@ -50,9 +50,10 @@ export default function VerificationCode() {
 			);
 			return;
 		}
-		console.log(userEmail)
-		console.log(formData)
 		await handleVerifyCode({ email: userEmail, code: formData.code });
+		setTimeout(() => {
+			navigate("/");
+		}, 4000);
 	};
 
 	return (

@@ -4,7 +4,7 @@ import { TextField } from "@mui/material";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { loginSchema } from "@/validation/loginSchema";
-import { login as loginApi } from "@/services/auth"; 
+import { login as loginApi } from "@services/auth"; 
 import { useAuthForms } from "@/hooks/useAuthForms"; 
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +36,7 @@ export default function Login() {
 		const success = await handleLogin(data); 
 		if (success) {
 			setTimeout(() => {
-				navigate("/dashboard");
+				navigate("/");
 			}, 3000);
 		}
 	};
