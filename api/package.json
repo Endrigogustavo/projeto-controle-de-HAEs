@@ -7,7 +7,7 @@
     "start": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "generate": "npx prisma generate --schema=src/database/prisma/schema.prisma",
     "migrate": "npx prisma migrate deploy --schema=src/database/prisma/schema.prisma",
-    "reset-migrate": "npx prisma migrate reset"
+    "reset-migrate": "npx prisma migrate reset --schema=src/database/prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^6.7.0",
