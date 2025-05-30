@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import { HaeDataType, StepProps } from "./types/haeFormTypes";
+import { HaeDataType, StepProps, FormErrors } from "./types/haeFormTypes";
 import { useLoggedEmployee } from "@/hooks/useLoggedEmployee";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useSnackbar } from "@/hooks/useSnackbar";
@@ -45,6 +45,8 @@ const StepperForm: React.FC = () => {
 		employeeId: "",
 	});
 
+	const [errors, setErrors] = useState<FormErrors>({});
+
 	const {
 		open: openSnackbar,
 		message: snackbarMessage,
@@ -79,6 +81,11 @@ const StepperForm: React.FC = () => {
 				...prevData,
 				[field]: value,
 			}));
+
+			setErrors((prevErrors) => ({
+				...prevErrors,
+				[field]: undefined, // limpa o erro do campo modificado
+			}));
 		},
 		[]
 	);
@@ -106,6 +113,15 @@ const StepperForm: React.FC = () => {
 				"Erros de validação final no StepperForm:",
 				validationErrors
 			);
+
+			if (validationErrors.inner) {
+				const formErrors: FormErrors = {};
+				validationErrors.inner.forEach((err: any) => {
+					if (err.path) formErrors[err.path] = err.message;
+				});
+				setErrors(formErrors);
+			}
+
 			showSnackbar(
 				"Por favor, corrija os erros no formulário antes de enviar.",
 				"error"
@@ -117,6 +133,7 @@ const StepperForm: React.FC = () => {
 		const commonStepProps: StepProps = {
 			formData: formData,
 			setFormData: updateFormData,
+			errors: errors,
 		};
 
 		switch (step) {
