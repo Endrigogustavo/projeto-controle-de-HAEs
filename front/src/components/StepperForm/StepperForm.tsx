@@ -17,9 +17,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 	return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-// Importar services e router se for usar no futuro (mantenha comentado por enquanto)
-// import { createHae } from "@/services/hae";
-// import { useNavigate } from "react-router-dom";
+import { createHae } from "@/services/hae";
+import { useNavigate } from "react-router-dom";
 
 const StepperForm: React.FC = () => {
 	const [step, setStep] = useState(1);
@@ -98,16 +97,17 @@ const StepperForm: React.FC = () => {
 		setStep((prev) => prev - 1);
 	}, []);
 
+	const navigate = useNavigate();
+
 	const handleFormSubmit = useCallback(async () => {
 		try {
 			await haeFormSchema.validate(formData, { abortEarly: false });
-
-			// TODO: Descomente esta seção quando a integração com a API estiver pronta
-			// const response = await createHae(formData);
-			// console.log("HAE criada com sucesso:", response);
+			await createHae(formData);
 
 			showSnackbar("Formulário HAE enviado com sucesso!", "success");
-			// navigate("/dashboard");
+			setTimeout(() => {
+				navigate("/");
+			}, 4000);
 		} catch (validationErrors: any) {
 			console.error(
 				"Erros de validação final no StepperForm:",
