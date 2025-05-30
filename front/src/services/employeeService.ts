@@ -1,9 +1,11 @@
 import { getProfessor } from "./employee";
-import { IAuthService } from "@/hooks/useLoggedEmployee";
+interface IAuthService {
+	getProfessor: (id: string) => Promise<any>;
+}
 
 const employeeService: IAuthService = {
-	getProfessor: async (data) => {
-		return await getProfessor(data);
+	getProfessor: async (id) => {
+		return await getProfessor(id);
 	},
 };
 

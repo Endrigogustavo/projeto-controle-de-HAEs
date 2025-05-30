@@ -10,20 +10,23 @@ import { HaeDataType } from "@/components/StepperForm/types/haeFormTypes";
  * @param setFormData Função para atualizar o formData no componente pai.
  */
 export const useHaeDateCalculation = (
-    cronograma: string[],
-    setFormData: <K extends keyof HaeDataType>(field: K, value: HaeDataType[K]) => void
+	cronograma: string[],
+	setFormData: <K extends keyof HaeDataType>(
+		field: K,
+		value: HaeDataType[K]
+	) => void
 ) => {
-    useEffect(() => {
-        if (cronograma && cronograma.length > 0) {
-            const parsedDates = cronograma.map(parseISO);
-            const minDate = min(parsedDates);
-            const maxDate = max(parsedDates);
+	useEffect(() => {
+		if (cronograma && cronograma.length > 0) {
+			const parsedDates = cronograma.map((dateStr) => parseISO(dateStr));
+			const minDate = min(parsedDates);
+			const maxDate = max(parsedDates);
 
-            setFormData("startDate", format(minDate, "yyyy-MM-dd"));
-            setFormData("endDate", format(maxDate, "yyyy-MM-dd"));
-        } else {
-            setFormData("startDate", "");
-            setFormData("endDate", "");
-        }
-    }, [cronograma, setFormData]);
+			setFormData("startDate", format(minDate, "yyyy-MM-dd"));
+			setFormData("endDate", format(maxDate, "yyyy-MM-dd"));
+		} else {
+			setFormData("startDate", "");
+			setFormData("endDate", "");
+		}
+	}, [cronograma, setFormData]);
 };
