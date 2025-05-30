@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 import "./shared/utils/yupTranslation.utils";
 import cors from "cors";
@@ -10,10 +9,12 @@ import { routes } from "./routes/index";
 const server = express();
 
 server.use(
-  cors({
-    origin: process.env.ENABLED_CORS?.split(";") || [],
-    credentials: true
-  })
+	cors({
+		origin: (origin, callback) => {
+			callback(null, origin || true);
+		},
+		credentials: true,
+	})
 );
 
 server.use(bodyParser.json());

@@ -5,12 +5,12 @@ ENV PORT=${PORT}
 
 WORKDIR /app
 
+COPY package*.json ./
+
 COPY . .
 
 RUN npm install
-RUN npm run generate
-RUN npm run migrate
 
-EXPOSE ${PORT}
+RUN npm run generate
 
 CMD ["npm", "start"]
