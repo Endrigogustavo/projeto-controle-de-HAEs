@@ -1,0 +1,63 @@
+package br.com.fateczl.apihae.adapter.controller;
+
+import br.com.fateczl.apihae.adapter.dto.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
+import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.useCase.service.HaeService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import java.util.Collections;
+import java.util.List;
+
+@RestController
+@RequestMapping("/hae")
+@SecurityRequirement(name = "cookieAuth") 
+public class HaeController {
+
+    private final HaeService haeService;
+
+    public HaeController(HaeService haeService) {
+        this.haeService = haeService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request) {
+        Hae createdHae = haeService.createHae(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdHae);
+    }
+
+    @GetMapping("/getHaeById/{id}")
+    public ResponseEntity<Object> getHaeById(@PathVariable String id) {
+        Hae hae = haeService.getHaeById(id);
+        return ResponseEntity.ok(hae);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteHae(@PathVariable String id) {
+        haeService.deleteHae(id);
+        return ResponseEntity.ok(Collections.singletonMap("mensagem", "HAE deletado com sucesso."));
+    }
+
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<List<Hae>> getHaesByEmployeeId(@PathVariable String id) {
+        List<Hae> haes = haeService.getHaesByEmployeeId(id);
+        return ResponseEntity.ok(haes);
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Hae>> getAllHaes() {
+        List<Hae> haes = haeService.getAllHaes();
+        return ResponseEntity.ok(haes);
+    }
+
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<Object> changeHaeStatus(@PathVariable String id,
+            @Valid @RequestBody HaeStatusUpdateRequest request) {
+        Hae updatedHae = haeService.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
+        return ResponseEntity.ok(updatedHae);
+    }
+}
