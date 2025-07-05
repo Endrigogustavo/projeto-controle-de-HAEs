@@ -34,6 +34,9 @@ spring:
 server:
   port: ${PORT:8080}
 
+logging:
+  level:
+    root: WARN
 
 app:
   jwt:
