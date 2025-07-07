@@ -29,6 +29,12 @@ public class HaeService {
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
                         + " não encontrado. Não é possível criar HAE."));
 
+        List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
+
+        if (existingHaes.stream().anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
+            throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
+        }
+        
         Hae newHae = new Hae();
         newHae.setEmployee(employee); 
         newHae.setProjectTitle(request.getProjectTitle());
@@ -37,6 +43,9 @@ public class HaeService {
         newHae.setEndDate(request.getEndDate());
         newHae.setObservations(request.getObservation());
         newHae.setStatus(Status.PENDENTE);
+        //newHae.setCourse(request.getCourse());
+        //newHae.setHaeType(request.getHaeType());
+        //newHae.setStudents(request.getStudents());
 
         return haeRepository.save(newHae);
     }
@@ -84,5 +93,10 @@ public class HaeService {
         hae.setStatus(newStatus);
         hae.setCoordenatorId(coordenadorId);
         return haeRepository.save(hae);
+    }
+
+    @Transactional
+    public List<Hae> getHaesByCourse(String course) {
+        return haeRepository.findByCourse(course);
     }
 }

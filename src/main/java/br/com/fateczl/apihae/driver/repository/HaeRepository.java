@@ -8,4 +8,6 @@ import br.com.fateczl.apihae.domain.entity.Hae;
 public interface HaeRepository extends JpaRepository<Hae, String> {
     List<Hae> findByEmployeeId(String employeeId);
 
+    List<Hae> findByCourse(String course);
+
 }
