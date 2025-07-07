@@ -39,6 +39,8 @@ logging:
     root: WARN
 
 app:
+  allowed:
+    origin: ${ALLOWED_ORIGIN}
   jwt:
     secret: SuaChaveSecretaMuitoForteParaJWTQueDeveTerPeloMenos256BitsParaHS512_abcdefghijklmnopqrstuvwxy
     expiration-ms: 86400000
