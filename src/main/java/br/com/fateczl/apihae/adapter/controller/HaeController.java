@@ -60,4 +60,42 @@ public class HaeController {
         Hae updatedHae = haeService.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
         return ResponseEntity.ok(updatedHae);
     }
+
+    //
+    //Rotas para Implementar
+    //
+
+    @GetMapping("/getHaesByCouse/{course}")
+    public ResponseEntity<?> getHaesByCourse(@PathVariable String course) {
+        return ResponseEntity.ok("haes by course: " + course);
+    }
+
+    @GetMapping("/getHaesByType/{haeType}")
+    public ResponseEntity<?> getHaesByType(@PathVariable String haeType) {
+        return ResponseEntity.ok("haes by type: " + haeType);
+    }
+
+    @GetMapping("/getStudentsByHae/{haeId}")
+    public ResponseEntity<?> getStudentsByHae(@PathVariable String haeId) {
+        return ResponseEntity.ok("students by hae: " + haeId);
+    }
+
+    //Rota para criar HAE como coordenador e atribuir a um professor
+    @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
+    public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId) {
+        return ResponseEntity.ok("create hae as coordinator: " + coordinatorId + ", employee: " + employeeId);
+    }
+
+    @GetMapping("/getHaesByProfessor/{professorId}")
+    public ResponseEntity<?> getHaesByProfessor(@PathVariable String professorId) {
+        return ResponseEntity.ok("haes by professor: " + professorId);
+    }
+
+    @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
+    public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId, @PathVariable String haeId) {
+        return ResponseEntity.ok("Email enviado ao coordenador: " + coordinatorId + " sobre a criação da HAE: " + haeId);
+    }
+
+    
+
 }
