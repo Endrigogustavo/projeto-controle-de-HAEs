@@ -9,22 +9,21 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import br.com.fateczl.apihae.domain.enums.Role;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Entity
-@Table(name = "Employee")
+@Table(name = "Student")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employee {
+public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private String ra;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -32,17 +31,13 @@ public class Employee {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "course", nullable = false)
+    @Column(name = "course", nullable = false, unique = false)
     private String course;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Role role = Role.PROFESSOR;
+    @Column(name = "period\t", nullable = false, unique = false)
+    private String period;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hae> haes;
 
     @CreationTimestamp
@@ -50,5 +45,4 @@ public class Employee {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 }

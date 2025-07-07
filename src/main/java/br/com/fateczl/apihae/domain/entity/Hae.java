@@ -11,6 +11,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import br.com.fateczl.apihae.domain.enums.HaeType;
+import br.com.fateczl.apihae.domain.enums.Modality;
 import br.com.fateczl.apihae.domain.enums.Status;
 
 import java.time.LocalDate;
@@ -78,9 +80,21 @@ public class Hae {
     @Column(name = "comprovanteDoc")
     private String comprovanteDoc;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "haeType", nullable = false)
+    private HaeType haeType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "modality", nullable = false)
+    private Modality modality;
+
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false)
     private Employee employee;
+
+    @ManyToOne
+    @JoinColumn(name = "studentRa", nullable = false)
+    private Student student;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
