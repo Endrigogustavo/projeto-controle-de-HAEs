@@ -27,9 +27,7 @@ spring:
           starttls:
             enable: true
           ssl:
-            trust: "*" # Confia em todos os hosts SSL (use com cautela)
-
-
+            trust: "*"
 
 server:
   port: ${PORT:8080}
@@ -42,5 +40,5 @@ app:
   allowed:
     origin: ${ALLOWED_ORIGIN}
   jwt:
-    secret: SuaChaveSecretaMuitoForteParaJWTQueDeveTerPeloMenos256BitsParaHS512_abcdefghijklmnopqrstuvwxy
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000
