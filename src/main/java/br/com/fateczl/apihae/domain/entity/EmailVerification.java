@@ -34,6 +34,9 @@ public class EmailVerification {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "course", nullable = false)
+    private String course;
+
     @Column(name = "expiresAt", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime expiresAt;

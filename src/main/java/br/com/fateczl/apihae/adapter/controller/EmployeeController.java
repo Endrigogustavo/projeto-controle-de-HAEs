@@ -40,4 +40,12 @@ public class EmployeeController {
         Employee updatedEmployee = employeeService.updateEmployeeAccount(id, request.getName(), request.getEmail());
         return ResponseEntity.ok(updatedEmployee);
     }
-}
+
+    //
+    // Rotas para implementar
+    //
+
+    @GetMapping("/get-my-user")
+    public ResponseEntity<?> getMyUser() {
+        return ResponseEntity.ok("Esta rota ainda não foi implementada.");
+    }

@@ -33,7 +33,7 @@ public class EmailVerificationService {
     }
 
     @Transactional
-    public String generateAndSaveVerificationCode(String email, String name, String hashedPassword) {
+    public String generateAndSaveVerificationCode(String email, String name, String course, String hashedPassword) {
         emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
 
         String verificationCode = generateNumericCode();
@@ -42,6 +42,7 @@ public class EmailVerificationService {
         EmailVerification newVerification = new EmailVerification();
         newVerification.setEmail(email);
         newVerification.setName(name);
+        newVerification.setCourse(course);
         newVerification.setPassword(hashedPassword);
         newVerification.setCode(verificationCode);
         newVerification.setExpiresAt(expiresAt);

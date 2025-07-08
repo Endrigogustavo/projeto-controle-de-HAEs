@@ -25,8 +25,7 @@ public class AuthController {
    
     @PostMapping("/send-email-code")
     public ResponseEntity<Object> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
-        String verificationCode = authService.sendVerificationCode(request.getName(), request.getEmail(),
-                request.getPassword());
+        String verificationCode = authService.sendVerificationCode(request.getName(), request.getEmail(), request.getCourse(), request.getPassword());
         return ResponseEntity.ok(Collections.singletonMap("mensagem",
                 "E-mail de confirmação enviado com sucesso. (Código: " + verificationCode + ")"));
     }

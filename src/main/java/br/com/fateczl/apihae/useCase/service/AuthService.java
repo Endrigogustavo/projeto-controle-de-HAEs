@@ -40,13 +40,13 @@ public class AuthService {
     }
 
     @Transactional
-    public String sendVerificationCode(String name, String email, String plainPassword) {
+    public String sendVerificationCode(String name, String email, String course, String plainPassword) {
         if (employeeRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email já registrado.");
         }
 
         String hashedPassword = passwordEncoder.encode(plainPassword);
-        return emailVerificationService.generateAndSaveVerificationCode(email, name, hashedPassword);
+        return emailVerificationService.generateAndSaveVerificationCode(email, name, course, hashedPassword);
     }
 
     @Transactional
@@ -62,6 +62,7 @@ public class AuthService {
         Employee newEmployee = new Employee();
         newEmployee.setName(verification.getName());
         newEmployee.setEmail(verification.getEmail());
+        newEmployee.setCourse(verification.getCourse());
         newEmployee.setPassword(verification.getPassword());
         newEmployee.setRole(Role.PROFESSOR);
 

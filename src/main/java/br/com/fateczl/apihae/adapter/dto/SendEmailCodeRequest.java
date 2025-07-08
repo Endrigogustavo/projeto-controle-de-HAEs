@@ -19,6 +19,10 @@ public class SendEmailCodeRequest {
     @Email(message = "E-mail deve ser válido")
     private String email;
 
+    @NotBlank(message = "Curso não pode estar em branco")
+    @Size(min = 2, max = 100, message = "Curso deve ter entre 2 e 100 caracteres")
+    private String course;
+
     @NotBlank(message = "Senha não pode estar em branco")
     @Size(min = 6, message = "Senha não pode ter menos de 6 caracteres")
     private String password;
