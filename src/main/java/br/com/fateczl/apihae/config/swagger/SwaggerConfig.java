@@ -3,14 +3,12 @@ package br.com.fateczl.apihae.config.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 
 
 @Configuration
@@ -28,16 +26,12 @@ public class SwaggerConfig {
             .info(new Info()
                 .title("API HAE")
                 .description("\n" + //
-                        "Link Line is a secure and scalable real-time chat system built with TypeScript, Node.js, React, Docker, and Prisma. Designed for professional, educational, and social use, it offers customizable messaging with low latency, strong data security, and a focus on user experience.")
+                        "Essa API foi desenvolvida para o gerenciamento de Horas de Atividades Específicas (HAE) da Fatec Zona Leste.")
                 .version("1.0")
                 .contact(new Contact()
-                    .name("Gustavo Ventieri")
-                    .url("https://www.linkline.com")
+                    .name("Fatec Zona Leste")
+                    .url("https://fateczl.cps.sp.gov.br")
                     .email("contato@linkline.com"))
-                .termsOfService("Termos de uso: Link Line")
-                .license(new License()
-                    .name("Licença - Link Line")
-                    .url("https://www.linkline.com"))
             );
     }
 }
