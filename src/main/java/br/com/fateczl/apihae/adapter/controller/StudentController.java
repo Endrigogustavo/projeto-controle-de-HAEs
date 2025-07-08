@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fateczl.apihae.adapter.dto.StudentRequest;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/student")
 @SecurityRequirement(name = "cookieAuth") 
+@Tag(name = "Student", description = "Endpoints para manipular os estudantes do sistema")
 public class StudentController {
     
     //

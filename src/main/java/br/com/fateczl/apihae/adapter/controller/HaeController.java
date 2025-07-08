@@ -5,6 +5,7 @@ import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.useCase.service.HaeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/hae")
 @SecurityRequirement(name = "cookieAuth") 
+@Tag(name = "Hae", description = "Endpoints para manipular HAEs (Horas de Atividades Específicas)")
 public class HaeController {
 
     private final HaeService haeService;

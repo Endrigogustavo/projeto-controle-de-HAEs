@@ -4,6 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.LoginRequest;
 import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
 import br.com.fateczl.apihae.adapter.dto.VerifyEmailCodeRequest;
 import br.com.fateczl.apihae.useCase.service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import java.util.Collections;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Tag(name = "Auth", description = "Endpoints para autenticação e autorização")
 public class AuthController {
 
     private final AuthService authService;

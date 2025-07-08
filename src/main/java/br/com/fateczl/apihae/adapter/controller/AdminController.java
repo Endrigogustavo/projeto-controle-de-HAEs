@@ -4,6 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.ChangeRoleRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/admin")
 @SecurityRequirement(name = "cookieAuth") 
+@Tag(name = "Admin", description = "Endpoints para administração do sistema")
 public class AdminController {
 
     private final EmployeeService employeeService;

@@ -4,6 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.EmployeeUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/employee")
 @SecurityRequirement(name = "cookieAuth") 
+@Tag(name = "Employee", description = "Endpoints para manipular os funcionários do sistema")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -49,3 +51,4 @@ public class EmployeeController {
     public ResponseEntity<?> getMyUser() {
         return ResponseEntity.ok("Esta rota ainda não foi implementada.");
     }
+}
