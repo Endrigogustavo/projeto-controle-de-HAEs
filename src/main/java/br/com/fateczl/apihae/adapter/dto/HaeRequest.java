@@ -11,6 +11,9 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import java.time.LocalDate;
 
+import br.com.fateczl.apihae.domain.enums.HaeType;
+import br.com.fateczl.apihae.domain.enums.Modality;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +28,15 @@ public class HaeRequest {
     @Min(value = 1, message = "As horas semanais devem ser no mínimo 1.")
     @Max(value = 40, message = "As horas semanais devem ser no máximo 40.")
     private Integer weeklyHours;
+
+    @NotBlank(message = "O curso não pode estar em branco.")
+    private String course;
+
+    @NotNull(message = "O tipo de projeto não pode ser nulo.")
+    private HaeType haeType;
+
+    @NotNull(message = "A modalidade não pode ser nula.")
+    private Modality modality;
 
     @NotNull(message = "A data de início não pode ser nula.")
     @FutureOrPresent(message = "A data de início não pode ser no passado.")

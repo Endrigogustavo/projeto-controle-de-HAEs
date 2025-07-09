@@ -92,9 +92,9 @@ public class Hae {
     @JoinColumn(name = "employeeId", nullable = false)
     private Employee employee;
 
-    @ManyToOne
-    @JoinColumn(name = "studentRa", nullable = false)
-    private Student student;
+    //@ManyToOne
+    //@JoinColumn(name = "studentRa", nullable = false)
+    //private Student student;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

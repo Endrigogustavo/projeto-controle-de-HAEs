@@ -35,17 +35,37 @@ public class HaeService {
             throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
         }
         
+
         Hae newHae = new Hae();
         newHae.setEmployee(employee); 
+        newHae.setNameEmployee(employee.getName());
         newHae.setProjectTitle(request.getProjectTitle());
         newHae.setWeeklyHours(request.getWeeklyHours());
         newHae.setStartDate(request.getStartDate());
         newHae.setEndDate(request.getEndDate());
         newHae.setObservations(request.getObservation());
         newHae.setStatus(Status.PENDENTE);
-        //newHae.setCourse(request.getCourse());
-        //newHae.setHaeType(request.getHaeType());
-        //newHae.setStudents(request.getStudents());
+        newHae.setCourse(request.getCourse());
+        newHae.setHaeType(request.getHaeType());
+        newHae.setModality(request.getModality());
+
+        //
+        // TODO: Implementar a lógica para definir os dados com string com a tag "Sem *** definido" dentro do DTO HaeRequest.
+        //
+
+        newHae.setCoordenatorId("Sem coordenador definido");
+        newHae.setDayOfWeek("Sem dia da semana definido");
+        newHae.setTimeRange("Sem horário definido");
+        newHae.setResultAchieved("Sem resultado definido");
+        newHae.setCronograma(List.of("Sem cronograma definido"));
+        newHae.setProjectDescription("Sem descrição do projeto definida");
+        newHae.setProjectType("Sem tipo de projeto definido");
+       
+        //
+        // TODO: Implementar a lógica para adicionar o estudante somente se o tipo de HAE for ESTAGIO ou TCC
+        //
+        
+        //newHae.setStudent("Sem aluno definido");
 
         return haeRepository.save(newHae);
     }
