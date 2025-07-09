@@ -55,4 +55,12 @@ public class JWTUtils {
             .plusHours(6)
             .toInstant(ZoneOffset.of("-03:00"));
     }
+
+    public String decodeToken(String token) {
+        try {
+            return JWT.decode(token).getSubject();
+        } catch (JWTVerificationException exc) {
+            return null;
+        }
+    }
 }
