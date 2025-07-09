@@ -4,11 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
-import jakarta.persistence.*;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +25,6 @@ import java.util.List;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String ra;
 
     @Column(name = "name", nullable = false)
@@ -34,7 +36,7 @@ public class Student {
     @Column(name = "course", nullable = false, unique = false)
     private String course;
 
-    @Column(name = "period\t", nullable = false, unique = false)
+    @Column(name = "period", nullable = false, unique = false)
     private String period;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
