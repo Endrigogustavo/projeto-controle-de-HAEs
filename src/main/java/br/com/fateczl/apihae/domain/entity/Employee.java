@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import br.com.fateczl.apihae.domain.enums.Role;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,7 @@ public class Employee {
     private Role role = Role.PROFESSOR;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private List<Hae> haes;
 
     @CreationTimestamp
