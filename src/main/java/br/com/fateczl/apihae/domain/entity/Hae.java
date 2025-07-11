@@ -11,6 +11,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Modality;
 import br.com.fateczl.apihae.domain.enums.Status;
@@ -68,7 +70,7 @@ public class Hae {
     @Column(name = "status", nullable = false)
     private Status status = Status.PENDENTE;
 
-    @Column(name = "coordenatorId", nullable = false)
+    @Column(name = "coordenatorId", nullable = true)
     private String coordenatorId;
 
     @Column(name = "startDate", nullable = false)
@@ -90,11 +92,18 @@ public class Hae {
 
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false)
+    @JsonManagedReference
     private Employee employee;
 
-    //@ManyToOne
-    //@JoinColumn(name = "studentRa", nullable = false)
-    //private Student student;
+    @ManyToMany
+    @JoinTable(
+        name = "hae_student",
+        joinColumns = @JoinColumn(name = "hae_id"),
+        inverseJoinColumns = @JoinColumn(name = "student_ra")
+    )
+    @JsonManagedReference
+    private List<Student> students;
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;
