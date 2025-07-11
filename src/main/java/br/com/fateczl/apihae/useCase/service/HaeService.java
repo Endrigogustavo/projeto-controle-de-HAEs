@@ -3,10 +3,13 @@ package br.com.fateczl.apihae.useCase.service;
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.domain.entity.Student;
+import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
+import br.com.fateczl.apihae.driver.repository.StudentRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,58 +20,59 @@ public class HaeService {
 
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
+    private final StudentRepository studentRepository;
 
-    public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository) {
+    public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository, 
+                      StudentRepository studentRepository) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
+        this.studentRepository = studentRepository;
     }
 
-    @Transactional
-    public Hae createHae(HaeRequest request) { 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
-                        + " não encontrado. Não é possível criar HAE."));
+ @Transactional
+public Hae createHae(HaeRequest request) {
+    Employee employee = employeeRepository.findById(request.getEmployeeId())
+            .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
+                    + " não encontrado. Não é possível criar HAE."));
 
-        List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
+    List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
 
-        if (existingHaes.stream().anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
-            throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
-        }
-        
-
-        Hae newHae = new Hae();
-        newHae.setEmployee(employee); 
-        newHae.setNameEmployee(employee.getName());
-        newHae.setProjectTitle(request.getProjectTitle());
-        newHae.setWeeklyHours(request.getWeeklyHours());
-        newHae.setStartDate(request.getStartDate());
-        newHae.setEndDate(request.getEndDate());
-        newHae.setObservations(request.getObservation());
-        newHae.setStatus(Status.PENDENTE);
-        newHae.setCourse(request.getCourse());
-        newHae.setHaeType(request.getHaeType());
-        newHae.setModality(request.getModality());
-
-        //
-        // TODO: Implementar a lógica para definir os dados com string com a tag "Sem *** definido" dentro do DTO HaeRequest.
-        //
-
-        newHae.setCoordenatorId("Sem coordenador definido");
-        newHae.setDayOfWeek("Sem dia da semana definido");
-        newHae.setTimeRange("Sem horário definido");
-        newHae.setResultAchieved("Sem resultado definido");
-        newHae.setCronograma(List.of("Sem cronograma definido"));
-        newHae.setProjectDescription("Sem descrição do projeto definida");
-        newHae.setProjectType("Sem tipo de projeto definido");
-       
-        //
-        // TODO: Implementar a lógica para adicionar o estudante somente se o tipo de HAE for ESTAGIO ou TCC
-        //
-        
-        //newHae.setStudent("Sem aluno definido");
-
-        return haeRepository.save(newHae);
+    if (existingHaes.stream().anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
+        throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
     }
+
+    Hae newHae = new Hae();
+    newHae.setEmployee(employee); 
+    newHae.setNameEmployee(employee.getName());
+    newHae.setProjectTitle(request.getProjectTitle());
+    newHae.setWeeklyHours(request.getWeeklyHours());
+    newHae.setStartDate(request.getStartDate());
+    newHae.setEndDate(request.getEndDate());
+    newHae.setObservations(request.getObservation());
+    newHae.setStatus(Status.PENDENTE);
+    newHae.setCourse(request.getCourse());
+    newHae.setHaeType(request.getHaeType());
+    newHae.setModality(request.getModality());
+    newHae.setCoordenatorId("Sem coordenador definido");
+    newHae.setDayOfWeek(request.getDayOfWeek());
+    newHae.setTimeRange(request.getTimeRange());
+    newHae.setResultAchieved(request.getResultAchieved());
+    newHae.setCronograma(List.of(request.getCronograma()));
+    newHae.setProjectDescription(request.getDescription());
+    newHae.setProjectType(request.getProjectType());
+    
+    if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
+            List<Student> students = request.getStudentRas().stream()
+            .map(ra -> studentRepository.findById(ra)
+                    .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
+            .toList();
+        newHae.setStudents(students);
+    } else {
+        newHae.setStudents(List.of());
+    }
+
+    return haeRepository.save(newHae);
+}
 
     @Transactional(readOnly = true)
     public Hae getHaeById(String id) {
