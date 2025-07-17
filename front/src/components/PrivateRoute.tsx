@@ -8,15 +8,20 @@ interface PrivateRouteProps {
 
 export function PrivateRoute({ children }: PrivateRouteProps) {
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+	
 	useEffect(() => {
 		api
-			.get("/auth/check-cookie")
-			.then(() => {
-				setIsAuthenticated(true)
+			.get("/employee/get-my-user")
+			.then((data) => {
+				if(data.status === 401) {
+					setIsAuthenticated(false);
+				}
+				else {
+					setIsAuthenticated(true);
+				}
 			})
 			.catch(() => {
-				setIsAuthenticated(false)
+				setIsAuthenticated(false);
 			});
 	}, []);
 
