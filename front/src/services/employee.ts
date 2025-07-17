@@ -1,11 +1,13 @@
+import { Employee } from "@/types/employee";
 import api from "./index";
 
-export const getProfessor = async (id: string) => {
+export const getMyUser = async (): Promise<Employee | null> => {
 	try {
-		const response = await api.get(`/employee/get-professor/${id}`);
-		return response.data;
+		const response = await api.get("/employee/get-my-user");
+		const { id, name, email, role } = response.data;
+		return { id, name, email, role };
 	} catch (error) {
-		console.log("Erro ao pegar professor");
-		throw error;
+		console.error("Erro ao buscar o usuário logado:", error);
+		return null;
 	}
 };

@@ -12,6 +12,7 @@ type FormData = {
 	name: string;
 	email: string;
 	password: string;
+	course: string;
 };
 
 export default function Register() {
@@ -75,6 +76,17 @@ export default function Register() {
 							sx={{ margin: "1rem 0" }}
 							required
 						/>
+
+						<TextField
+							label="Curso"
+							placeholder="Análise e Desenvolvimento de Sistemas AMS"
+							{...register("course")}
+							error={!!errors.course}
+							helperText={errors.course?.message}
+							sx={{ margin: "1rem 0" }}
+							required
+						/>
+
 
 						<PasswordField
 							{...register("password")}

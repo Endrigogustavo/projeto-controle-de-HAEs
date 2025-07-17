@@ -57,8 +57,8 @@ export const logout = async () => {
 
 export const checkCookie = async () => {
 	try {
-		const response = await api.get("/auth/check-cookie");
-		return response.data.userId;
+		const response = await api.get("/employee/get-my-user");
+		return response.data.id;
 	} catch (error) {
 		console.error("Erro ao verificar cookie");
 		throw error;

@@ -5,6 +5,7 @@ export interface IAuthService {
 		name: string;
 		email: string;
 		password: string;
+		course?: string;
 	}): Promise<any>;
 	login?(data: { email: string; password: string }): Promise<any>;
 	verifyCode?(data: { email: string; code: string }): Promise<any>;

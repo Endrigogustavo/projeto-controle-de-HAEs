@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { checkCookie } from "@services/auth";
-import { getProfessor } from "@services/employee";
-import { Employee, GetProfessorResponse } from "@/types/employee";
+import { getMyUser } from "@services/employee";
+import { Employee } from "@/types/employee";
 
 interface UseLoggedEmployeeReturn {
 	employee: Employee | null;
@@ -11,7 +11,7 @@ interface UseLoggedEmployeeReturn {
 
 export const useLoggedEmployee = (): UseLoggedEmployeeReturn => {
 	const [employee, setEmployee] = useState<Employee | null>(null);
-	const [isLoadingEmployee, setIsLoadingEmployee] = useState<boolean>(true);
+	const [isLoadingEmployee, setIsLoadingEmployee] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 
 	useEffect(() => {
@@ -24,19 +24,14 @@ export const useLoggedEmployee = (): UseLoggedEmployeeReturn => {
 					return;
 				}
 
-				const professorResponse: GetProfessorResponse = await getProfessor(
-					userId
-				);
-
-				setEmployee(professorResponse.record);
+				const employeeData = await getMyUser();
+				setEmployee(employeeData);
 			} catch (err) {
 				console.error("Erro ao carregar dados do funcionário logado:", err);
 				setError(
 					err instanceof Error
 						? err
-						: new Error(
-								"Ocorreu um erro desconhecido ao carregar o funcionário."
-						  )
+						: new Error("Erro desconhecido ao carregar o funcionário.")
 				);
 				setEmployee(null);
 			} finally {
