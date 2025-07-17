@@ -12,7 +12,7 @@ export const EmployeeInfoDisplay = ({
 }: EmployeeInfoDisplayProps) => {
 	if (isLoading) {
 		return (
-			<div className="grid grid-cols-2 grid-rows-2 items-center text-sm text-gray-600">
+			<div className="flex items-center text-sm text-gray-700 px-2">
 				<p>Carregando...</p>
 				<div className="row-span-2 col-start-2 flex justify-center items-center">
 					<PersonIcon className="text-gray-500" />
@@ -24,9 +24,9 @@ export const EmployeeInfoDisplay = ({
 
 	if (!employee) {
 		return (
-			<div className="grid grid-cols-2 grid-rows-2 items-center text-sm text-gray-600">
+			<div className="flex items-center text-sm text-gray-700 px-2">
 				<p>Visitante</p>
-				<div className="row-span-2 col-start-2 flex justify-center items-center">
+				<div className="row-span-2 col-start-2 flex justify-center items-center p-4">
 					<PersonIcon className="text-gray-500" />
 				</div>
 				<p>Não logado</p>
@@ -35,12 +35,14 @@ export const EmployeeInfoDisplay = ({
 	}
 
 	return (
-		<div className="grid grid-cols-2 grid-rows-2 items-center text-sm text-gray-700">
-			<p className="font-semibold">{employee.name}</p>
-			<div className="row-span-2 col-start-2 flex justify-center items-center pl-2">
+		<div className="flex items-center text-sm text-gray-700 px-2">
+			<div className="px-2">
+				<p className="font-semibold">{employee.name}</p>
+				<p className="text-gray-500">{employee.email}</p>
+			</div>
+			<div className="row-span-2 col-start-2 flex justify-center items-center p-4">
 				<PersonIcon className="text-blue-600 text-3xl" />
 			</div>
-			<p className="text-gray-500">{employee.email}</p>
 		</div>
 	);
 };
