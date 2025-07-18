@@ -4,8 +4,3 @@ export interface Employee {
     email: string;
     role: string; 
 }
-
-export interface GetProfessorResponse {
-    message: string;
-    record: Employee;
-}

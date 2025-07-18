@@ -1,16 +1,58 @@
+import { useEffect, useState } from "react";
 import { Sidebar } from "@components/Sidebar";
 import { Header } from "@components/Header";
 import { CardRequestHae } from "@components/CardRequestHae";
 import { MobileHeader } from "@components/MobileHeader";
-import { useState } from "react";
 import Drawer from "@mui/material/Drawer";
+import { Hae } from "@/types/hae";
+import { Employee } from "@/types/employee";
+import api from "@/services";
 
 export default function MyRequests() {
 	const [isDrawerOpen, setDrawerOpen] = useState(false);
+	const [haes, setHaes] = useState<Hae[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
 
 	const toggleDrawer = (open: boolean) => () => {
 		setDrawerOpen(open);
 	};
+
+
+	useEffect(() => {
+		const fetchHaes = async () => {
+			try {
+				setLoading(true);
+				const userResponse = await api.get<Employee>("/employee/get-my-user");
+				const professorId = userResponse.data.id;
+
+				const haeResponse = await api.get<Hae[]>(`/hae/getHaesByProfessor/${professorId}`);
+
+				const filteredHaes = haeResponse.data.filter(hae => hae.status === "PENDENTE");
+
+				setHaes(filteredHaes);
+			} catch (err: any) {
+				console.error(err);
+				setError("Erro ao carregar as HAEs");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchHaes();
+	}, []);
+
+	const handleDelete = async (id: string) => {
+		try {
+			await api.delete(`/hae/delete/${id}`);
+			setHaes(prev => prev.filter(hae => hae.id !== id));
+		} catch (error) {
+			console.error("Erro ao deletar HAE:", error);
+			alert("Não foi possível deletar a solicitação.");
+		}
+	};
+
+
 
 	return (
 		<div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
@@ -38,16 +80,19 @@ export default function MyRequests() {
 					Nesta seção, você pode gerenciar suas solicitações de HAEs. Tenha a
 					opção de editar ou excluir atividades, conforme sua necessidade.
 				</p>
-				<CardRequestHae
-					titulo="Hae Muito legal"
-					curso="Desenvolvimento de Sistemas"
-					descricao="HAE legal"
-				/>
-				<CardRequestHae
-					titulo="Outra Solicitação lá"
-					curso="Logistica"
-					descricao="HAE Não tao legal assim"
-				/>
+
+				{loading && <p>Carregando HAEs...</p>}
+				{error && <p className="text-red-500">{error}</p>}
+
+				{haes.map((hae) => (
+					<CardRequestHae
+						key={hae.id}
+						titulo={hae.projectTitle}
+						curso={hae.course}
+						descricao={hae.projectDescription}
+						onDelete={() => handleDelete(hae.id)}
+					/>
+				))}
 			</main>
 		</div>
 	);
