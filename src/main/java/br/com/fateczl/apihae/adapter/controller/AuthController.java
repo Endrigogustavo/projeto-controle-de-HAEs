@@ -47,10 +47,15 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Object> logout() {
+    public ResponseEntity<Object> logout(HttpServletResponse response) {
         SecurityContextHolder.clearContext();
-        return ResponseEntity.ok(Collections.singletonMap("mensagem",
-                "Logout bem-sucedido. Por favor, descarte seu token de autenticação."));
+        Cookie cookie = new Cookie("auth_token", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); 
+        response.addCookie(cookie);
+        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout bem-sucedido. Por favor, descarte seu token de autenticação."));
     }
 
     @GetMapping("/check-cookie")
@@ -80,4 +85,6 @@ public class AuthController {
         cookie.setMaxAge(60 * 60);
         response.addCookie(cookie);
     }
+
+
 }
