@@ -97,6 +97,22 @@ public Hae createHae(HaeRequest request) {
     }
 
     @Transactional(readOnly = true)
+    public List<Hae> getHaesByEmployeeIdWithLimit(String employeeId) {
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new IllegalArgumentException("Empregado com ID " + employeeId + " não encontrado.");
+        }
+        return haeRepository.findTop5ByEmployeeIdOrderByCreatedAtDesc(employeeId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Hae> getHaesByProfessorId(String professorId) {
+        if (!employeeRepository.existsById(professorId)) {
+            throw new IllegalArgumentException("Professor com ID " + professorId + " não encontrado.");
+        }
+        return haeRepository.findByEmployeeId(professorId);
+    }
+
+    @Transactional(readOnly = true)
     public List<Hae> getAllHaes() {
         return haeRepository.findAll();
     }

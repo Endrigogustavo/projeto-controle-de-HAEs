@@ -50,6 +50,13 @@ public class HaeController {
         return ResponseEntity.ok(haes);
     }
 
+    @GetMapping("/getHaesByEmployeeIdWithLimit/{employeeId}")
+    public ResponseEntity<List<Hae>> getHaesByEmployeeIdWithLimit(@PathVariable String employeeId) {
+        List<Hae> haes = haeService.getHaesByEmployeeIdWithLimit(employeeId);
+        return ResponseEntity.ok(haes);
+    }
+
+
     @GetMapping("/getAll")
     public ResponseEntity<List<Hae>> getAllHaes() {
         List<Hae> haes = haeService.getAllHaes();
@@ -62,6 +69,13 @@ public class HaeController {
         Hae updatedHae = haeService.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
         return ResponseEntity.ok(updatedHae);
     }
+
+    @GetMapping("/getHaesByProfessor/{professorId}")
+    public ResponseEntity<?> getHaesByProfessor(@PathVariable String professorId) {
+        List<Hae> haes = haeService.getHaesByProfessorId(professorId);
+        return ResponseEntity.ok(haes);
+    }
+
 
     //
     //Rotas para Implementar
@@ -86,11 +100,6 @@ public class HaeController {
     @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
     public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId) {
         return ResponseEntity.ok("create hae as coordinator: " + coordinatorId + ", employee: " + employeeId);
-    }
-
-    @GetMapping("/getHaesByProfessor/{professorId}")
-    public ResponseEntity<?> getHaesByProfessor(@PathVariable String professorId) {
-        return ResponseEntity.ok("haes by professor: " + professorId);
     }
 
     @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
