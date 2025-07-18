@@ -3,6 +3,8 @@ package br.com.fateczl.apihae.adapter.controller;
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.domain.entity.Student;
+import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.useCase.service.HaeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,37 +78,33 @@ public class HaeController {
         return ResponseEntity.ok(haes);
     }
 
-
-    //
-    //Rotas para Implementar
-    //
-
-    @GetMapping("/getHaesByCouse/{course}")
+    @GetMapping("/getHaesByCourse/{course}")
     public ResponseEntity<?> getHaesByCourse(@PathVariable String course) {
-        return ResponseEntity.ok("haes by course: " + course);
+        List<Hae> haes = haeService.getHaesByCourse(course);
+        return ResponseEntity.ok(haes);
     }
 
     @GetMapping("/getHaesByType/{haeType}")
-    public ResponseEntity<?> getHaesByType(@PathVariable String haeType) {
-        return ResponseEntity.ok("haes by type: " + haeType);
+        public ResponseEntity<?> getHaesByType(@PathVariable HaeType haeType) {
+        List<Hae> haes = haeService.getHaesByType(haeType);
+        return ResponseEntity.ok(haes);
     }
 
     @GetMapping("/getStudentsByHae/{haeId}")
     public ResponseEntity<?> getStudentsByHae(@PathVariable String haeId) {
-        return ResponseEntity.ok("students by hae: " + haeId);
-    }
-
-    //Rota para criar HAE como coordenador e atribuir a um professor
-    @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
-    public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId) {
-        return ResponseEntity.ok("create hae as coordinator: " + coordinatorId + ", employee: " + employeeId);
+        List<Student> students = haeService.getStudentsByHaeId(haeId);
+        return ResponseEntity.ok(students);
     }
 
     @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
     public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId, @PathVariable String haeId) {
-        return ResponseEntity.ok("Email enviado ao coordenador: " + coordinatorId + " sobre a criação da HAE: " + haeId);
+        haeService.sendEmailToCoordinatorAboutHAECreated(coordinatorId, haeId);
+        return ResponseEntity.ok("Email enviado para o coordenador sobre a criação da HAE com ID: " + haeId);
     }
 
-    
-
+    @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
+    public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId, @Valid @RequestBody HaeRequest request) {
+        Hae hae = haeService.createHaeAsCoordinator(coordinatorId, employeeId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(hae);
+    }
 }

@@ -139,4 +139,70 @@ public Hae createHae(HaeRequest request) {
     public List<Hae> getHaesByCourse(String course) {
         return haeRepository.findByCourse(course);
     }
+
+    @Transactional(readOnly = true)
+    public List<Hae> getHaesByType(HaeType haeType) {
+        return haeRepository.findByHaeType(haeType);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Student> getStudentsByHaeId(String haeId) {
+        Hae hae = haeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
+        return hae.getStudents();
+    }
+
+
+    //TODO Implementar lógica de envio de email
+    @Transactional
+    public void sendEmailToCoordinatorAboutHAECreated(String coordinatorId, String haeId) {
+        Hae hae = haeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
+        Employee coordinator = employeeRepository.findById(coordinatorId)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
+        System.out.println("Email enviado para o coordenador " + coordinator.getName() + " sobre a criação da HAE com ID: " + haeId);
+    }
+
+    @Transactional
+    public Hae createHaeAsCoordinator(String coordinatorId, String employeeId, HaeRequest request) {
+        Employee coordinator = employeeRepository.findById(coordinatorId)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
+        if (coordinator.getRole() != Role.COORDENADOR) {
+            throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
+        }
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado com ID: " + employeeId));
+
+        Hae hae = new Hae();
+        hae.setEmployee(employee);
+        hae.setNameEmployee(employee.getName());
+        hae.setStatus(Status.APROVADO);
+        hae.setCoordenatorId(coordinatorId);
+        hae.setProjectTitle(request.getProjectTitle());
+        hae.setWeeklyHours(request.getWeeklyHours());
+        hae.setStartDate(request.getStartDate());
+        hae.setEndDate(request.getEndDate());
+        hae.setObservations(request.getObservation());
+        hae.setCourse(request.getCourse());
+        hae.setHaeType(request.getHaeType());
+        hae.setModality(request.getModality());
+        hae.setDayOfWeek(request.getDayOfWeek());
+        hae.setTimeRange(request.getTimeRange());
+        hae.setResultAchieved(request.getResultAchieved());
+        hae.setCronograma(List.of(request.getCronograma()));
+        hae.setProjectDescription(request.getDescription());
+        hae.setProjectType(request.getProjectType());
+        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
+            List<Student> students = request.getStudentRas().stream()
+                    .map(ra -> studentRepository.findById(ra)
+                            .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
+                    .toList();
+            hae.setStudents(students);
+        } else {
+            hae.setStudents(List.of());
+        }
+
+        return haeRepository.save(hae);
+    }
 }
