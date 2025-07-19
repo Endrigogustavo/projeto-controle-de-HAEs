@@ -2,15 +2,36 @@ import { Sidebar } from "@components/Sidebar";
 import { Header } from "@components/Header";
 import { CardHae } from "@components/CardHae";
 import { MobileHeader } from "@components/MobileHeader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
+import api from "@/services";
+import { Hae } from "@/types/hae";
+import { Employee } from "@/types/employee";
 
 export default function Dashboard() {
 	const [isDrawerOpen, setDrawerOpen] = useState(false);
+	const [haes, setHaes] = useState<Hae[]>([]);
 
 	const toggleDrawer = (open: boolean) => () => {
 		setDrawerOpen(open);
 	};
+
+	useEffect(() => {
+		const fetchHaes = async () => {
+			try {
+				const userResponse = await api.get<Employee>("/employee/get-my-user");
+				const professorId = userResponse.data.id;
+
+				const haeResponse = await api.get<Hae[]>(`/hae/getHaesByProfessor/${professorId}`);
+
+				setHaes(haeResponse.data);
+			} catch (err: any) {
+				console.error(err);
+			}
+		};
+
+		fetchHaes();
+	}, []);
 
 	return (
 		<div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
@@ -40,26 +61,15 @@ export default function Dashboard() {
 					ou se aguarda avaliação.
 				</p>
 
-				<CardHae
-					titulo="Aulas de Legislação para Concurso Público"
-					curso="Análise e Desenvolvimento de Sistemas"
-					status="Em Espera"
-					descricao="Musaum Ipsum, cacilds vidis litro abertis. Present vel viverra nisi. Mauris aliquet nunc non turpis scelerisque, eget."
-				/>
-
-				<CardHae
-					titulo="Aulas de Legislação para Concurso Público 2"
-					curso="Análise e Desenvolvimento de Sistemas"
-					status="Rejeitado fella"
-					descricao="Musaum Ipsum, cacilds vidis litro abertis. Present vel viverra nisi. Mauris aliquet nunc non turpis scelerisque, eget."
-				/>
-
-				<CardHae
-					titulo="Aulas de Legislação para Concurso Público 3"
-					curso="Análise e Desenvolvimento de Sistemas"
-					status="Concluído"
-					descricao="Musaum Ipsum, cacilds vidis litro abertis. Present vel viverra nisi. Mauris aliquet nunc non turpis scelerisque, eget."
-				/>
+				{haes.map((hae) => (
+					<CardHae
+						key={hae.id}
+						titulo={hae.projectTitle}
+						curso={hae.course}
+						descricao={hae.projectDescription}
+						status={hae.status}
+					/>
+				))}
 			</main>
 		</div>
 	);
