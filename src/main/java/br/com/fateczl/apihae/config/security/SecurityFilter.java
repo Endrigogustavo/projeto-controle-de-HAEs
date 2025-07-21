@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-    private final JWTUtils jwtUtils;
+    private final JWTUtils JWTUtils;
     private final EmployeeRepository employeeRepository;
 
     @Override
@@ -41,7 +41,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = recoverToken(request);
         if (token != null) {
             try {
-                String userId = jwtUtils.validateToken(token);
+                String userId = JWTUtils.validateToken(token);
                 if (userId != null) {
                     Employee employee = employeeRepository.findById(userId)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));

@@ -4,7 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.LoginRequest;
 import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
 import br.com.fateczl.apihae.adapter.dto.VerifyEmailCodeRequest;
 import br.com.fateczl.apihae.useCase.service.AuthService;
-import br.com.fateczl.apihae.useCase.utils.CookieUtils;
+import br.com.fateczl.apihae.useCase.util.CookieUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

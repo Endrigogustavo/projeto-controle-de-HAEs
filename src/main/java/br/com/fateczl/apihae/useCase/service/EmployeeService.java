@@ -3,7 +3,7 @@ package br.com.fateczl.apihae.useCase.service;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.useCase.utils.TokenUtils;
+import br.com.fateczl.apihae.useCase.util.JWTUtils;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,6 @@ import java.util.Optional;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-    private final TokenUtils tokenService;
 
     @Transactional(readOnly = true)
     public Employee getEmployeeById(String id) {
@@ -61,14 +60,5 @@ public class EmployeeService {
 
         employee.setRole(newRole);
         return employeeRepository.save(employee);
-    }
-
-    @Transactional
-    public Employee findMyEmployee(String token) {
-        if (token == null || !tokenService.isTokenValid(token)) throw new JwtException("Token inválido ou ausente");
-
-        String tokenId = tokenService.extractUserId(token);
-        Optional<Employee> optionalEmployee = employeeRepository.findByEmail(tokenId);
-        return optionalEmployee.orElse(null);
     }
 }

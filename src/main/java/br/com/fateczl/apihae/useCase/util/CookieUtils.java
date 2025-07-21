@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.useCase.utils;
+package br.com.fateczl.apihae.useCase.util;
 
 import org.springframework.context.annotation.Configuration;
 import jakarta.servlet.http.Cookie;

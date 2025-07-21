@@ -8,7 +8,7 @@ import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.useCase.utils.TokenUtils;
+import br.com.fateczl.apihae.useCase.util.JWTUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,7 +18,7 @@ public class AuthService {
     private final EmployeeRepository employeeRepository;
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
-    private final TokenUtils TokenService;
+    private final JWTUtils TokenService;
 
 
 
