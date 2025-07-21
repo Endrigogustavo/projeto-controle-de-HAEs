@@ -7,13 +7,19 @@ import br.com.fateczl.apihae.domain.entity.Student;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
+import br.com.fateczl.apihae.domain.singleton.CalendarioSingleton;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.StudentRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class HaeService {
@@ -21,12 +27,14 @@ public class HaeService {
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
+    private final CalendarioSingleton calendarioSingleton;
 
     public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository,
-            StudentRepository studentRepository) {
+            StudentRepository studentRepository, CalendarioSingleton calendarioSingleton) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
         this.studentRepository = studentRepository;
+        this.calendarioSingleton = calendarioSingleton;
     }
 
     @Transactional
@@ -42,6 +50,35 @@ public class HaeService {
             throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
         }
 
+        LocalDate inicio = request.getStartDate();
+        LocalDate fim = request.getEndDate();
+        String cronogramaStr = request.getCronograma();
+        Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
+
+        List<LocalDate> cronogramaConvertido = Arrays.stream(cronogramaStr.split(","))
+                .map(String::trim)
+                .map(LocalDate::parse)
+                .toList();
+
+        List<LocalDate> datasInvalidas = new ArrayList<>();
+
+        if (diasNaoLetivos.contains(inicio)) {
+            datasInvalidas.add(inicio);
+        }
+        if (diasNaoLetivos.contains(fim)) {
+            datasInvalidas.add(fim);
+        }
+
+        for (LocalDate data : cronogramaConvertido) {
+            if (diasNaoLetivos.contains(data)) {
+                datasInvalidas.add(data);
+            }
+        }
+
+        if (!datasInvalidas.isEmpty()) {
+            throw new IllegalArgumentException("As seguintes datas não são letivas: " + datasInvalidas);
+        }
+        
         Hae newHae = new Hae();
         newHae.setEmployee(employee);
         newHae.setNameEmployee(employee.getName());
@@ -62,16 +99,18 @@ public class HaeService {
         newHae.setProjectDescription(request.getDescription());
         newHae.setProjectType(request.getProjectType());
 
-//        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
-//            List<Student> students = request.getStudentRas().stream()
-//                    .map(ra -> studentRepository.findById(ra)
-//                            .orElseThrow(
-//                                    () -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
-//                    .toList();
-//            newHae.setStudents(students);
-//        } else {
-//            newHae.setStudents(List.of());
-//        }
+        // if (request.getHaeType() == HaeType.Estagio || request.getHaeType() ==
+        // HaeType.TCC) {
+        // List<Student> students = request.getStudentRas().stream()
+        // .map(ra -> studentRepository.findById(ra)
+        // .orElseThrow(
+        // () -> new IllegalArgumentException("Estudante com RA " + ra + " não
+        // encontrado.")))
+        // .toList();
+        // newHae.setStudents(students);
+        // } else {
+        // newHae.setStudents(List.of());
+        // }
 
         if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
             List<String> studentRas = request.getStudentRas();
@@ -180,6 +219,35 @@ public class HaeService {
                 .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
         if (coordinator.getRole() != Role.COORDENADOR) {
             throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
+        }
+
+        LocalDate inicio = request.getStartDate();
+        LocalDate fim = request.getEndDate();
+        String cronogramaStr = request.getCronograma();
+        Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
+
+        List<LocalDate> cronogramaConvertido = Arrays.stream(cronogramaStr.split(","))
+                .map(String::trim)
+                .map(LocalDate::parse)
+                .toList();
+
+        List<LocalDate> datasInvalidas = new ArrayList<>();
+
+        if (diasNaoLetivos.contains(inicio)) {
+            datasInvalidas.add(inicio);
+        }
+        if (diasNaoLetivos.contains(fim)) {
+            datasInvalidas.add(fim);
+        }
+
+        for (LocalDate data : cronogramaConvertido) {
+            if (diasNaoLetivos.contains(data)) {
+                datasInvalidas.add(data);
+            }
+        }
+
+        if (!datasInvalidas.isEmpty()) {
+            throw new IllegalArgumentException("As seguintes datas não são letivas: " + datasInvalidas);
         }
 
         Employee employee = employeeRepository.findById(employeeId)
