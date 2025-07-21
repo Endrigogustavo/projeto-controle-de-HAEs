@@ -8,7 +8,7 @@ import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.useCase.util.JWTUtils;
+import br.com.fateczl.apihae.useCase.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,7 +18,7 @@ public class AuthService {
     private final EmployeeRepository employeeRepository;
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
-    private final JWTUtils jwtUtils;
+    private final TokenUtils TokenService;
 
 
 
@@ -31,7 +31,7 @@ public class AuthService {
             throw new IllegalArgumentException("Credenciais inválidas.");
         }
 
-        String token = jwtUtils.generateToken(employee);
+        String token = TokenService.generateToken(employee);
         if (token == null || token.isBlank()) {
             return "Error";
         }
@@ -69,7 +69,7 @@ public class AuthService {
         Employee savedEmployee = employeeRepository.save(newEmployee);
         emailVerificationService.deleteVerification(verification);
 
-        String token = jwtUtils.generateToken(savedEmployee);
+        String token = TokenService.generateToken(savedEmployee);
         if (token == null || token.isBlank()) {
             return "Error";
         }

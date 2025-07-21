@@ -41,9 +41,11 @@ public class Student {
     @Column(name = "period", nullable = false, unique = false)
     private String period;
 
-    @ManyToMany(mappedBy = "students")
-    @JsonBackReference
-    private List<Hae> haes;
+//    @ManyToMany(mappedBy = "students")
+//    @JsonBackReference
+//    private List<Hae> haes;
+
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;

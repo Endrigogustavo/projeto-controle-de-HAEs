@@ -22,57 +22,66 @@ public class HaeService {
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
 
-    public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository, 
-                      StudentRepository studentRepository) {
+    public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository,
+            StudentRepository studentRepository) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
         this.studentRepository = studentRepository;
     }
 
- @Transactional
-public Hae createHae(HaeRequest request) {
-    Employee employee = employeeRepository.findById(request.getEmployeeId())
-            .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
-                    + " não encontrado. Não é possível criar HAE."));
+    @Transactional
+    public Hae createHae(HaeRequest request) {
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
+                        + " não encontrado. Não é possível criar HAE."));
 
-    List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
+        List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
 
-    if (existingHaes.stream().anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
-        throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
+        if (existingHaes.stream()
+                .anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
+            throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
+        }
+
+        Hae newHae = new Hae();
+        newHae.setEmployee(employee);
+        newHae.setNameEmployee(employee.getName());
+        newHae.setProjectTitle(request.getProjectTitle());
+        newHae.setWeeklyHours(request.getWeeklyHours());
+        newHae.setStartDate(request.getStartDate());
+        newHae.setEndDate(request.getEndDate());
+        newHae.setObservations(request.getObservation());
+        newHae.setStatus(Status.PENDENTE);
+        newHae.setCourse(request.getCourse());
+        newHae.setHaeType(request.getHaeType());
+        newHae.setModality(request.getModality());
+        newHae.setCoordenatorId("Sem coordenador definido");
+        newHae.setDayOfWeek(request.getDayOfWeek());
+        newHae.setTimeRange(request.getTimeRange());
+        newHae.setResultAchieved(request.getResultAchieved());
+        newHae.setCronograma(List.of(request.getCronograma()));
+        newHae.setProjectDescription(request.getDescription());
+        newHae.setProjectType(request.getProjectType());
+
+//        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
+//            List<Student> students = request.getStudentRas().stream()
+//                    .map(ra -> studentRepository.findById(ra)
+//                            .orElseThrow(
+//                                    () -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
+//                    .toList();
+//            newHae.setStudents(students);
+//        } else {
+//            newHae.setStudents(List.of());
+//        }
+
+        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
+            List<String> studentRas = request.getStudentRas();
+            newHae.setStudents(studentRas);
+        } else {
+            newHae.setStudents(List.of());
+        }
+
+        return haeRepository.save(newHae);
     }
-
-    Hae newHae = new Hae();
-    newHae.setEmployee(employee); 
-    newHae.setNameEmployee(employee.getName());
-    newHae.setProjectTitle(request.getProjectTitle());
-    newHae.setWeeklyHours(request.getWeeklyHours());
-    newHae.setStartDate(request.getStartDate());
-    newHae.setEndDate(request.getEndDate());
-    newHae.setObservations(request.getObservation());
-    newHae.setStatus(Status.PENDENTE);
-    newHae.setCourse(request.getCourse());
-    newHae.setHaeType(request.getHaeType());
-    newHae.setModality(request.getModality());
-    newHae.setCoordenatorId("Sem coordenador definido");
-    newHae.setDayOfWeek(request.getDayOfWeek());
-    newHae.setTimeRange(request.getTimeRange());
-    newHae.setResultAchieved(request.getResultAchieved());
-    newHae.setCronograma(List.of(request.getCronograma()));
-    newHae.setProjectDescription(request.getDescription());
-    newHae.setProjectType(request.getProjectType());
-    
-    if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
-            List<Student> students = request.getStudentRas().stream()
-            .map(ra -> studentRepository.findById(ra)
-                    .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
-            .toList();
-        newHae.setStudents(students);
-    } else {
-        newHae.setStudents(List.of());
-    }
-
-    return haeRepository.save(newHae);
-}
 
     @Transactional(readOnly = true)
     public Hae getHaeById(String id) {
@@ -123,7 +132,8 @@ public Hae createHae(HaeRequest request) {
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + id));
 
         Employee coordenador = employeeRepository.findById(coordenadorId)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador com id " + coordenadorId + " não encontrado."));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Coordenador com id " + coordenadorId + " não encontrado."));
 
         if (coordenador.getRole() != Role.COORDENADOR) {
             throw new IllegalArgumentException("Empregado com ID " + coordenadorId
@@ -145,22 +155,23 @@ public Hae createHae(HaeRequest request) {
         return haeRepository.findByHaeType(haeType);
     }
 
-    @Transactional(readOnly = true)
-    public List<Student> getStudentsByHaeId(String haeId) {
-        Hae hae = haeRepository.findById(haeId)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
-        return hae.getStudents();
-    }
+    // @Transactional(readOnly = true)
+    // public List<Student> getStudentsByHaeId(String haeId) {
+    // Hae hae = haeRepository.findById(haeId)
+    // .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: "
+    // + haeId));
+    // return hae.getStudents();
+    // }
 
-
-    //TODO Implementar lógica de envio de email
+    // TODO Implementar lógica de envio de email
     @Transactional
     public void sendEmailToCoordinatorAboutHAECreated(String coordinatorId, String haeId) {
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
         Employee coordinator = employeeRepository.findById(coordinatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
-        System.out.println("Email enviado para o coordenador " + coordinator.getName() + " sobre a criação da HAE com ID: " + haeId);
+        System.out.println("Email enviado para o coordenador " + coordinator.getName()
+                + " sobre a criação da HAE com ID: " + haeId);
     }
 
     @Transactional
@@ -193,12 +204,24 @@ public Hae createHae(HaeRequest request) {
         hae.setCronograma(List.of(request.getCronograma()));
         hae.setProjectDescription(request.getDescription());
         hae.setProjectType(request.getProjectType());
+
+        // Verifica se o tipo de HAE é Estágio ou TCC e atribui os estudantes
+        // cadastrados no sistema
+        // if (request.getHaeType() == HaeType.Estagio || request.getHaeType() ==
+        // HaeType.TCC) {
+        // List<Student> students = request.getStudentRas().stream()
+        // .map(ra -> studentRepository.findById(ra)
+        // .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + "
+        // não encontrado.")))
+        // .toList();
+        // hae.setStudents(students);
+        // } else {
+        // hae.setStudents(List.of());
+        // }
+
         if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
-            List<Student> students = request.getStudentRas().stream()
-                    .map(ra -> studentRepository.findById(ra)
-                            .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + " não encontrado.")))
-                    .toList();
-            hae.setStudents(students);
+            List<String> studentRas = request.getStudentRas();
+            hae.setStudents(studentRas);
         } else {
             hae.setStudents(List.of());
         }

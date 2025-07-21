@@ -90,11 +90,11 @@ public class HaeController {
         return ResponseEntity.ok(haes);
     }
 
-    @GetMapping("/getStudentsByHae/{haeId}")
-    public ResponseEntity<?> getStudentsByHae(@PathVariable String haeId) {
-        List<Student> students = haeService.getStudentsByHaeId(haeId);
-        return ResponseEntity.ok(students);
-    }
+//    @GetMapping("/getStudentsByHae/{haeId}")
+//    public ResponseEntity<?> getStudentsByHae(@PathVariable String haeId) {
+//        List<Student> students = haeService.getStudentsByHaeId(haeId);
+//        return ResponseEntity.ok(students);
+//    }
 
     @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
     public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId, @PathVariable String haeId) {

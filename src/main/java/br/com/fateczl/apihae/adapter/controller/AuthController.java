@@ -4,14 +4,13 @@ import br.com.fateczl.apihae.adapter.dto.LoginRequest;
 import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
 import br.com.fateczl.apihae.adapter.dto.VerifyEmailCodeRequest;
 import br.com.fateczl.apihae.useCase.service.AuthService;
+import br.com.fateczl.apihae.useCase.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,16 +23,19 @@ import java.util.Collections;
 public class AuthController {
 
     private final AuthService authService;
-   
+    private final CookieUtils cookieUtils;
+
     @PostMapping("/send-email-code")
     public ResponseEntity<Object> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
-        String verificationCode = authService.sendVerificationCode(request.getName(), request.getEmail(), request.getCourse(), request.getPassword());
+        String verificationCode = authService.sendVerificationCode(request.getName(), request.getEmail(),
+                request.getCourse(), request.getPassword());
         return ResponseEntity.ok(Collections.singletonMap("mensagem",
                 "E-mail de confirmação enviado com sucesso. (Código: " + verificationCode + ")"));
     }
 
     @PostMapping("/verify-email-code")
-    public ResponseEntity<Object> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request, HttpServletResponse response) {
+    public ResponseEntity<Object> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request,
+            HttpServletResponse response) {
         String token = authService.verifyEmailCode(request.getEmail(), request.getCode());
         setTokenCookie(response, token);
         return ResponseEntity.ok("Created");
@@ -49,42 +51,11 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletResponse response) {
         SecurityContextHolder.clearContext();
-        Cookie cookie = new Cookie("auth_token", "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); 
-        response.addCookie(cookie);
-        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout bem-sucedido. Por favor, descarte seu token de autenticação."));
-    }
-
-    @GetMapping("/check-cookie")
-    public ResponseEntity<Object> checkCookie(@CookieValue(value = "auth_token", required = false) String authToken) {
-        if (authToken == null || authToken.isEmpty()) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("mensagem", "Cookie 'auth_token' não encontrado."));
-        }
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated() &&
-                !(authentication.getPrincipal() instanceof String && "anonymousUser".equals(authentication.getPrincipal()))) {
-            String username = authentication.getName();
-            return ResponseEntity.ok(Collections.singletonMap("mensagem", "Usuário autenticado: " + username));
-        }
-
-        return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap("mensagem", "Não autenticado."));
+        cookieUtils.DeleteCookies(response);
+        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout realizado com sucesso."));
     }
 
     private void setTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("auth_token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60);
-        response.addCookie(cookie);
+        cookieUtils.CreateCookies(response, token);
     }
-
-
 }

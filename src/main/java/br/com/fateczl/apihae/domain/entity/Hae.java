@@ -95,14 +95,18 @@ public class Hae {
     @JsonManagedReference
     private Employee employee;
 
-    @ManyToMany
-    @JoinTable(
-        name = "hae_student",
-        joinColumns = @JoinColumn(name = "hae_id"),
-        inverseJoinColumns = @JoinColumn(name = "student_ra")
-    )
-    @JsonManagedReference
-    private List<Student> students;
+//    @ManyToMany
+//    @JoinTable(
+//        name = "hae_student",
+//        joinColumns = @JoinColumn(name = "hae_id"),
+//        inverseJoinColumns = @JoinColumn(name = "student_ra")
+//    )
+//    @JsonManagedReference
+//    private List<Student> students;
+
+    @Column(name = "students", nullable = false)
+    private List<String> students;
+
 
 
     @CreationTimestamp
