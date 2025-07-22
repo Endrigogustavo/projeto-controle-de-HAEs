@@ -1,7 +1,8 @@
 export interface HaeDataType {
-	nameEmployee: string;
+	employeeId: string;
 	course: string;
 	projectTitle: string;
+	modality: string;
 	weeklyHours: number;
 	projectType: string;
 	dayOfWeek: string;
@@ -12,10 +13,30 @@ export interface HaeDataType {
 	startDate: string;
 	endDate: string;
 	employeeId: string;
+	studentRAs: string[];
 }
 
 export interface FormErrors {
-	[key: string]: string | undefined;
+	[key: string]: string | { [index: number]: string } | undefined;
+
+	nameEmployee?: string;
+	course?: string;
+	projectTitle?: string;
+	modality?: string;
+	weeklyHours?: string;
+	projectType?: string;
+	dayOfWeek?: string;
+	timeRange?: string;
+	cronograma?: string;
+	projectDescription?: string;
+	observations?: string;
+	startDate?: string;
+	endDate?: string;
+	employeeId?: string;
+
+	studentRAs?: {
+		[index: number]: string;
+	};
 }
 
 export interface StepProps {
