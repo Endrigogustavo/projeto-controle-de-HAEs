@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.config.cloudinary;
+package br.com.fateczl.apihae.driver.config.cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

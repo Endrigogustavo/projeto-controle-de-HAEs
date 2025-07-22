@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.config.cors;
+package br.com.fateczl.apihae.driver.config.cors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

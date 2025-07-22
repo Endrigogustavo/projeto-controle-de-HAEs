@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.config.security;
+package br.com.fateczl.apihae.driver.config.security;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.config.swagger;
+package br.com.fateczl.apihae.driver.config.swagger;
 
 
 import org.springframework.context.annotation.Bean;
