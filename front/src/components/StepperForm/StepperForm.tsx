@@ -19,6 +19,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
 import { createHae } from "@/services/hae";
 import { useNavigate } from "react-router-dom";
+import { ValidationError } from "yup";
 
 const StepperForm: React.FC = () => {
 	const [step, setStep] = useState(1);
@@ -29,9 +30,10 @@ const StepperForm: React.FC = () => {
 	} = useLoggedEmployee();
 
 	const [formData, setFormData] = useState<HaeDataType>({
-		nameEmployee: "",
-		course: "Análise e Desenvolvimento de Sistemas",
+		employeeId: "",
+		course: "",
 		projectTitle: "",
+		modality: "",
 		weeklyHours: 0,
 		projectType: "",
 		dayOfWeek: "",
@@ -41,7 +43,7 @@ const StepperForm: React.FC = () => {
 		observations: "",
 		startDate: "",
 		endDate: "",
-		employeeId: "",
+		studentRAs: [],
 	});
 
 	const [errors, setErrors] = useState<FormErrors>({});
@@ -58,7 +60,6 @@ const StepperForm: React.FC = () => {
 		if (employee && !isLoadingEmployee) {
 			setFormData((prevData) => ({
 				...prevData,
-				nameEmployee: employee.name || "",
 				employeeId: employee.id || "",
 			}));
 		}
@@ -108,26 +109,33 @@ const StepperForm: React.FC = () => {
 			setTimeout(() => {
 				navigate("/");
 			}, 4000);
-		} catch (validationErrors: any) {
-			console.error(
-				"Erros de validação final no StepperForm:",
-				validationErrors
-			);
+		} catch (validationErrors: unknown) {
+			if (validationErrors instanceof ValidationError) {
+				console.error(
+					"Erros de validação final no StepperForm:",
+					validationErrors
+				);
 
-			if (validationErrors.inner) {
-				const formErrors: FormErrors = {};
-				validationErrors.inner.forEach((err: any) => {
-					if (err.path) formErrors[err.path] = err.message;
-				});
-				setErrors(formErrors);
+				if (validationErrors.inner) {
+					const formErrors: FormErrors = {};
+					validationErrors.inner.forEach((err) => {
+						if (err.path) formErrors[err.path] = err.message;
+					});
+					setErrors(formErrors);
+				}
+
+				showSnackbar(
+					"Por favor, corrija os erros no formulário antes de enviar.",
+					"error"
+				);
+			} else {
+				console.error(
+					"Erro inesperado no envio do formulário:",
+					validationErrors
+				);
 			}
-
-			showSnackbar(
-				"Por favor, corrija os erros no formulário antes de enviar.",
-				"error"
-			);
 		}
-	}, [formData, showSnackbar]);
+	}, [formData, showSnackbar, navigate]);
 
 	const renderCurrentStep = () => {
 		const commonStepProps: StepProps = {
