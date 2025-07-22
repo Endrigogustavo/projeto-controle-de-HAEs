@@ -79,8 +79,8 @@ public class Hae {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "comprovanteDoc")
-    private String comprovanteDoc;
+    @Column(name = "comprovanteDoc", nullable = false)
+    private List<String> comprovanteDoc;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "haeType", nullable = false)
