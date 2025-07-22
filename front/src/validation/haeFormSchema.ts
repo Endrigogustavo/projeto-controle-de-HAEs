@@ -10,7 +10,7 @@ const parseTime = (timeStr: string) => {
 };
 
 export const haeFormSchema = yup.object().shape({
-	nameEmployee: yup.string().required("Nome do colaborador é obrigatório"),
+	employeeId: yup.string().required("O ID do funcionário é obrigatório"),
 	course: yup.string().required("Curso é obrigatório"),
 	projectTitle: yup.string().required("Título do projeto é obrigatório"),
 	weeklyHours: yup
@@ -63,6 +63,16 @@ export const haeFormSchema = yup.object().shape({
 		.of(yup.string())
 		.min(1, "Selecione pelo menos uma data no cronograma")
 		.required("Cronograma é obrigatório"),
+	studentRAs: yup
+		.array()
+		.of(
+			yup
+				.string()
+				.matches(/^\d{13}$/, "O RA deve conter exatamente 13 números")
+				.required("RA é obrigatório")
+		)
+		.min(1, "Informe pelo menos um RA")
+		.required("É necessário informar os RAs"),
 	projectDescription: yup
 		.string()
 		.required("Descrição do projeto é obrigatória"),
@@ -83,6 +93,17 @@ export const stepOneSchema = yup.object().shape({
 	projectDescription: yup
 		.string()
 		.required("Descrição do projeto é obrigatória"),
+	modality: yup.string().required("Modalidade é obrigatória"),
+	studentRAs: yup
+		.array()
+		.of(
+			yup
+				.string()
+				.matches(/^\d{13}$/, "O RA deve conter exatamente 13 números")
+				.required("RA é obrigatório")
+		)
+		.min(1, "Informe pelo menos um RA")
+		.required("É necessário informar os RAs"),
 });
 
 export const stepTwoSchema = yup.object().shape({
