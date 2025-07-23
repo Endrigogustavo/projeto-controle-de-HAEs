@@ -1,18 +1,25 @@
+export interface WeeklyScheduleEntry {
+	timeRange: string;
+}
+
+export type WeeklySchedule = {
+	[day: string]: WeeklyScheduleEntry;
+};
+
 export interface HaeDataType {
 	employeeId: string;
 	course: string;
 	projectTitle: string;
 	modality: string;
 	weeklyHours: number;
-	projectType: string;
-	dayOfWeek: string;
+	projectType: string; 
+	dayOfWeek: string[];
+	weeklySchedule: WeeklySchedule;
 	timeRange: string;
-	cronograma: string[];
 	projectDescription: string;
-	observations: string;
+	observation: string;
 	startDate: string;
 	endDate: string;
-	employeeId: string;
 	studentRAs: string[];
 }
 
@@ -27,9 +34,8 @@ export interface FormErrors {
 	projectType?: string;
 	dayOfWeek?: string;
 	timeRange?: string;
-	cronograma?: string;
 	projectDescription?: string;
-	observations?: string;
+	observation?: string;
 	startDate?: string;
 	endDate?: string;
 	employeeId?: string;

@@ -17,14 +17,14 @@ const StepThree: React.FC<StepThreeProps> = ({
 			setErrors({});
 			await object()
 				.shape({
-					observations: haeFormSchema.fields.observations,
+					observation: haeFormSchema.fields.observation,
 				})
 				.validate(
-					{ observations: formData.observations },
+					{ observation: formData.observation },
 					{ abortEarly: false }
 				);
-			console.log("Validação local do StepThree (observations) OK.");
 
+			console.log(formData);
 			onSubmit();
 		} catch (validationErrors: any) {
 			const newErrors: FormErrors = {};
@@ -32,7 +32,6 @@ const StepThree: React.FC<StepThreeProps> = ({
 				newErrors[error.path] = error.message;
 			});
 			setErrors(newErrors);
-			console.error("Erros de validação local no StepThree:", newErrors);
 		}
 	};
 
@@ -51,18 +50,18 @@ const StepThree: React.FC<StepThreeProps> = ({
 					minRows={3}
 					maxRows={10}
 					placeholder="Ex.: Necessidade de acesso a laboratórios específicos..."
-					value={formData.observations}
+					value={formData.observation}
 					onChange={(e) => {
-						setFormData("observations", e.target.value);
-						if (errors.observations) {
+						setFormData("observation", e.target.value);
+						if (errors.observation) {
 							setErrors((prevErrors) => ({
 								...prevErrors,
-								observations: undefined,
+								observation: undefined,
 							}));
 						}
 					}}
-					error={!!errors.observations}
-					helperText={errors.observations}
+					error={!!errors.observation}
+					helperText={errors.observation}
 				/>
 			</div>
 

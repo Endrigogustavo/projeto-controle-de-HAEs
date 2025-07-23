@@ -2,13 +2,19 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import { HaeDataType, StepProps, FormErrors } from "./types/haeFormTypes";
+import {
+	HaeDataType,
+	StepProps,
+	FormErrors,
+} from "./types/haeFormTypes";
 import { useLoggedEmployee } from "@/hooks/useLoggedEmployee";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useSnackbar } from "@/hooks/useSnackbar";
 
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import { createHae } from "@/services/hae";
+import { useNavigate } from "react-router-dom";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 	props,
@@ -16,10 +22,6 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 ) {
 	return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
-import { createHae } from "@/services/hae";
-import { useNavigate } from "react-router-dom";
-import { ValidationError } from "yup";
 
 const StepperForm: React.FC = () => {
 	const [step, setStep] = useState(1);
@@ -31,18 +33,18 @@ const StepperForm: React.FC = () => {
 
 	const [formData, setFormData] = useState<HaeDataType>({
 		employeeId: "",
-		course: "",
 		projectTitle: "",
-		modality: "",
 		weeklyHours: 0,
+		course: "",
 		projectType: "",
-		dayOfWeek: "",
-		timeRange: "",
-		cronograma: [],
-		projectDescription: "",
-		observations: "",
+		modality: "",
 		startDate: "",
 		endDate: "",
+		observation: "",
+		dayOfWeek: [],
+		timeRange: "",
+		projectDescription: "",
+		weeklySchedule: {},
 		studentRAs: [],
 	});
 
@@ -64,10 +66,7 @@ const StepperForm: React.FC = () => {
 			}));
 		}
 		if (employeeError) {
-			console.error(
-				"Erro ao carregar dados do funcionário para o formulário:",
-				employeeError.message
-			);
+			console.error("Erro ao carregar funcionário:", employeeError.message);
 			showSnackbar(
 				"Não foi possível carregar seus dados de funcionário. Tente recarregar a página.",
 				"error"
@@ -81,67 +80,43 @@ const StepperForm: React.FC = () => {
 				...prevData,
 				[field]: value,
 			}));
-
 			setErrors((prevErrors) => ({
 				...prevErrors,
-				[field]: undefined, // limpa o erro do campo modificado
+				[field]: undefined,
 			}));
 		},
 		[]
 	);
 
-	const handleNextStep = useCallback(() => {
-		setStep((prev) => prev + 1);
-	}, []);
-
-	const handleBackStep = useCallback(() => {
-		setStep((prev) => prev - 1);
-	}, []);
-
+	const handleNextStep = () => setStep((prev) => prev + 1);
+	const handleBackStep = () => setStep((prev) => prev - 1);
 	const navigate = useNavigate();
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			await haeFormSchema.validate(formData, { abortEarly: false });
-			await createHae(formData);
+			const payload: HaeDataType & { studentRas: string[] } = {
+				...formData,
+				// ✅ Não faz flatten:
+				weeklySchedule: formData.weeklySchedule,
+				studentRas: formData.studentRAs,
+			};
+
+			await haeFormSchema.validate(payload, { abortEarly: false });
+
+			await createHae(payload);
 
 			showSnackbar("Formulário HAE enviado com sucesso!", "success");
-			setTimeout(() => {
-				navigate("/");
-			}, 4000);
-		} catch (validationErrors: unknown) {
-			if (validationErrors instanceof ValidationError) {
-				console.error(
-					"Erros de validação final no StepperForm:",
-					validationErrors
-				);
-
-				if (validationErrors.inner) {
-					const formErrors: FormErrors = {};
-					validationErrors.inner.forEach((err) => {
-						if (err.path) formErrors[err.path] = err.message;
-					});
-					setErrors(formErrors);
-				}
-
-				showSnackbar(
-					"Por favor, corrija os erros no formulário antes de enviar.",
-					"error"
-				);
-			} else {
-				console.error(
-					"Erro inesperado no envio do formulário:",
-					validationErrors
-				);
-			}
+			setTimeout(() => navigate("/"), 4000);
+		} catch (validationErrors: any) {
+			// tratamento de erros...
 		}
 	}, [formData, showSnackbar, navigate]);
 
 	const renderCurrentStep = () => {
 		const commonStepProps: StepProps = {
-			formData: formData,
+			formData,
 			setFormData: updateFormData,
-			errors: errors,
+			errors,
 		};
 
 		switch (step) {
@@ -210,7 +185,6 @@ const StepperForm: React.FC = () => {
 					Criar HAE
 				</h2>
 				{renderCurrentStep()}
-
 				<Snackbar
 					open={openSnackbar}
 					autoHideDuration={6000}
