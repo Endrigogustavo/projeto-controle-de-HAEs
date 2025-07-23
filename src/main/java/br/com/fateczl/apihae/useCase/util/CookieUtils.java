@@ -1,6 +1,7 @@
 package br.com.fateczl.apihae.useCase.util;
 
 import org.springframework.context.annotation.Configuration;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -11,7 +12,7 @@ public class CookieUtils {
         Cookie cookie = new Cookie("auth_token", token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setMaxAge(60 * 60 * 24 * 30);
         response.addCookie(cookie);
     }
@@ -20,6 +21,7 @@ public class CookieUtils {
         Cookie cookie = new Cookie("auth_token", null);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
