@@ -1,6 +1,7 @@
 package br.com.fateczl.apihae.useCase.service;
 
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.WeeklyScheduleEntry;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.entity.Student;
@@ -19,7 +20,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class HaeService {
@@ -37,7 +40,6 @@ public class HaeService {
         this.calendarioSingleton = calendarioSingleton;
     }
 
-    @Transactional
     public Hae createHae(HaeRequest request) {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -52,13 +54,7 @@ public class HaeService {
 
         LocalDate inicio = request.getStartDate();
         LocalDate fim = request.getEndDate();
-        String cronogramaStr = request.getCronograma();
         Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
-
-        List<LocalDate> cronogramaConvertido = Arrays.stream(cronogramaStr.split(","))
-                .map(String::trim)
-                .map(LocalDate::parse)
-                .toList();
 
         List<LocalDate> datasInvalidas = new ArrayList<>();
 
@@ -68,17 +64,17 @@ public class HaeService {
         if (diasNaoLetivos.contains(fim)) {
             datasInvalidas.add(fim);
         }
-
-        for (LocalDate data : cronogramaConvertido) {
-            if (diasNaoLetivos.contains(data)) {
-                datasInvalidas.add(data);
-            }
-        }
-
         if (!datasInvalidas.isEmpty()) {
             throw new IllegalArgumentException("As seguintes datas não são letivas: " + datasInvalidas);
         }
-        
+
+        Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().getTimeRange()));
+
         Hae newHae = new Hae();
         newHae.setEmployee(employee);
         newHae.setNameEmployee(employee.getName());
@@ -89,32 +85,18 @@ public class HaeService {
         newHae.setObservations(request.getObservation());
         newHae.setStatus(Status.PENDENTE);
         newHae.setCourse(request.getCourse());
-        newHae.setHaeType(request.getHaeType());
+        newHae.setProjectType(request.getProjectType());
         newHae.setModality(request.getModality());
         newHae.setCoordenatorId("Sem coordenador definido");
         newHae.setDayOfWeek(request.getDayOfWeek());
         newHae.setTimeRange(request.getTimeRange());
-        newHae.setResultAchieved(request.getResultAchieved());
-        newHae.setCronograma(List.of(request.getCronograma()));
-        newHae.setProjectDescription(request.getDescription());
-        newHae.setProjectType(request.getProjectType());
+        newHae.setProjectDescription(request.getProjectDescription());
 
-        // if (request.getHaeType() == HaeType.Estagio || request.getHaeType() ==
-        // HaeType.TCC) {
-        // List<Student> students = request.getStudentRas().stream()
-        // .map(ra -> studentRepository.findById(ra)
-        // .orElseThrow(
-        // () -> new IllegalArgumentException("Estudante com RA " + ra + " não
-        // encontrado.")))
-        // .toList();
-        // newHae.setStudents(students);
-        // } else {
-        // newHae.setStudents(List.of());
-        // }
+        // aqui, usa o Map<String, String> já formatado
+        newHae.setWeeklySchedule(weeklyScheduleFlattened);
 
-        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
-            List<String> studentRas = request.getStudentRas();
-            newHae.setStudents(studentRas);
+        if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
+            newHae.setStudents(request.getStudentRAs());
         } else {
             newHae.setStudents(List.of());
         }
@@ -191,7 +173,7 @@ public class HaeService {
 
     @Transactional(readOnly = true)
     public List<Hae> getHaesByType(HaeType haeType) {
-        return haeRepository.findByHaeType(haeType);
+        return haeRepository.findByProjectType(haeType);
     }
 
     // @Transactional(readOnly = true)
@@ -223,13 +205,7 @@ public class HaeService {
 
         LocalDate inicio = request.getStartDate();
         LocalDate fim = request.getEndDate();
-        String cronogramaStr = request.getCronograma();
         Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
-
-        List<LocalDate> cronogramaConvertido = Arrays.stream(cronogramaStr.split(","))
-                .map(String::trim)
-                .map(LocalDate::parse)
-                .toList();
 
         List<LocalDate> datasInvalidas = new ArrayList<>();
 
@@ -238,12 +214,6 @@ public class HaeService {
         }
         if (diasNaoLetivos.contains(fim)) {
             datasInvalidas.add(fim);
-        }
-
-        for (LocalDate data : cronogramaConvertido) {
-            if (diasNaoLetivos.contains(data)) {
-                datasInvalidas.add(data);
-            }
         }
 
         if (!datasInvalidas.isEmpty()) {
@@ -264,14 +234,11 @@ public class HaeService {
         hae.setEndDate(request.getEndDate());
         hae.setObservations(request.getObservation());
         hae.setCourse(request.getCourse());
-        hae.setHaeType(request.getHaeType());
+        hae.setProjectType(request.getProjectType());
         hae.setModality(request.getModality());
         hae.setDayOfWeek(request.getDayOfWeek());
         hae.setTimeRange(request.getTimeRange());
-        hae.setResultAchieved(request.getResultAchieved());
-        hae.setCronograma(List.of(request.getCronograma()));
-        hae.setProjectDescription(request.getDescription());
-        hae.setProjectType(request.getProjectType());
+        hae.setProjectDescription(request.getProjectDescription());
 
         // Verifica se o tipo de HAE é Estágio ou TCC e atribui os estudantes
         // cadastrados no sistema
@@ -287,8 +254,8 @@ public class HaeService {
         // hae.setStudents(List.of());
         // }
 
-        if (request.getHaeType() == HaeType.Estagio || request.getHaeType() == HaeType.TCC) {
-            List<String> studentRas = request.getStudentRas();
+        if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
+            List<String> studentRas = request.getStudentRAs();
             hae.setStudents(studentRas);
         } else {
             hae.setStudents(List.of());

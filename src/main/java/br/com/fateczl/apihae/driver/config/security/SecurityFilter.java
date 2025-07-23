@@ -70,7 +70,8 @@ public class SecurityFilter extends OncePerRequestFilter {
             "/swagger-ui.html",
             "/webjars",
             "/configuration",
-            "/swagger-resources"
+            "/swagger-resources",
+            "/employee/get-my-user"
         };
         return Arrays.stream(excludedPaths).anyMatch(path::startsWith);
     }

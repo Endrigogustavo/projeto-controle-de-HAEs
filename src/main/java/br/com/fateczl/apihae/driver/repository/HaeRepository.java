@@ -13,5 +13,5 @@ public interface HaeRepository extends JpaRepository<Hae, String> {
 
     List<Hae> findTop5ByEmployeeIdOrderByCreatedAtDesc(String employeeId);
 
-    List<Hae> findByHaeType(HaeType haeType);
+    List<Hae> findByProjectType(HaeType projectType);
 }

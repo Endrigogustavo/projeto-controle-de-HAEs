@@ -2,6 +2,7 @@ package br.com.fateczl.apihae.adapter.dto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Modality;
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HaeRequest {
+
     @NotBlank(message = "O ID do funcionário não pode estar em branco.")
     private String employeeId;
 
@@ -35,7 +37,7 @@ public class HaeRequest {
     private String course;
 
     @NotNull(message = "O tipo de projeto não pode ser nulo.")
-    private HaeType haeType;
+    private HaeType projectType;
 
     @NotNull(message = "A modalidade não pode ser nula.")
     private Modality modality;
@@ -48,41 +50,23 @@ public class HaeRequest {
     @Future(message = "A data de término deve ser no futuro.")
     private LocalDate endDate;
 
-    @NotBlank(message = "A descrição não pode estar em branco.")
-    private String description;
-
-    @NotNull(message = "A observação não pode ser nula.")
-    @NotBlank(message = "A observação não pode estar em branco.")
-
     @NotBlank(message = "A observação não pode estar em branco.")
     private String observation;
 
-    @NotBlank(message = "O dia da semana não pode estar em branco.")
-    @NotNull(message = "O dia da semana não pode ser nulo.")
-    private String dayOfWeek;
+    @NotNull(message = "O(s) dia(s) da semana não pode(m) ser nulo(s).")
+    @Size(min = 1, message = "Pelo menos um dia da semana deve ser informado.")
+    private List<String> dayOfWeek;
 
     @NotBlank(message = "O intervalo de tempo não pode estar em branco.")
-    @NotNull(message = "O intervalo de tempo não pode ser nulo.")
     private String timeRange;
 
-    @NotBlank(message = "O resultado alcançado não pode estar em branco.")
-    @NotNull(message = "O resultado alcançado não pode ser nulo.")
-    private String resultAchieved;
-
-    @NotNull(message = "O cronograma não pode ser nulo.")
-    @NotBlank(message = "O cronograma não pode estar em branco.")
-    private String cronograma;
-
     @NotBlank(message = "A descrição do projeto não pode estar em branco.")
-    @NotNull(message = "A descrição do projeto não pode ser nula.")
     private String projectDescription;
 
-    @NotBlank(message = "O tipo de projeto não pode estar em branco.")
-    @NotNull(message = "O tipo de projeto não pode ser nulo.")
-    private String projectType;
+    @NotNull(message = "O cronograma semanal não pode ser nulo.")
+    @Size(min = 1, message = "Pelo menos um dia do cronograma deve ser informado.")
+    private Map<String, WeeklyScheduleEntry> weeklySchedule;
 
-    @NotNull(message = "A lista de RAs dos estudantes não pode ser nula.")
     @Size(min = 1, message = "Deve haver pelo menos um estudante na HAE.")
-    private List<@NotBlank(message = "RA do estudante não pode estar em branco.") String> studentRas;
-
+    private List<String> studentRAs;
 }
