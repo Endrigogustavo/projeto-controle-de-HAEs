@@ -121,11 +121,14 @@ export const stepTwoSchema = yup.object().shape({
 			"at-least-one-day",
 			"Selecione pelo menos um dia da semana com horário",
 			(value) => {
-				if (!value || typeof value !== "object") return false;
-				const days = Object.keys(value);
-				return days.length > 0 && days.every((day) => !!value[day]?.timeRange);
+				const schedule = value as Record<string, { timeRange: string }>;
+				const days = Object.keys(schedule);
+				return (
+					days.length > 0 && days.every((day) => !!schedule[day]?.timeRange)
+				);
 			}
 		)
+
 		.test(
 			"valid-time-format",
 			"Um ou mais horários estão em formato inválido. Use HH:MM - HH:MM",
