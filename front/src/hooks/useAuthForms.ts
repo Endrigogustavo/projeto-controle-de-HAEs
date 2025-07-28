@@ -1,4 +1,4 @@
-import { useSnackbar } from "./useSnackbar"; 
+import { useSnackbar } from "./useSnackbar";
 
 export interface IAuthService {
 	register?(data: {
@@ -26,7 +26,15 @@ export const useAuthForms = (authService: IAuthService) => {
 			return false;
 		}
 		try {
-			await authService.register(data);
+			const response = await authService.register(data);
+
+			if (response?.token) {
+				localStorage.setItem("token", response.token);
+			}
+			if (response?.user) {
+				localStorage.setItem("user", JSON.stringify(response.user));
+			}
+
 			showSnackbar(
 				"Cadastro realizado com sucesso! Verifique seu e-mail.",
 				"success"
@@ -48,7 +56,15 @@ export const useAuthForms = (authService: IAuthService) => {
 			return false;
 		}
 		try {
-			await authService.login(data);
+			const response = await authService.login(data);
+
+			if (response?.token) {
+				localStorage.setItem("token", response.token);
+			}
+			if (response?.user) {
+				localStorage.setItem("user", JSON.stringify(response.user));
+			}
+
 			showSnackbar("Login realizado com sucesso!", "success");
 			return true;
 		} catch (error) {
@@ -92,6 +108,10 @@ export const useAuthForms = (authService: IAuthService) => {
 		}
 		try {
 			await authService.logout();
+
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+
 			showSnackbar("Logout realizado com sucesso!", "success");
 			return true;
 		} catch (error) {
