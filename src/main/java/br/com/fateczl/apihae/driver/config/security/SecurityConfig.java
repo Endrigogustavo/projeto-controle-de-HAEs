@@ -25,6 +25,10 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_MATCHERS = {
         "/auth/**",
+        "/**",
+        "/hae/**",
+        "/employee/**",
+        "/student/**",
         "/docs/index.html",
         "/docs-client-service.html",
         "/docs-client-service/**",
