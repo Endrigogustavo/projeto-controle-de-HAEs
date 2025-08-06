@@ -1,0 +1,8 @@
+# Normaliza finais de linha para arquivos de texto
+* text=auto
+
+# Se quiser forçar LF em scripts shell
+*.sh text eol=lf
+
+# Força CRLF em arquivos batch do Windows
+*.bat text eol=crlf
