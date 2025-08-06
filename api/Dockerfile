@@ -1,16 +1,9 @@
-FROM node:22.15.0
-
-ARG PORT
-ENV PORT=${PORT}
+FROM openjdk:21
 
 WORKDIR /app
 
 COPY . .
 
-RUN npm install
-RUN npm run generate
-RUN npm run migrate
+EXPOSE 8080
 
-EXPOSE ${PORT}
-
-CMD ["npm", "start"]
+CMD ["./mvnw", "spring-boot:run"]

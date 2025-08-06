@@ -8,19 +8,11 @@
 **/package-lock.json
 **/yarn.lock
 
-# Prisma: arquivos gerados automaticamente
-**/prisma/migrations/
-**/prisma/dev.db
-**/generated/
-**/generated-prisma/
-**/prisma/generated/
-**/generated/prisma/
-
-# Prisma Client gerado (ajuste se estiver em outro caminho)
-**/generated/prisma/
-
 # Arquivos temporários e de cache
 *.log
 *.tmp
 *.sqlite
 *.db
+
+/mvnw text eol=lf
+*.cmd text eol=crlf

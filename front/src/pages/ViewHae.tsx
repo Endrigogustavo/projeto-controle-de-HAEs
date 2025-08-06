@@ -1,0 +1,389 @@
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { Sidebar } from "@components/Sidebar";
+import { Header } from "@components/Header";
+import { MobileHeader } from "@components/MobileHeader";
+import Drawer from "@mui/material/Drawer";
+import api from "@/services";
+import {
+	Snackbar,
+	Alert,
+	CircularProgress,
+	Box,
+	Divider,
+	Select,
+	MenuItem,
+	FormControl,
+	InputLabel,
+} from "@mui/material";
+import {
+	SchoolOutlined,
+	Event as EventIcon,
+	AccessTime as AccessTimeIcon,
+	NotesOutlined,
+	InfoOutlined,
+	CheckCircleOutline,
+	HighlightOffOutlined,
+	HourglassEmpty,
+	CalendarMonthOutlined,
+	WorkspacePremiumOutlined,
+	CategoryOutlined,
+	GroupOutlined,
+} from "@mui/icons-material";
+import { useAuth } from "@/hooks/useAuth";
+import { Hae } from "@/types/hae";
+
+/**
+ * Formata uma string de data (YYYY-MM-DD) para o formato local do usuário.
+ */
+const formatDate = (dateString: string | null | undefined): string => {
+	if (!dateString) return "N/A";
+	try {
+		const date = new Date(dateString);
+		if (isNaN(date.getTime())) return "Data inválida";
+		return date.toLocaleDateString(undefined, { timeZone: "UTC" });
+	} catch (error) {
+		console.error("Erro ao formatar data:", error);
+		return dateString;
+	}
+};
+
+interface DetailItemProps {
+	icon: React.ReactNode;
+	label: string;
+	value: React.ReactNode;
+	className?: string;
+}
+
+const DetailItem: React.FC<DetailItemProps> = ({
+	icon,
+	label,
+	value,
+	className = "",
+}) => (
+	<div className={`flex flex-col gap-1 ${className}`}>
+		<div className="flex items-center gap-2 text-sm text-gray-500">
+			{icon}
+			<span>{label}</span>
+		</div>
+		<p className="text-gray-800 text-base">{value}</p>
+	</div>
+);
+
+interface StatusBadgeProps {
+	status: Hae["status"];
+}
+
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+	const statusStyles: Record<
+		string,
+		{ bg: string; text: string; icon: React.ReactElement }
+	> = {
+		PENDENTE: {
+			bg: "bg-yellow-100",
+			text: "text-yellow-800",
+			icon: <HourglassEmpty fontSize="small" />,
+		},
+		APROVADO: {
+			bg: "bg-green-100",
+			text: "text-green-800",
+			icon: <CheckCircleOutline fontSize="small" />,
+		},
+		REPROVADO: {
+			bg: "bg-red-100",
+			text: "text-red-800",
+			icon: <HighlightOffOutlined fontSize="small" />,
+		},
+		COMPLETO: {
+			bg: "bg-blue-100",
+			text: "text-blue-800",
+			icon: <WorkspacePremiumOutlined fontSize="small" />,
+		},
+	};
+	const style = statusStyles[status] || statusStyles.PENDENTE;
+	return (
+		<div
+			className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${style.bg} ${style.text}`}
+		>
+			{style.icon}
+			{status}
+		</div>
+	);
+};
+
+const STATUS_OPTIONS: Hae["status"][] = [
+	"PENDENTE",
+	"APROVADO",
+	"REPROVADO",
+	"COMPLETO",
+];
+
+const projectTypeLabels: Record<string, string> = {
+	ApoioDirecao: "Apoio à Direção",
+	Estagio: "Estágio",
+	TCC: "Trabalho de Conclusão de Curso",
+};
+
+export default function ViewHae() {
+	const { id } = useParams<{ id: string }>();
+	const { user, loading: isLoadingUser } = useAuth();
+	const [isDrawerOpen, setDrawerOpen] = useState(false);
+	const [hae, setHae] = useState<Hae | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [snackbar, setSnackbar] = useState<{
+		open: boolean;
+		message: string;
+		severity: "success" | "error";
+	} | null>(null);
+
+	const toggleDrawer = (open: boolean) => () => setDrawerOpen(open);
+
+	const fetchHae = useCallback(async () => {
+		if (!id) return;
+		try {
+			const response = await api.get<Hae>(`/hae/getHaeById/${id}`);
+			setHae(response.data);
+		} catch (err: any) {
+			console.error("Erro ao buscar HAE:", err);
+			setSnackbar({
+				open: true,
+				message: "Falha ao carregar os dados da HAE.",
+				severity: "error",
+			});
+		}
+	}, [id]);
+
+	useEffect(() => {
+		fetchHae();
+	}, [fetchHae]);
+
+	const handleStatusChange = async (newStatus: Hae["status"]) => {
+		if (!user?.id) {
+			setSnackbar({
+				open: true,
+				message: "Não foi possível verificar sua identidade.",
+				severity: "error",
+			});
+			return;
+		}
+		setIsSubmitting(true);
+		try {
+			const payload = { newStatus, coordenadorId: user.id };
+			await api.put(`/hae/change-status/${id}`, payload);
+			setSnackbar({
+				open: true,
+				message: `Status da HAE atualizado para ${newStatus} com sucesso!`,
+				severity: "success",
+			});
+			setHae((prevHae: Hae | null) =>
+				prevHae ? { ...prevHae, status: newStatus } : null
+			);
+		} catch (err: any) {
+			const errorMessage =
+				err.response?.data?.message || "Ocorreu um erro na operação.";
+			setSnackbar({ open: true, message: errorMessage, severity: "error" });
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const isCoordinator = user?.role === "COORDENADOR";
+
+	if (isLoadingUser || !hae) {
+		return (
+			<Box
+				display="flex"
+				alignItems="center"
+				justifyContent="center"
+				height="100vh"
+			>
+				<CircularProgress />
+			</Box>
+		);
+	}
+
+	return (
+		<div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
+			<div className="hidden md:block row-span-2">
+				<Sidebar />
+			</div>
+			<div className="md:hidden">
+				<MobileHeader onMenuClick={toggleDrawer(true)} />
+			</div>
+			<Drawer open={isDrawerOpen} onClose={toggleDrawer(false)}>
+				<div className="w-64 h-full bg-gray-fatec">
+					<Sidebar />
+				</div>
+			</Drawer>
+			<div className="hidden md:block col-start-2 row-start-1">
+				<Header />
+			</div>
+
+			<main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
+				<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+					<div className="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-4 border-b border-gray-200">
+						<div>
+							<h1 className="text-2xl font-bold text-gray-800">
+								{hae.projectTitle}
+							</h1>
+							<p className="text-gray-500">por {hae.employee.name ?? "N/A"}</p>
+						</div>
+						<StatusBadge status={hae.status} />
+					</div>
+
+					<div className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+						<DetailItem
+							icon={<SchoolOutlined />}
+							label="Curso"
+							value={hae.course}
+						/>
+						<DetailItem
+							icon={<CategoryOutlined />}
+							label="Tipo de Projeto"
+							value={projectTypeLabels[hae.projectType] || hae.projectType}
+						/>
+						<DetailItem
+							icon={<AccessTimeIcon />}
+							label="Horas Semanais"
+							value={`${hae.weeklyHours} horas`}
+						/>
+						<DetailItem
+							icon={<InfoOutlined />}
+							label="Modalidade"
+							value={hae.modality}
+						/>
+						<DetailItem
+							icon={<EventIcon />}
+							label="Data de Início"
+							value={formatDate(hae.startDate)}
+						/>
+						<DetailItem
+							icon={<EventIcon />}
+							label="Data de Término"
+							value={formatDate(hae.endDate)}
+						/>
+					</div>
+
+					{hae.weeklySchedule && Object.keys(hae.weeklySchedule).length > 0 && (
+						<div className="pt-6">
+							<Divider />
+							<div className="pt-6">
+								<DetailItem
+									icon={<CalendarMonthOutlined />}
+									label="Cronograma Semanal"
+									value={
+										<div className="mt-2 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4">
+											{Object.entries(hae.weeklySchedule).map(
+												([day, timeRange]) => (
+													<div key={day} className="flex flex-col">
+														<span className="font-semibold text-gray-700">
+															{day}
+														</span>
+														<span className="text-gray-600">
+															{typeof timeRange === "string"
+																? timeRange
+																: "Horário inválido"}
+														</span>
+													</div>
+												)
+											)}
+										</div>
+									}
+								/>
+							</div>
+						</div>
+					)}
+
+					{hae.students && hae.students.length > 0 && (
+						<div className="pt-6">
+							<Divider />
+							<div className="pt-6">
+								<DetailItem
+									icon={<GroupOutlined />}
+									label="Alunos Envolvidos (RAs)"
+									value={
+										<div className="mt-2 flex flex-wrap gap-2">
+											{hae.students.map((ra) => (
+												<span
+													key={ra}
+													className="bg-gray-100 text-gray-800 text-sm font-mono px-3 py-1 rounded-full"
+												>
+													{ra}
+												</span>
+											))}
+										</div>
+									}
+								/>
+							</div>
+						</div>
+					)}
+
+					<div className="pt-6 space-y-6">
+						<Divider />
+						{hae.projectDescription && (
+							<DetailItem
+								icon={<NotesOutlined />}
+								label="Descrição do Projeto"
+								value={
+									<p className="whitespace-pre-wrap">
+										{hae.projectDescription}
+									</p>
+								}
+								className="col-span-full pt-6"
+							/>
+						)}
+						{hae.observations && (
+							<DetailItem
+								icon={<InfoOutlined />}
+								label="Observações"
+								value={
+									<p className="whitespace-pre-wrap">{hae.observations}</p>
+								}
+								className="col-span-full"
+							/>
+						)}
+					</div>
+				</div>
+
+				{isCoordinator && (
+					<div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4 p-4 bg-gray-100 rounded-lg">
+						<p className="font-semibold text-gray-700">Ações do Coordenador:</p>
+						<FormControl size="small" sx={{ minWidth: 200 }}>
+							<InputLabel id="status-select-label">Alterar Status</InputLabel>
+							<Select
+								labelId="status-select-label"
+								label="Alterar Status"
+								value={hae.status}
+								onChange={(e) =>
+									handleStatusChange(e.target.value as Hae["status"])
+								}
+								disabled={isSubmitting}
+							>
+								{STATUS_OPTIONS.map((statusOption) => (
+									<MenuItem key={statusOption} value={statusOption}>
+										{statusOption}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</div>
+				)}
+			</main>
+
+			<Snackbar
+				open={snackbar?.open}
+				autoHideDuration={6000}
+				onClose={() => setSnackbar(null)}
+				anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+			>
+				<Alert
+					onClose={() => setSnackbar(null)}
+					severity={snackbar?.severity}
+					sx={{ width: "100%" }}
+				>
+					{snackbar?.message}
+				</Alert>
+			</Snackbar>
+		</div>
+	);
+}

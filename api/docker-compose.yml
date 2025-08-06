@@ -1,25 +1,33 @@
 services:
-  api:
-    image: nickolss/apihae:latest
-    ports:
-      - ${PORT}:${PORT}
+  postgresTemporario:
+    image: postgres:17
+    container_name: postgresTemporario
     environment:
-      PORT: ${PORT}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_HOST: redis
-      REDIS_PORT: ${REDIS_PORT}
-    privileged: true
-    depends_on:
-      - redis
-    container_name: apiHae
-
-  redis:
-    image: redis:7.0
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - "${DATABASE_PORT}:5432"
     volumes:
-      - redis-data:/data
-    container_name: redisHae
-  
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  api:
+    build: .
+    container_name: api
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - postgresTemporario
+    env_file:
+      - .env
+    networks:
+      - backend
+
 volumes:
-  redis-data:
+  pgdata:
+
+networks:
+  backend:
+    driver: bridge
