@@ -1,29 +1,33 @@
 package br.com.fateczl.apihae.adapter.controller;
 
 import br.com.fateczl.apihae.adapter.dto.LoginRequest;
+import br.com.fateczl.apihae.adapter.dto.ResetPasswordRequest;
 import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
 import br.com.fateczl.apihae.adapter.dto.VerifyEmailCodeRequest;
+import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.AuthService;
 import br.com.fateczl.apihae.useCase.util.CookieUtils;
+import br.com.fateczl.apihae.useCase.util.JWTUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Map;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
 @RequestMapping("/auth")
 @Tag(name = "Auth", description = "Endpoints para autenticação e autorização")
 public class AuthController {
 
     private final AuthService authService;
     private final CookieUtils cookieUtils;
+    private final JWTUtils tokenService;
 
     @PostMapping("/send-email-code")
     public ResponseEntity<Object> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
@@ -34,23 +38,28 @@ public class AuthController {
     }
 
     @PostMapping("/verify-email-code")
-    public ResponseEntity<Object> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request,
+    public ResponseEntity<Employee> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request,
             HttpServletResponse response) {
-        String token = authService.verifyEmailCode(request.getEmail(), request.getCode());
+        Employee verifiedEmployee = authService.verifyEmailCode(request.getEmail(), request.getCode());
+
+        String token = tokenService.generateToken(verifiedEmployee);
         setTokenCookie(response, token);
-        return ResponseEntity.ok("Created");
+
+        return ResponseEntity.ok(verifiedEmployee);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        String token = authService.login(request.getEmail(), request.getPassword());
+    public ResponseEntity<Employee> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        Employee authenticatedEmployee = authService.login(request.getEmail(), request.getPassword());
+
+        String token = tokenService.generateToken(authenticatedEmployee);
         setTokenCookie(response, token);
-        return ResponseEntity.ok("logado");
+
+        return ResponseEntity.ok(authenticatedEmployee);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletResponse response) {
-        SecurityContextHolder.clearContext();
         cookieUtils.DeleteCookies(response);
         return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout realizado com sucesso."));
     }
@@ -58,4 +67,19 @@ public class AuthController {
     private void setTokenCookie(HttpServletResponse response, String token) {
         cookieUtils.CreateCookies(response, token);
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Object> forgotPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        authService.sendPasswordResetToken(email);
+        return ResponseEntity.ok(Collections.singletonMap("mensagem",
+                "Se o e-mail estiver cadastrado, um link para redefinição de senha foi enviado."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Object> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Senha redefinida com sucesso."));
+    }
+
 }
