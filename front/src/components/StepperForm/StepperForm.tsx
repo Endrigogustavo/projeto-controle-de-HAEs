@@ -2,19 +2,16 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import {
-	HaeDataType,
-	StepProps,
-	FormErrors,
-} from "./types/haeFormTypes";
+import { HaeDataType, StepProps, FormErrors } from "./types/haeFormTypes";
 import { useLoggedEmployee } from "@/hooks/useLoggedEmployee";
 import { haeFormSchema } from "@/validation/haeFormSchema";
-import { useSnackbar } from "@/hooks/useSnackbar";
-
+import { useNavigate, useLocation } from "react-router-dom";
+import { useHaeService } from "@/hooks/useHaeService";
+import haeService from "@/services/haeService";
+import api from "@/services";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
-import { createHae } from "@/services/hae";
-import { useNavigate } from "react-router-dom";
+import * as yup from "yup";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 	props,
@@ -23,6 +20,14 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 	return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+interface HaeApiResponse
+	extends Omit<HaeDataType, "employeeId" | "studentRAs"> {
+	employee: {
+		id: string;
+	};
+	students: string[];
+}
+
 const StepperForm: React.FC = () => {
 	const [step, setStep] = useState(1);
 	const {
@@ -30,6 +35,11 @@ const StepperForm: React.FC = () => {
 		isLoadingEmployee,
 		error: employeeError,
 	} = useLoggedEmployee();
+
+	const location = useLocation();
+	const haeIdToEdit = location.state?.haeId;
+	const isEditMode = !!haeIdToEdit;
+	const [isLoadingHae, setIsLoadingHae] = useState(isEditMode);
 
 	const [formData, setFormData] = useState<HaeDataType>({
 		employeeId: "",
@@ -40,7 +50,7 @@ const StepperForm: React.FC = () => {
 		modality: "",
 		startDate: "",
 		endDate: "",
-		observation: "",
+		observations: "",
 		dayOfWeek: [],
 		timeRange: "",
 		projectDescription: "",
@@ -51,15 +61,41 @@ const StepperForm: React.FC = () => {
 	const [errors, setErrors] = useState<FormErrors>({});
 
 	const {
-		open: openSnackbar,
-		message: snackbarMessage,
-		severity: snackbarSeverity,
-		showSnackbar,
-		hideSnackbar,
-	} = useSnackbar();
+		openSnackbar,
+		snackbarMessage,
+		snackbarSeverity,
+		handleCloseSnackbar: hideSnackbar,
+		handleCreateHae,
+		handleUpdateHae,
+	} = useHaeService(haeService);
 
 	useEffect(() => {
-		if (employee && !isLoadingEmployee) {
+		if (isEditMode && haeIdToEdit) {
+			const fetchHaeForEdit = async () => {
+				setIsLoadingHae(true);
+				try {
+					const response = await api.get<HaeApiResponse>(
+						`/hae/getHaeById/${haeIdToEdit}`
+					);
+					const haeData = response.data;
+
+					setFormData({
+						...haeData,
+						employeeId: haeData.employee.id,
+						studentRAs: haeData.students,
+					});
+				} catch (error) {
+					console.error("Erro ao buscar HAE para edição:", error);
+				} finally {
+					setIsLoadingHae(false);
+				}
+			};
+			fetchHaeForEdit();
+		}
+	}, [isEditMode, haeIdToEdit]);
+
+	useEffect(() => {
+		if (employee && !isLoadingEmployee && !isEditMode) {
 			setFormData((prevData) => ({
 				...prevData,
 				employeeId: employee.id || "",
@@ -67,12 +103,8 @@ const StepperForm: React.FC = () => {
 		}
 		if (employeeError) {
 			console.error("Erro ao carregar funcionário:", employeeError.message);
-			showSnackbar(
-				"Não foi possível carregar seus dados de funcionário. Tente recarregar a página.",
-				"error"
-			);
 		}
-	}, [employee, isLoadingEmployee, employeeError, showSnackbar]);
+	}, [employee, isLoadingEmployee, employeeError, isEditMode]);
 
 	const updateFormData = useCallback(
 		<K extends keyof HaeDataType>(field: K, value: HaeDataType[K]) => {
@@ -80,12 +112,11 @@ const StepperForm: React.FC = () => {
 				...prevData,
 				[field]: value,
 			}));
-			setErrors((prevErrors) => ({
-				...prevErrors,
-				[field]: undefined,
-			}));
+			if (errors[field]) {
+				setErrors((prevErrors) => ({ ...prevErrors, [field]: undefined }));
+			}
 		},
-		[]
+		[errors]
 	);
 
 	const handleNextStep = () => setStep((prev) => prev + 1);
@@ -94,23 +125,42 @@ const StepperForm: React.FC = () => {
 
 	const handleFormSubmit = useCallback(async () => {
 		try {
-			const payload: HaeDataType & { studentRas: string[] } = {
-				...formData,
-				// ✅ Não faz flatten:
-				weeklySchedule: formData.weeklySchedule,
-				studentRas: formData.studentRAs,
-			};
+			setErrors({});
+			console.log(formData)
+			await haeFormSchema.validate(formData, { abortEarly: false });
 
-			await haeFormSchema.validate(payload, { abortEarly: false });
+			let success = false;
+			if (isEditMode) {
+				success = await handleUpdateHae(haeIdToEdit, formData);
+			} else {
+				success = await handleCreateHae(formData);
+			}
 
-			await createHae(payload);
-
-			showSnackbar("Formulário HAE enviado com sucesso!", "success");
-			setTimeout(() => navigate("/"), 4000);
-		} catch (validationErrors: any) {
-			// tratamento de erros...
+			if (success) {
+				const redirectPath = "/myrequests";
+				setTimeout(() => navigate(redirectPath), 2000);
+			}
+		} catch (error: unknown) {
+			if (error instanceof yup.ValidationError) {
+				const newErrors: FormErrors = {};
+				error.inner.forEach((err) => {
+					if (err.path) {
+						newErrors[err.path] = err.message;
+					}
+				});
+				setErrors(newErrors);
+			} else {
+				console.error("Erro inesperado no formulário:", error);
+			}
 		}
-	}, [formData, showSnackbar, navigate]);
+	}, [
+		formData,
+		handleCreateHae,
+		handleUpdateHae,
+		navigate,
+		isEditMode,
+		haeIdToEdit,
+	]);
 
 	const renderCurrentStep = () => {
 		const commonStepProps: StepProps = {
@@ -136,6 +186,7 @@ const StepperForm: React.FC = () => {
 						{...commonStepProps}
 						onBack={handleBackStep}
 						onSubmit={handleFormSubmit}
+						isEditMode={isEditMode}
 					/>
 				);
 			default:
@@ -143,11 +194,13 @@ const StepperForm: React.FC = () => {
 		}
 	};
 
-	if (isLoadingEmployee) {
+	if (isLoadingEmployee || isLoadingHae) {
 		return (
 			<div className="flex items-center justify-center h-screen">
 				<p className="text-xl text-gray-700">
-					Carregando dados do funcionário...
+					{isEditMode
+						? "Carregando dados da HAE para edição..."
+						: "Carregando dados do funcionário..."}
 				</p>
 			</div>
 		);
@@ -182,7 +235,7 @@ const StepperForm: React.FC = () => {
 		<div className="flex items-center justify-center my-6">
 			<div className="p-8 rounded-xl w-full shadow-md bg-white">
 				<h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-					Criar HAE
+					{isEditMode ? "Editar Solicitação de HAE" : "Criar Nova HAE"}
 				</h2>
 				{renderCurrentStep()}
 				<Snackbar

@@ -1,37 +1,22 @@
 import React, { useState } from "react";
 import { TextField } from "@mui/material";
 import { StepThreeProps, FormErrors } from "./types/haeFormTypes";
-import { object } from "yup";
-import { haeFormSchema } from "@/validation/haeFormSchema";
 
 const StepThree: React.FC<StepThreeProps> = ({
 	onBack,
 	formData,
 	setFormData,
 	onSubmit,
+	isEditMode,
 }) => {
 	const [errors, setErrors] = useState<FormErrors>({});
 
 	const handleSendClick = async () => {
 		try {
 			setErrors({});
-			await object()
-				.shape({
-					observation: haeFormSchema.fields.observation,
-				})
-				.validate(
-					{ observation: formData.observation },
-					{ abortEarly: false }
-				);
-
-			console.log(formData);
-			onSubmit();
-		} catch (validationErrors: any) {
-			const newErrors: FormErrors = {};
-			validationErrors.inner.forEach((error: any) => {
-				newErrors[error.path] = error.message;
-			});
-			setErrors(newErrors);
+			await onSubmit();
+		} catch (err: unknown) {
+			console.log(err);
 		}
 	};
 
@@ -50,18 +35,18 @@ const StepThree: React.FC<StepThreeProps> = ({
 					minRows={3}
 					maxRows={10}
 					placeholder="Ex.: Necessidade de acesso a laboratórios específicos..."
-					value={formData.observation}
+					value={formData.observations}
 					onChange={(e) => {
-						setFormData("observation", e.target.value);
-						if (errors.observation) {
+						setFormData("observations", e.target.value);
+						if (errors.observations) {
 							setErrors((prevErrors) => ({
 								...prevErrors,
-								observation: undefined,
+								observations: undefined,
 							}));
 						}
 					}}
-					error={!!errors.observation}
-					helperText={errors.observation}
+					error={!!errors.observations}
+					helperText={errors.observations}
 				/>
 			</div>
 
@@ -76,9 +61,11 @@ const StepThree: React.FC<StepThreeProps> = ({
 				<button
 					type="button"
 					onClick={handleSendClick}
-					className="btnFatec bg-green-600 text-white"
+					className={`btnFatec text-white ${
+						isEditMode ? "bg-blue-600" : "bg-green-600"
+					}`}
 				>
-					Enviar
+					{isEditMode ? "Atualizar" : "Enviar"}
 				</button>
 			</div>
 		</div>
