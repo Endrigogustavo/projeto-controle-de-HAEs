@@ -10,11 +10,12 @@ export const registerSchema = yup
 		email: yup
 			.string()
 			.email("E-mail inválido")
-			.matches(/@fatec\.sp\.gov\.br$/, "E-mail deve ser institucional")
+			.matches(
+				/@(fatec|cps)\.sp\.gov\.br$/,
+				"E-mail deve ser institucional (@fatec ou @cps)"
+			)
 			.required("E-mail é obrigatório"),
-		course: yup
-			.string()
-			.required("Curso é obrigatório"),
+		course: yup.string().required("Curso é obrigatório"),
 		password: yup
 			.string()
 			.min(6, "Senha deve ter no mínimo 6 caracteres")
