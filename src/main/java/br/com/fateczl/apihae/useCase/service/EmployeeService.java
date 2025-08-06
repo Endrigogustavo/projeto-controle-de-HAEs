@@ -1,23 +1,52 @@
 package br.com.fateczl.apihae.useCase.service;
 
+import br.com.fateczl.apihae.adapter.dto.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
+import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.useCase.util.JWTUtils;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final HaeRepository haeRepository;
+
+    @Transactional(readOnly = true)
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeSummaryDTO> getEmployeeSummaries(Role role) {
+        List<Employee> professors = employeeRepository.findAllByRole(role);
+
+        return professors.stream().map(professor -> {
+            int haeCount = haeRepository.countByEmployeeId(professor.getId());
+
+            return new EmployeeSummaryDTO(
+                    professor.getId(),
+                    professor.getName(),
+                    professor.getEmail(),
+                    professor.getCourse(),
+                    haeCount);
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Employee getEmployeeByEmail(String email) {
+        return employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com email " + email));
+    }
 
     @Transactional(readOnly = true)
     public Employee getEmployeeById(String id) {

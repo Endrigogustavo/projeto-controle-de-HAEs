@@ -1,7 +1,9 @@
 package br.com.fateczl.apihae.adapter.controller;
 
+import br.com.fateczl.apihae.adapter.dto.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.adapter.dto.EmployeeUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
+import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import br.com.fateczl.apihae.useCase.util.JWTUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
@@ -27,9 +30,28 @@ public class EmployeeController {
         this.TokenService = TokenService;
     }
 
+    @GetMapping("/getAllEmployee")
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping("/getAllByRole/{role}")
+    public ResponseEntity<List<EmployeeSummaryDTO>> getAllProfessoresByRole(@PathVariable("role") Role role) {
+        List<EmployeeSummaryDTO> summaries = employeeService.getEmployeeSummaries(role);
+        return ResponseEntity.ok(summaries);
+    }
+
     @GetMapping("/get-professor/{id}")
     public ResponseEntity<Object> getProfessorById(@PathVariable("id") String id) {
         Employee employee = employeeService.getEmployeeById(id);
+        System.out.println(employee);
+        return ResponseEntity.ok(employee);
+    }
+
+    @GetMapping("/get-professor")
+    public ResponseEntity<Object> getProfessorByEmail(@RequestParam("email") String email) {
+        Employee employee = employeeService.getEmployeeByEmail(email);
         System.out.println(employee);
         return ResponseEntity.ok(employee);
     }
@@ -48,12 +70,9 @@ public class EmployeeController {
     }
 
     @GetMapping("/get-my-user")
-    public ResponseEntity<?> getMyUser(@CookieValue(value = "auth_token", required = false) String authToken) {
-        String userId = TokenService.decodeToken(authToken);
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido.");
-        }
-        Employee employee = employeeService.getEmployeeById(userId);
+    public ResponseEntity<?> getMyUser(@RequestParam("email") String email) {
+        Employee employee = employeeService.getEmployeeByEmail(email);
+        System.out.println(employee);
         return ResponseEntity.ok(employee);
     }
 }
