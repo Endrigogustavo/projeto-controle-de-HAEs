@@ -12,12 +12,12 @@ export interface HaeDataType {
 	projectTitle: string;
 	modality: string;
 	weeklyHours: number;
-	projectType: string; 
+	projectType: string;
 	dayOfWeek: string[];
 	weeklySchedule: WeeklySchedule;
 	timeRange: string;
 	projectDescription: string;
-	observation: string;
+	observations: string;
 	startDate: string;
 	endDate: string;
 	studentRAs: string[];
@@ -25,7 +25,6 @@ export interface HaeDataType {
 
 export interface FormErrors {
 	[key: string]: string | { [index: number]: string } | undefined;
-
 	nameEmployee?: string;
 	course?: string;
 	projectTitle?: string;
@@ -34,20 +33,18 @@ export interface FormErrors {
 	projectType?: string;
 	dayOfWeek?: string;
 	timeRange?: string;
+	startTime?: string;
+	endTime?: string;
 	projectDescription?: string;
-	observation?: string;
+	observations?: string;
 	startDate?: string;
 	endDate?: string;
 	employeeId?: string;
-
-	studentRAs?: {
-		[index: number]: string;
-	};
+	studentRAs?: { [index: number]: string } | string;
 }
 
 export interface StepProps {
 	formData: HaeDataType;
-
 	setFormData: <K extends keyof HaeDataType>(
 		field: K,
 		value: HaeDataType[K]
@@ -67,4 +64,5 @@ export interface StepTwoProps extends StepProps {
 export interface StepThreeProps extends StepProps {
 	onBack: () => void;
 	onSubmit: () => Promise<void>;
+	isEditMode: boolean;
 }
