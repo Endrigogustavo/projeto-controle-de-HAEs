@@ -1,7 +1,23 @@
 export interface Hae {
-    id: string;
-    projectTitle: string;
-    course: string;
-    projectDescription: string;
-    status: "PENDENTE" | "APROVADO" | "REJEITADO";
+	id: string;
+	nameEmployee: string;
+	course: string;
+	projectTitle: string;
+	weeklyHours: number;
+	projectType: string;
+	dayOfWeek: string[];
+	timeRange: string;
+	projectDescription: string;
+	observations: string;
+	status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO";
+	coordenatorId: string;
+	startDate: string;
+	endDate: string;
+	comprovanteDoc: any[];
+	modality: "ONLINE" | "PRESENCIAL";
+	employee: EmployeeDetails;
+	students: string[];
+	weeklySchedule: Record<string, string>;
+	createdAt: string;
+	updatedAt: string;
 }
