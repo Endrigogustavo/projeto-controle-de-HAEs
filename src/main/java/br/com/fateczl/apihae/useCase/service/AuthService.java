@@ -1,42 +1,46 @@
 package br.com.fateczl.apihae.useCase.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
+import br.com.fateczl.apihae.domain.entity.PasswordResetToken;
 import br.com.fateczl.apihae.domain.enums.Role;
+import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.useCase.util.JWTUtils;
+import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final EmployeeRepository employeeRepository;
-    private final EmailVerificationService emailVerificationService;
-    private final PasswordEncoder passwordEncoder;
-    private final JWTUtils TokenService;
-
-
+    private final EmailVerificationRepository emailVerificationRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailService emailService;
+    private final BasicTextEncryptor textEncryptor;
 
     @Transactional(readOnly = true)
-    public String login(String email, String plainPassword) {
+    public Employee login(String email, String plainPassword) {
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Credenciais inválidas."));
 
-        if (!passwordEncoder.matches(plainPassword, employee.getPassword())) {
+        try {
+            String decryptedStoredPassword = textEncryptor.decrypt(employee.getPassword());
+            if (!plainPassword.equals(decryptedStoredPassword)) {
+                throw new IllegalArgumentException("Credenciais inválidas.");
+            }
+        } catch (Exception e) {
             throw new IllegalArgumentException("Credenciais inválidas.");
         }
 
-        String token = TokenService.generateToken(employee);
-        if (token == null || token.isBlank()) {
-            return "Error";
-        }
-
-        return token;
+        return employee;
     }
 
     @Transactional
@@ -45,17 +49,32 @@ public class AuthService {
             throw new IllegalArgumentException("Email já registrado.");
         }
 
-        String hashedPassword = passwordEncoder.encode(plainPassword);
-        return emailVerificationService.generateAndSaveVerificationCode(email, name, course, hashedPassword);
+        String encryptedPassword = textEncryptor.encrypt(plainPassword);
+
+        emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
+        String verificationCode = generateNumericCode();
+
+        EmailVerification newVerification = new EmailVerification();
+        newVerification.setEmail(email);
+        newVerification.setName(name);
+        newVerification.setCourse(course);
+        newVerification.setPassword(encryptedPassword);
+        newVerification.setCode(verificationCode);
+        newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        emailVerificationRepository.save(newVerification);
+
+        emailService.sendVerificationEmail(email, verificationCode);
+
+        return verificationCode;
     }
 
     @Transactional
-    public String verifyEmailCode(String email, String code) {
-        EmailVerification verification = emailVerificationService.findValidVerification(email, code)
+    public Employee verifyEmailCode(String email, String code) {
+        EmailVerification verification = findValidVerification(email, code)
                 .orElseThrow(() -> new IllegalArgumentException("Código inválido ou expirado."));
 
         if (employeeRepository.findByEmail(email).isPresent()) {
-            emailVerificationService.deleteVerification(verification);
+            emailVerificationRepository.delete(verification);
             throw new IllegalArgumentException("Email já associado com uma conta registrada.");
         }
 
@@ -64,17 +83,54 @@ public class AuthService {
         newEmployee.setEmail(verification.getEmail());
         newEmployee.setCourse(verification.getCourse());
         newEmployee.setPassword(verification.getPassword());
-        newEmployee.setRole(Role.PROFESSOR);
 
-        Employee savedEmployee = employeeRepository.save(newEmployee);
-        emailVerificationService.deleteVerification(verification);
-
-        String token = TokenService.generateToken(savedEmployee);
-        if (token == null || token.isBlank()) {
-            return "Error";
+        if (email.toLowerCase().endsWith("@cps.sp.gov.br")) {
+            newEmployee.setRole(Role.COORDENADOR);
+        } else {
+            newEmployee.setRole(Role.PROFESSOR);
         }
 
-        return token;
+        Employee savedEmployee = employeeRepository.save(newEmployee);
+        emailVerificationRepository.delete(verification);
+
+        return savedEmployee;
     }
 
+    @Transactional
+    public void sendPasswordResetToken(String email) {
+        employeeRepository.findByEmail(email).ifPresent(employee -> {
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = new PasswordResetToken(token, employee);
+            passwordResetTokenRepository.save(resetToken);
+            emailService.sendPasswordResetEmail(employee.getEmail(), token);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado."));
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new IllegalArgumentException("Token inválido ou expirado.");
+        }
+
+        Employee employee = resetToken.getEmployee();
+        String encryptedPassword = textEncryptor.encrypt(newPassword);
+        employee.setPassword(encryptedPassword);
+        employeeRepository.save(employee);
+
+        passwordResetTokenRepository.delete(resetToken);
+    }
+
+    private String generateNumericCode() {
+        return String.valueOf(100000 + new Random().nextInt(900000));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<EmailVerification> findValidVerification(String email, String code) {
+        return emailVerificationRepository.findByEmailAndCode(email, code)
+                .filter(verification -> verification.getExpiresAt().isAfter(LocalDateTime.now()));
+    }
 }

@@ -32,9 +32,9 @@ spring:
 server:
   port: ${PORT:8080}
 
-logging:
-  level:
-    root: WARN
+frontend:
+  reset:
+    url: ${FRONTEND_URL}
 
 app:
   allowed:
@@ -42,3 +42,7 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
