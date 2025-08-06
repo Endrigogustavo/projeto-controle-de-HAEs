@@ -15,16 +15,16 @@ export const useLoggedEmployee = (): UseLoggedEmployeeReturn => {
 	const [error, setError] = useState<Error | null>(null);
 
 	useEffect(() => {
-		const fetchEmployeeData = async () => {
+		const fetchEmployeeData = async (emailRequest: string) => {
 			try {
-				const userId = await checkCookie();
+				const userId = await checkCookie(emailRequest);
 
 				if (!userId) {
 					setEmployee(null);
 					return;
 				}
 
-				const employeeData = await getMyUser();
+				const employeeData = await getMyUser(emailRequest);
 				setEmployee(employeeData);
 			} catch (err) {
 				console.error("Erro ao carregar dados do funcionário logado:", err);
@@ -39,7 +39,13 @@ export const useLoggedEmployee = (): UseLoggedEmployeeReturn => {
 			}
 		};
 
-		fetchEmployeeData();
+		const email = localStorage.getItem("email");
+		if (email) {
+			fetchEmployeeData(email);
+		} else {
+			setIsLoadingEmployee(false);
+			setEmployee(null);
+		}
 	}, []);
 
 	return { employee, isLoadingEmployee, error };

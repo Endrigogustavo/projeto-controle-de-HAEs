@@ -18,7 +18,7 @@ interface UseSnackbarReturn {
 export const useSnackbar = (): UseSnackbarReturn => {
 	const [open, setOpen] = useState(false);
 	const [message, setMessage] = useState("");
-	const [severity, setSeverity] = useState<AlertColor>("info"); // Default para 'info'
+	const [severity, setSeverity] = useState<AlertColor>("info");
 
 	/**
 	 * Exibe o snackbar com a mensagem e severidade especificadas.
@@ -36,7 +36,7 @@ export const useSnackbar = (): UseSnackbarReturn => {
 	 */
 	const hideSnackbar = useCallback(() => {
 		setOpen(false);
-		setMessage(""); // Opcional: Limpar a mensagem ao fechar
+		setMessage("");
 	}, []);
 
 	return {

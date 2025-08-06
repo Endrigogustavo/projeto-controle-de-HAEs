@@ -19,16 +19,18 @@ const parseTime = (timeStr: string): number => {
 };
 
 /**
- * Hook para calcular e atualizar as horas semanais estimadas (weeklyHours)
- * com base na string de faixa de horário (timeRange).
+ * Hook para calcular e atualizar as horas semanais TOTAIS (weeklyHours)
+ * com base no horário diário e no número de dias selecionados.
  *
- * @param timeRange String com a faixa de horário (Ex: "08:00 - 12:00").
+ * @param timeRange String com a faixa de horário diário (Ex: "08:00 - 12:00").
+ * @param dayOfWeek Array com os dias da semana selecionados.
  * @param setFormData Função para atualizar o formData no componente pai.
- * @param errors Objeto de erros do formulário para limpar erros de timeRange se o formato for corrigido.
- * @param setErrors Função para atualizar o estado de erros no componente pai.
+ * @param errors Objeto de erros do formulário.
+ * @param setErrors Função para atualizar o estado de erros.
  */
 export const useHaeHoursCalculation = (
 	timeRange: string,
+	dayOfWeek: string[], // Adicionado parâmetro para os dias da semana
 	setFormData: <K extends keyof HaeDataType>(
 		field: K,
 		value: HaeDataType[K]
@@ -37,16 +39,24 @@ export const useHaeHoursCalculation = (
 	setErrors: React.Dispatch<React.SetStateAction<FormErrors>>
 ) => {
 	useEffect(() => {
-		if (timeRange) {
-			if (TIME_RANGE_REGEX.test(timeRange)) {
-				const [startTimeStr, endTimeStr] = timeRange.split(" - ");
-				const startMinutes = parseTime(startTimeStr);
-				const endMinutes = parseTime(endTimeStr);
+		// A condição agora verifica se há dias selecionados
+		if (timeRange && dayOfWeek.length > 0 && TIME_RANGE_REGEX.test(timeRange)) {
+			const [startTimeStr, endTimeStr] = timeRange.split(" - ");
+			const startMinutes = parseTime(startTimeStr);
+			const endMinutes = parseTime(endTimeStr);
 
-				const durationInMinutes = endMinutes - startMinutes;
-				const durationInHours = durationInMinutes / 60;
+			const durationInMinutes = endMinutes - startMinutes;
 
-				setFormData("weeklyHours", durationInHours);
+			// Apenas calcula se a duração for positiva
+			if (durationInMinutes > 0) {
+				const dailyDurationInHours = durationInMinutes / 60;
+
+				// Multiplica a duração diária pelo número de dias
+				const numberOfDays = dayOfWeek.length;
+				const totalWeeklyHours = dailyDurationInHours * numberOfDays;
+
+				setFormData("weeklyHours", Math.round(totalWeeklyHours * 100) / 100);
+
 				// Limpa o erro de timeRange se o formato estiver correto agora
 				if (errors.timeRange) {
 					setErrors((prevErrors) => ({ ...prevErrors, timeRange: undefined }));
@@ -55,7 +65,8 @@ export const useHaeHoursCalculation = (
 				setFormData("weeklyHours", 0);
 			}
 		} else {
+			// Zera as horas se qualquer uma das condições não for atendida
 			setFormData("weeklyHours", 0);
 		}
-	}, [timeRange, setFormData, errors.timeRange, setErrors]); // Adicionado setErrors como dependência
+	}, [timeRange, dayOfWeek, setFormData, errors.timeRange, setErrors]); // Adicionado dayOfWeek como dependência
 };
