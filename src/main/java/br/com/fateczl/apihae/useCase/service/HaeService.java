@@ -1,10 +1,8 @@
 package br.com.fateczl.apihae.useCase.service;
 
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
-import br.com.fateczl.apihae.adapter.dto.WeeklyScheduleEntry;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
-import br.com.fateczl.apihae.domain.entity.Student;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
@@ -17,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,16 +38,25 @@ public class HaeService {
         this.calendarioSingleton = calendarioSingleton;
     }
 
+    @Transactional
     public Hae createHae(HaeRequest request) {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
                         + " não encontrado. Não é possível criar HAE."));
 
+        LocalDate newHaeStartDate = request.getStartDate();
+        String newHaeSemestre = getSemestre(newHaeStartDate);
+
         List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
 
-        if (existingHaes.stream()
-                .anyMatch(hae -> hae.getStatus() == Status.PENDENTE || hae.getStatus() == Status.APROVADO)) {
-            throw new IllegalArgumentException("O professor já possui uma HAE pendente.");
+        boolean hasUnfinishedPastHae = existingHaes.stream().anyMatch(hae -> {
+            String existingHaeSemestre = getSemestre(hae.getStartDate());
+            return existingHaeSemestre.compareTo(newHaeSemestre) < 0 && hae.getStatus() != Status.COMPLETO;
+        });
+
+        if (hasUnfinishedPastHae) {
+            throw new IllegalArgumentException(
+                    "Você possui HAEs de semestres anteriores que não foram concluídas. Finalize-as para poder criar novas.");
         }
 
         LocalDate inicio = request.getStartDate();
@@ -82,7 +89,7 @@ public class HaeService {
         newHae.setWeeklyHours(request.getWeeklyHours());
         newHae.setStartDate(request.getStartDate());
         newHae.setEndDate(request.getEndDate());
-        newHae.setObservations(request.getObservation());
+        newHae.setObservations(request.getObservations());
         newHae.setStatus(Status.PENDENTE);
         newHae.setCourse(request.getCourse());
         newHae.setProjectType(request.getProjectType());
@@ -91,8 +98,6 @@ public class HaeService {
         newHae.setDayOfWeek(request.getDayOfWeek());
         newHae.setTimeRange(request.getTimeRange());
         newHae.setProjectDescription(request.getProjectDescription());
-
-        // aqui, usa o Map<String, String> já formatado
         newHae.setWeeklySchedule(weeklyScheduleFlattened);
 
         if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
@@ -176,15 +181,37 @@ public class HaeService {
         return haeRepository.findByProjectType(haeType);
     }
 
-    // @Transactional(readOnly = true)
-    // public List<Student> getStudentsByHaeId(String haeId) {
-    // Hae hae = haeRepository.findById(haeId)
-    // .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: "
-    // + haeId));
-    // return hae.getStudents();
-    // }
+    @Transactional
+    public Hae updateHae(String id, HaeRequest request) {
+        Hae hae = haeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + id));
 
-    // TODO Implementar lógica de envio de email
+        Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().getTimeRange()));
+
+        hae.setCourse(request.getCourse());
+        hae.setProjectTitle(request.getProjectTitle());
+        hae.setWeeklyHours(request.getWeeklyHours());
+        hae.setProjectType(request.getProjectType());
+        hae.setDayOfWeek(request.getDayOfWeek());
+        hae.setTimeRange(request.getTimeRange());
+        hae.setProjectDescription(request.getProjectDescription());
+        hae.setObservations(request.getObservations());
+        hae.setStatus(Status.PENDENTE);
+        hae.setStartDate(request.getStartDate());
+        hae.setEndDate(request.getEndDate());
+        hae.setModality(request.getModality());
+        hae.setStudents(request.getStudentRAs());
+        hae.setWeeklySchedule(weeklyScheduleFlattened);
+        hae.setUpdatedAt(LocalDateTime.now());
+
+        return haeRepository.save(hae);
+    }
+
     @Transactional
     public void sendEmailToCoordinatorAboutHAECreated(String coordinatorId, String haeId) {
         Hae hae = haeRepository.findById(haeId)
@@ -232,27 +259,13 @@ public class HaeService {
         hae.setWeeklyHours(request.getWeeklyHours());
         hae.setStartDate(request.getStartDate());
         hae.setEndDate(request.getEndDate());
-        hae.setObservations(request.getObservation());
+        hae.setObservations(request.getObservations());
         hae.setCourse(request.getCourse());
         hae.setProjectType(request.getProjectType());
         hae.setModality(request.getModality());
         hae.setDayOfWeek(request.getDayOfWeek());
         hae.setTimeRange(request.getTimeRange());
         hae.setProjectDescription(request.getProjectDescription());
-
-        // Verifica se o tipo de HAE é Estágio ou TCC e atribui os estudantes
-        // cadastrados no sistema
-        // if (request.getHaeType() == HaeType.Estagio || request.getHaeType() ==
-        // HaeType.TCC) {
-        // List<Student> students = request.getStudentRas().stream()
-        // .map(ra -> studentRepository.findById(ra)
-        // .orElseThrow(() -> new IllegalArgumentException("Estudante com RA " + ra + "
-        // não encontrado.")))
-        // .toList();
-        // hae.setStudents(students);
-        // } else {
-        // hae.setStudents(List.of());
-        // }
 
         if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
             List<String> studentRas = request.getStudentRAs();
@@ -262,5 +275,18 @@ public class HaeService {
         }
 
         return haeRepository.save(hae);
+    }
+
+    /**
+     * Função auxiliar para determinar o semestre de uma data.
+     * 
+     * @param date A data da HAE.
+     * @return Uma string no formato "AAAA/S" (ex: "2025/1").
+     */
+    private String getSemestre(LocalDate date) {
+        int year = date.getYear();
+        int month = date.getMonthValue(); // 1 (Jan) a 12 (Dez)
+        int semestre = (month <= 6) ? 1 : 2; // Semestre 1: Jan-Jun, Semestre 2: Jul-Dez
+        return year + "/" + semestre;
     }
 }
