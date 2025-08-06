@@ -67,7 +67,7 @@ public class Hae {
     @Column(name = "projectDescription", nullable = false, columnDefinition = "TEXT")
     private String projectDescription;
 
-    @Column(name = "observations", columnDefinition = "TEXT")
+    @Column(name = "observations", columnDefinition = "TEXT", nullable = true)
     private String observations;
 
     @Enumerated(EnumType.STRING)

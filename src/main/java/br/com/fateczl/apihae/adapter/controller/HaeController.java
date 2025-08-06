@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/hae")
-@SecurityRequirement(name = "cookieAuth") 
+@SecurityRequirement(name = "cookieAuth")
 @Tag(name = "Hae", description = "Endpoints para manipular HAEs (Horas de Atividades Específicas)")
 public class HaeController {
 
@@ -58,7 +61,6 @@ public class HaeController {
         return ResponseEntity.ok(haes);
     }
 
-
     @GetMapping("/getAll")
     public ResponseEntity<List<Hae>> getAllHaes() {
         List<Hae> haes = haeService.getAllHaes();
@@ -85,25 +87,28 @@ public class HaeController {
     }
 
     @GetMapping("/getHaesByType/{haeType}")
-        public ResponseEntity<?> getHaesByType(@PathVariable HaeType haeType) {
+    public ResponseEntity<?> getHaesByType(@PathVariable HaeType haeType) {
         List<Hae> haes = haeService.getHaesByType(haeType);
         return ResponseEntity.ok(haes);
     }
 
-//    @GetMapping("/getStudentsByHae/{haeId}")
-//    public ResponseEntity<?> getStudentsByHae(@PathVariable String haeId) {
-//        List<Student> students = haeService.getStudentsByHaeId(haeId);
-//        return ResponseEntity.ok(students);
-//    }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Hae> updateHae(@PathVariable String id, @RequestBody HaeRequest request) {
+        Hae createdHae = haeService.updateHae(id, request);
+        return ResponseEntity.status(HttpStatus.OK).body(createdHae);
+    }
 
     @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
-    public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId, @PathVariable String haeId) {
+    public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId,
+            @PathVariable String haeId) {
         haeService.sendEmailToCoordinatorAboutHAECreated(coordinatorId, haeId);
+        // TODO Criar lógica para enviar email para o coordenador
         return ResponseEntity.ok("Email enviado para o coordenador sobre a criação da HAE com ID: " + haeId);
     }
 
     @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
-    public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId, @Valid @RequestBody HaeRequest request) {
+    public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId,
+            @Valid @RequestBody HaeRequest request) {
         Hae hae = haeService.createHaeAsCoordinator(coordinatorId, employeeId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
     }

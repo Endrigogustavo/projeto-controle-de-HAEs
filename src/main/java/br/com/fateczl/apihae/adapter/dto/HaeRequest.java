@@ -50,8 +50,7 @@ public class HaeRequest {
     @Future(message = "A data de término deve ser no futuro.")
     private LocalDate endDate;
 
-    @NotBlank(message = "A observação não pode estar em branco.")
-    private String observation;
+    private String observations;
 
     @NotNull(message = "O(s) dia(s) da semana não pode(m) ser nulo(s).")
     @Size(min = 1, message = "Pelo menos um dia da semana deve ser informado.")
@@ -67,6 +66,5 @@ public class HaeRequest {
     @Size(min = 1, message = "Pelo menos um dia do cronograma deve ser informado.")
     private Map<String, WeeklyScheduleEntry> weeklySchedule;
 
-    @Size(min = 1, message = "Deve haver pelo menos um estudante na HAE.")
     private List<String> studentRAs;
 }
