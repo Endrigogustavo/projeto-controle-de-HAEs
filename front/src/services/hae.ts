@@ -10,3 +10,18 @@ export const createHae = async (data: HaeDataType) => {
 		throw error;
 	}
 };
+
+export const getHaesByProfessorId = async (professorId: string) => {
+	try {
+		const result = await api.get(`hae/getHaesByProfessor/${professorId}`);
+		return result.data;
+	} catch (error) {
+		console.log("Erro recuperar HAE por professor: " + error);
+		throw error;
+	}
+};
+
+export const updateHae = async (id: string, data: HaeDataType) => {
+	const response = await api.put(`/hae/update/${id}`, data);
+	return response.data;
+};

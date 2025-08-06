@@ -1,11 +1,11 @@
 import { getMyUser } from "./employee";
 interface IAuthService {
-	getProfessor: (id: string) => Promise<any>;
+	getProfessor: (id: string) => Promise<unknown>;
 }
 
 const employeeService: IAuthService = {
-	getProfessor: async () => {
-		return await getMyUser();
+	getProfessor: async (email: string) => {
+		return await getMyUser(email);
 	},
 };
 

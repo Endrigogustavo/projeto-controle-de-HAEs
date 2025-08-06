@@ -14,8 +14,8 @@ const authService: IAuthService = {
 	logout: async () => {
 		return await logout();
 	},
-	checkCookie: async () => {
-		return await checkCookie();
+	checkCookie: async (emailRequest: string) => {
+		return await checkCookie(emailRequest);
 	},
 };
 

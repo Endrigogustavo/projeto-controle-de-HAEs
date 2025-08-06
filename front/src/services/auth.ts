@@ -55,9 +55,9 @@ export const logout = async () => {
 	}
 };
 
-export const checkCookie = async () => {
+export const checkCookie = async (email: string) => {
 	try {
-		const response = await api.get("/employee/get-my-user");
+		const response = await api.get(`/employee/get-professor?email=${email}`);
 		return response.data.id;
 	} catch (error) {
 		console.error("Erro ao verificar cookie");
