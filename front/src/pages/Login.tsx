@@ -1,11 +1,23 @@
+import { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup"; 
-import { TextField } from "@mui/material";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+	TextField,
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogContentText,
+	DialogActions,
+	Button,
+	Box,
+	Divider,
+} from "@mui/material";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { loginSchema } from "@/validation/loginSchema";
-import { login as loginApi } from "@services/auth"; 
-import { useAuthForms } from "@/hooks/useAuthForms"; 
+import { login as loginApi } from "@services/auth";
+import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
 
 type FormData = {
@@ -13,15 +25,19 @@ type FormData = {
 	password: string;
 };
 
+const FATEC_RED_COLOR = "#D32F2F";
+const FATEC_RED_HOVER_COLOR = "#B71C1C";
+
 export default function Login() {
 	const navigate = useNavigate();
+	const [isWarningDialogOpen, setWarningDialogOpen] = useState(false);
 
 	const {
 		openSnackbar,
 		snackbarMessage,
 		snackbarSeverity,
 		handleCloseSnackbar,
-		handleLogin, 
+		handleLogin,
 	} = useAuthForms({ login: loginApi });
 
 	const {
@@ -29,15 +45,24 @@ export default function Login() {
 		handleSubmit,
 		formState: { errors, isSubmitting },
 	} = useForm<FormData>({
-		resolver: yupResolver(loginSchema), 
+		resolver: yupResolver(loginSchema),
 	});
 
+	useEffect(() => {
+		setWarningDialogOpen(true);
+	}, []);
+
+	const handleCloseWarningDialog = () => {
+		setWarningDialogOpen(false);
+	};
+
 	const onSubmit: SubmitHandler<FormData> = async (data) => {
-		const success = await handleLogin(data); 
-		if (success) {
+		const result = await handleLogin(data);
+
+		if (result.success && result.user) {			
 			setTimeout(() => {
 				navigate("/");
-			}, 3000);
+			}, 2000);
 		}
 	};
 
@@ -89,7 +114,7 @@ export default function Login() {
 							disabled={isSubmitting}
 							className="bg-red-fatec text-white p-2 rounded mt-6 mb-2 uppercase"
 						>
-							Entrar
+							{isSubmitting ? "Entrando..." : "Entrar"}
 						</button>
 					</form>
 
@@ -108,6 +133,53 @@ export default function Login() {
 				severity={snackbarSeverity}
 				onClose={handleCloseSnackbar}
 			/>
+
+			<Dialog
+				open={isWarningDialogOpen}
+				disableEscapeKeyDown
+				onClose={(_, reason) => {
+					if (reason && reason === "backdropClick") return;
+					handleCloseWarningDialog();
+				}}
+				aria-labelledby="development-warning-title"
+			>
+				<DialogTitle id="development-warning-title" sx={{ fontWeight: "600" }}>
+					<Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+						<WarningAmberIcon sx={{ color: FATEC_RED_COLOR }} />
+						Aviso Importante
+					</Box>
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						Bem-vindo! Este sistema ainda está em fase de desenvolvimento e pode
+						apresentar instabilidades.
+						<br />
+						<br />
+						Se encontrar algum problema, por favor, tente novamente entre 5 a 10
+						minutos. Se o erro persistir, contate um coordenador.
+					</DialogContentText>
+				</DialogContent>
+				<Divider />
+				<DialogActions sx={{ padding: "16px 24px" }}>
+					<Button
+						onClick={handleCloseWarningDialog}
+						variant="contained"
+						autoFocus
+						sx={{
+							backgroundColor: FATEC_RED_COLOR,
+							color: "white",
+							textTransform: "uppercase",
+							borderRadius: "0.25rem",
+							padding: "8px 22px",
+							"&:hover": {
+								backgroundColor: FATEC_RED_HOVER_COLOR,
+							},
+						}}
+					>
+						Entendido
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</>
 	);
 }

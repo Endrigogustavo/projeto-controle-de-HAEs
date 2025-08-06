@@ -19,13 +19,20 @@ export default function Dashboard() {
 	useEffect(() => {
 		const fetchHaes = async () => {
 			try {
-				const userResponse = await api.get<Employee>("/employee/get-my-user");
+				const email = localStorage.getItem("email");
+
+				const userResponse = await api.get<Employee>(
+					`/employee/get-professor?email=${email}`
+				);
+
 				const professorId = userResponse.data.id;
 
-				const haeResponse = await api.get<Hae[]>(`/hae/getHaesByProfessor/${professorId}`);
+				const haeResponse = await api.get<Hae[]>(
+					`/hae/getHaesByProfessor/${professorId}`
+				);
 
 				setHaes(haeResponse.data);
-			} catch (err: any) {
+			} catch (err: unknown) {
 				console.error(err);
 			}
 		};
@@ -34,26 +41,26 @@ export default function Dashboard() {
 	}, []);
 
 	return (
-		<div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
-			<div className="hidden md:block row-span-2">
+		<div className="layout-container">
+			<div className="sidebar">
 				<Sidebar />
 			</div>
 
-			<div className="md:hidden">
+			<div className="mobile-header">
 				<MobileHeader onMenuClick={toggleDrawer(true)} />
 			</div>
 
 			<Drawer open={isDrawerOpen} onClose={toggleDrawer(false)}>
-				<div className="w-64 h-full bg-gray-fatec">
+				<div className="drawer-sidebar">
 					<Sidebar />
 				</div>
 			</Drawer>
 
-			<div className="hidden md:block col-start-2 row-start-1">
+			<div className="header">
 				<Header />
 			</div>
 
-			<main className="col-start-2 row-start-2 p-4 overflow-auto bg-background pt-20 md:pt-4">
+			<main className="main-content">
 				<h2 className="subtitle">Visão Geral HAEs</h2>
 				<p>
 					Aqui você encontra a lista das suas HAEs solicitadas e o status de

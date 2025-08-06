@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { registerSchema } from "@/validation/registerSchema";
@@ -34,10 +34,12 @@ export default function Register() {
 	});
 
 	const onSubmit: SubmitHandler<FormData> = async (data) => {
-		await handleRegister(data);
-		setTimeout(() => {
-			navigate("/verificationCode", { state: { userEmail: data.email } });
-		}, 4000);
+		const success = await handleRegister(data);
+		if (success) {
+			setTimeout(() => {
+				navigate("/verificationCode", { state: { userEmail: data.email } });
+			}, 4000);
+		}
 	};
 
 	return (
@@ -79,14 +81,41 @@ export default function Register() {
 
 						<TextField
 							label="Curso"
-							placeholder="Análise e Desenvolvimento de Sistemas AMS"
+							select
 							{...register("course")}
 							error={!!errors.course}
 							helperText={errors.course?.message}
 							sx={{ margin: "1rem 0" }}
 							required
-						/>
+						>
+							<MenuItem value="Análise e Desenvolvimento de Sistemas AMS">
+								Análise e Desenvolvimento de Sistemas AMS
+							</MenuItem>
 
+							<MenuItem value="Análise e Desenvolvimento de Sistemas">
+								Análise e Desenvolvimento de Sistemas
+							</MenuItem>
+
+							<MenuItem value="Comercio Exterior">Comércio Exterior</MenuItem>
+
+							<MenuItem value="Desenvolvimento de Produtos Plásticos">
+								Desenvolvimento de Produtos Plásticos
+							</MenuItem>
+
+							<MenuItem value="Desenvolvimento de Software Multiplataforma">
+								Desenvolvimento de Software Multiplataforma
+							</MenuItem>
+
+							<MenuItem value="Gestão de Recursos Humanos">
+								Gestão de Recursos Humanos
+							</MenuItem>
+
+							<MenuItem value="Gestão Empresarial">Gestão Empresarial</MenuItem>
+
+							<MenuItem value="Logística">Logística</MenuItem>
+
+							<MenuItem value="Polímeros">Polímeros</MenuItem>
+						</TextField>
 
 						<PasswordField
 							{...register("password")}

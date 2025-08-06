@@ -1,7 +1,7 @@
 import { TextField, FormControl } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation, useNavigate } from "react-router-dom"; // Importa useLocation para pegar o state
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastNotification } from "@/components/ToastNotification";
 import { verificationCodeSchema } from "@/validation/verificationCodeSchema";
 import { verifyEmailCode as verifyCodeApi } from "@/services/auth";
@@ -31,7 +31,6 @@ export default function VerificationCode() {
 		handleCloseSnackbar,
 		handleVerifyCode,
 	} = useAuthForms({
-		register: async () => {},
 		verifyCode: verifyCodeApi,
 	});
 
@@ -50,10 +49,25 @@ export default function VerificationCode() {
 			);
 			return;
 		}
-		await handleVerifyCode({ email: userEmail, code: formData.code });
-		setTimeout(() => {
-			navigate("/");
-		}, 4000);
+		
+		const result = await handleVerifyCode({ email: userEmail, code: formData.code });
+
+		if (result.success && result.user) {
+			let redirectPath = "/dashboard";
+
+			switch (result.user.role) {
+				case "COORDENADOR":
+					redirectPath = "/dashboard-coordenador";
+					break;
+				case "ADMIN":
+					redirectPath = "/dashboard-admin";
+					break;
+			}
+
+			setTimeout(() => {
+				navigate(redirectPath, { replace: true });
+			}, 2000);
+		}
 	};
 
 	return (
@@ -66,7 +80,7 @@ export default function VerificationCode() {
 					</h1>
 					<p className="my-4">
 						Nós enviamos um código de confirmação para o seu{" "}
-						<a href="/#">e-mail institucional.</a>
+						<a href="/#" className="font-bold text-red-fatec">e-mail institucional.</a>
 						{userEmail && (
 							<span className="font-bold"> ({userEmail})</span>
 						)}{" "}
@@ -80,14 +94,15 @@ export default function VerificationCode() {
 						<FormControl>
 							<TextField
 								required
-								label="Código"
-								placeholder="369777"
+								label="Código de Verificação"
+								placeholder="xxxxxx"
 								{...register("code")}
 								error={!!errors.code}
 								helperText={errors.code?.message}
 								inputProps={{
 									maxLength: 6,
 									pattern: "[0-9]*",
+									style: { textAlign: 'center', letterSpacing: '0.5rem' }
 								}}
 							/>
 						</FormControl>
@@ -97,7 +112,7 @@ export default function VerificationCode() {
 							disabled={isSubmitting || !userEmail}
 							className="bg-red-fatec text-white p-2 rounded my-2 uppercase"
 						>
-							Confirmar Cadastro
+							{isSubmitting ? "Verificando..." : "Confirmar Cadastro"}
 						</button>
 					</form>
 				</div>
