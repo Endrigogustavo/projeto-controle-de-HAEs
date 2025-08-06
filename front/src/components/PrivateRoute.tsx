@@ -1,37 +1,40 @@
-import { JSX, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import api from "@services/index";
+import { useAuth } from "@/hooks/useAuth";
+import { JSX } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 
-interface PrivateRouteProps {
-	children: JSX.Element;
-}
+export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+	const { user, loading } = useAuth();
+	const location = useLocation();
 
-export function PrivateRoute({ children }: PrivateRouteProps) {
-	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-	
-	useEffect(() => {
-		api
-			.get("/employee/get-my-user")
-			.then((data) => {
-				if(data.status === 401) {
-					setIsAuthenticated(false);
-				}
-				else {
-					setIsAuthenticated(true);
-				}
-			})
-			.catch(() => {
-				setIsAuthenticated(false);
-			});
-	}, []);
-
-	if (isAuthenticated === null) {
-		return <div>Loading...</div>;
+	if (loading) {
+		return <div>Carregando...</div>;
 	}
 
-	if (!isAuthenticated) {
-		return <Navigate to="/login" replace />;
+	if (!user) {
+		return <Navigate to="/login" state={{ from: location }} replace />;
+	}
+
+	if (location.pathname === "/") {
+		let redirectPath = "/dashboard";
+
+		switch (user.role) {
+			case "COORDENADOR":
+				redirectPath = "/dashboard-coordenador";
+				break;
+			case "ADMIN":
+				redirectPath = "/dashboard-admin";
+				break;
+			case "DIRETOR":
+				redirectPath = "/dashboard-diretor";
+				break;
+			case "PROFESSOR":
+			default:
+				redirectPath = "/dashboard";
+				break;
+		}
+
+		return <Navigate to={redirectPath} replace />;
 	}
 
 	return children;
-}
+};
