@@ -3,9 +3,18 @@ import { Sidebar } from "@components/Sidebar";
 import { Header } from "@components/Header";
 import { CardRequestHae } from "@components/CardRequestHae";
 import { MobileHeader } from "@components/MobileHeader";
-import Drawer from "@mui/material/Drawer";
-import { Employee } from "@/types/employee";
 import api from "@/services";
+import { Employee } from "@/types/employee";
+
+import {
+	Drawer,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	Button,
+} from "@mui/material";
 import { Hae } from "@/types/hae";
 
 export default function MyRequests() {
@@ -13,6 +22,9 @@ export default function MyRequests() {
 	const [haes, setHaes] = useState<Hae[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
+
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [haeToDelete, setHaeToDelete] = useState<string | null>(null);
 
 	const toggleDrawer = (open: boolean) => () => {
 		setDrawerOpen(open);
@@ -23,16 +35,13 @@ export default function MyRequests() {
 			try {
 				setLoading(true);
 				const email = localStorage.getItem("email");
-
 				const userResponse = await api.get<Employee>(
 					`/employee/get-professor?email=${email}`
 				);
 				const professorId = userResponse.data.id;
-
 				const haeResponse = await api.get<Hae[]>(
 					`/hae/getHaesByProfessor/${professorId}`
 				);
-
 				const filteredHaes = haeResponse.data.filter(
 					(hae) => hae.status === "PENDENTE"
 				);
@@ -44,23 +53,36 @@ export default function MyRequests() {
 				setLoading(false);
 			}
 		};
-
 		fetchHaes();
 	}, []);
 
-	const handleDelete = async (id: string) => {
+	const openDeleteDialog = (id: string) => {
+		setHaeToDelete(id);
+		setIsDeleteDialogOpen(true);
+	};
+
+	const closeDeleteDialog = () => {
+		setHaeToDelete(null);
+		setIsDeleteDialogOpen(false);
+	};
+
+	const handleDeleteConfirm = async () => {
+		if (!haeToDelete) return;
+
 		try {
-			await api.delete(`/hae/delete/${id}`);
-			setHaes((prev) => prev.filter((hae) => hae.id !== id));
+			await api.delete(`/hae/delete/${haeToDelete}`);
+			setHaes((prev) => prev.filter((hae) => hae.id !== haeToDelete));
 		} catch (error) {
 			console.error("Erro ao deletar HAE:", error);
 			alert("Não foi possível deletar a solicitação.");
+		} finally {
+			closeDeleteDialog();
 		}
 	};
 
 	return (
 		<div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
-			<div className="sidebar">
+			<div className="sidebar hidden md:block row-span-2">
 				<Sidebar />
 			</div>
 			<div className="md:hidden">
@@ -71,7 +93,7 @@ export default function MyRequests() {
 					<Sidebar />
 				</div>
 			</Drawer>
-			<div className="header">
+			<div className="header hidden md:block col-start-2 row-start-1">
 				<Header />
 			</div>
 
@@ -96,10 +118,33 @@ export default function MyRequests() {
 						titulo={hae.projectTitle}
 						curso={hae.course}
 						descricao={hae.projectDescription}
-						onDelete={() => handleDelete(hae.id)}
+						onDelete={() => openDeleteDialog(hae.id)}
 					/>
 				))}
 			</main>
+
+			<Dialog
+				open={isDeleteDialogOpen}
+				onClose={closeDeleteDialog}
+				aria-labelledby="alert-dialog-title"
+				aria-describedby="alert-dialog-description"
+			>
+				<DialogTitle id="alert-dialog-title">
+					{"Confirmar Exclusão"}
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">
+						Você tem certeza que deseja excluir esta solicitação de HAE? Esta
+						ação não pode ser desfeita.
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeDeleteDialog}>Cancelar</Button>
+					<Button onClick={handleDeleteConfirm} color="error" autoFocus>
+						Confirmar Exclusão
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }
