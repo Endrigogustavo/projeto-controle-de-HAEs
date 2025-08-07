@@ -6,3 +6,6 @@
 
 # Força CRLF em arquivos batch do Windows
 *.bat text eol=crlf
+
+/mvnw text eol=lf
+*.cmd text eol=crlf
