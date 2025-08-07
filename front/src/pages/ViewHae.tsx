@@ -29,9 +29,11 @@ import {
 	WorkspacePremiumOutlined,
 	CategoryOutlined,
 	GroupOutlined,
+	VerifiedUserOutlined,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { Hae } from "@/types/hae";
+import { Employee } from "@/types/employee";
 
 /**
  * Formata uma string de data (YYYY-MM-DD) para o formato local do usuário.
@@ -136,13 +138,31 @@ export default function ViewHae() {
 		severity: "success" | "error";
 	} | null>(null);
 
+	const [coordenatorName, setCoordenatorName] = useState<string | null>(null);
+
 	const toggleDrawer = (open: boolean) => () => setDrawerOpen(open);
 
 	const fetchHae = useCallback(async () => {
 		if (!id) return;
 		try {
 			const response = await api.get<Hae>(`/hae/getHaeById/${id}`);
-			setHae(response.data);
+			const fetchedHae = response.data;
+			setHae(fetchedHae);
+
+			if (
+				fetchedHae.coordenatorId &&
+				fetchedHae.coordenatorId !== "Sem coordenador definido"
+			) {
+				try {
+					const coordinatorResponse = await api.get<Employee>(
+						`/employee/get-professor/${fetchedHae.coordenatorId}`
+					);
+					setCoordenatorName(coordinatorResponse.data.name);
+				} catch (coordError) {
+					console.error("Erro ao buscar dados do coordenador:", coordError);
+					setCoordenatorName("Informação indisponível");
+				}
+			}
 		} catch (err: any) {
 			console.error("Erro ao buscar HAE:", err);
 			setSnackbar({
@@ -175,9 +195,7 @@ export default function ViewHae() {
 				message: `Status da HAE atualizado para ${newStatus} com sucesso!`,
 				severity: "success",
 			});
-			setHae((prevHae: Hae | null) =>
-				prevHae ? { ...prevHae, status: newStatus } : null
-			);
+			fetchHae();
 		} catch (err: any) {
 			const errorMessage =
 				err.response?.data?.message || "Ocorreu um erro na operação.";
@@ -226,12 +244,21 @@ export default function ViewHae() {
 							<h1 className="text-2xl font-bold text-gray-800">
 								{hae.projectTitle}
 							</h1>
-							<p className="text-gray-500">por {hae.employee.name ?? "N/A"}</p>
+							<p className="text-gray-500">
+								Solicitado por: {hae.employee.name ?? "N/A"}
+							</p>
 						</div>
 						<StatusBadge status={hae.status} />
 					</div>
 
 					<div className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+						{coordenatorName && (
+							<DetailItem
+								icon={<VerifiedUserOutlined />}
+								label="Avaliado por"
+								value={coordenatorName}
+							/>
+						)}
 						<DetailItem
 							icon={<SchoolOutlined />}
 							label="Curso"

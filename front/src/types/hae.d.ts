@@ -1,3 +1,5 @@
+import { EmployeeDetails } from "./employee";
+
 export interface Hae {
 	id: string;
 	nameEmployee: string;
@@ -11,6 +13,7 @@ export interface Hae {
 	observations: string;
 	status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO";
 	coordenatorId: string;
+	coordenatorName?: string;
 	startDate: string;
 	endDate: string;
 	comprovanteDoc: any[];
