@@ -95,6 +95,22 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
 		}
 	};
 
+	const handleProjectTypeChange = (newValue: string) => {
+		setFormData("projectType", newValue);
+
+		if (errors.projectType) {
+			setErrors((prevErrors) => ({ ...prevErrors, projectType: undefined }));
+		}
+
+		if (newValue !== "Estagio" && newValue !== "TCC") {
+			setStudentRAs([""]);
+			setFormData("studentRAs", []);
+			if (errors.studentRAs) {
+				setErrors((prevErrors) => ({ ...prevErrors, studentRAs: undefined }));
+			}
+		}
+	};
+
 	const addRMField = () => {
 		setStudentRAs([...studentRAs, ""]);
 	};
@@ -158,15 +174,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
 				select
 				variant="outlined"
 				value={formData.projectType}
-				onChange={(e) => {
-					setFormData("projectType", e.target.value);
-					if (errors.projectType) {
-						setErrors((prevErrors) => ({
-							...prevErrors,
-							projectType: undefined,
-						}));
-					}
-				}}
+				onChange={(e) => handleProjectTypeChange(e.target.value)} // Usa o novo handler
 				error={!!errors.projectType}
 				helperText={errors.projectType}
 			>
