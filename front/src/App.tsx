@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "@pages/Login";
 import Register from "@pages/Register";
-import VerificationCode from "@pages/VerificationCode";
 import RequestHae from "@pages/RequestHae";
 import Dashboard from "@pages/Dashboard";
 import DashboardCoordenador from "@pages/DashboardCoordenador";
@@ -16,6 +15,7 @@ import Coordenadores from "./pages/Coordenadores";
 import GerenciarUsuarios from "./pages/GerenciarUsuarios";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ActivateAccount from "./pages/ActivateAccount";
 
 function App() {
 	return (
@@ -24,7 +24,7 @@ function App() {
 				{/* Rotas públicas */}
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
-				<Route path="/verificationCode" element={<VerificationCode />} />
+				<Route path="/activate-account" element={<ActivateAccount />} />
 				<Route path="/forgot-password" element={<ForgotPassword />} />
 				<Route path="/reset-password" element={<ResetPassword />} />
 

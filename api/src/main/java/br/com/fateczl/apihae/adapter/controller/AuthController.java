@@ -3,7 +3,6 @@ package br.com.fateczl.apihae.adapter.controller;
 import br.com.fateczl.apihae.adapter.dto.LoginRequest;
 import br.com.fateczl.apihae.adapter.dto.ResetPasswordRequest;
 import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
-import br.com.fateczl.apihae.adapter.dto.VerifyEmailCodeRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.AuthService;
 import br.com.fateczl.apihae.useCase.util.CookieUtils;
@@ -12,17 +11,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Collections;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
-@Tag(name = "Auth", description = "Endpoints para autenticação e autorização")
+@Tag(name = "Auth", description = "Endpoints para autenticação, registro e autorização")
 public class AuthController {
 
     private final AuthService authService;
@@ -31,19 +28,19 @@ public class AuthController {
 
     @PostMapping("/send-email-code")
     public ResponseEntity<Object> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
-        String verificationCode = authService.sendVerificationCode(request.getName(), request.getEmail(),
+        authService.sendVerificationCode(request.getName(), request.getEmail(),
                 request.getCourse(), request.getPassword());
+
         return ResponseEntity.ok(Collections.singletonMap("mensagem",
-                "E-mail de confirmação enviado com sucesso. (Código: " + verificationCode + ")"));
+                "E-mail de ativação enviado com sucesso."));
     }
 
-    @PostMapping("/verify-email-code")
-    public ResponseEntity<Employee> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request,
-            HttpServletResponse response) {
-        Employee verifiedEmployee = authService.verifyEmailCode(request.getEmail(), request.getCode());
+    @GetMapping("/verify-email")
+    public ResponseEntity<Employee> verifyEmailCode(@RequestParam("token") String token, HttpServletResponse response) {
+        Employee verifiedEmployee = authService.verifyEmailCode(token);
 
-        String token = tokenService.generateToken(verifiedEmployee);
-        setTokenCookie(response, token);
+        String jwtToken = tokenService.generateToken(verifiedEmployee);
+        setTokenCookie(response, jwtToken);
 
         return ResponseEntity.ok(verifiedEmployee);
     }
@@ -58,16 +55,6 @@ public class AuthController {
         return ResponseEntity.ok(authenticatedEmployee);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<Object> logout(HttpServletResponse response) {
-        cookieUtils.DeleteCookies(response);
-        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout realizado com sucesso."));
-    }
-
-    private void setTokenCookie(HttpServletResponse response, String token) {
-        cookieUtils.CreateCookies(response, token);
-    }
-
     @PostMapping("/forgot-password")
     public ResponseEntity<Object> forgotPassword(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
@@ -77,9 +64,18 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Object> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<Object> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(Collections.singletonMap("mensagem", "Senha redefinida com sucesso."));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Object> logout(HttpServletResponse response) {
+        cookieUtils.DeleteCookies(response);
+        return ResponseEntity.ok(Collections.singletonMap("mensagem", "Logout realizado com sucesso."));
+    }
+
+    private void setTokenCookie(HttpServletResponse response, String token) {
+        cookieUtils.CreateCookies(response, token);
+    }
 }

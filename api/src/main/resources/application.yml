@@ -34,7 +34,9 @@ server:
 
 frontend:
   reset:
-    url: ${FRONTEND_URL}
+    url: ${RESET_PASSWORD_URL}
+  activation:
+    url: ${ACTIVATE_ACCOUNT_URL}
 
 app:
   allowed:

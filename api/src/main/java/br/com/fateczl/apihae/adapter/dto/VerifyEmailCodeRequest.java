@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +15,5 @@ public class VerifyEmailCodeRequest {
     private String email;
 
     @NotBlank(message = "Código não pode estar em branco")
-    @Size(min = 6, max = 6, message = "Código deve ter exatamente 6 caracteres")
     private String code;
 }

@@ -3,7 +3,6 @@ import { HaeDataType } from "@/components/StepperForm/types/haeFormTypes";
 import { AxiosError } from "axios";
 import { Hae } from "@/types/hae";
 
-
 /**
  * Obtém o semestre de uma data.
  * @param date A data (objeto Date do JS).
@@ -37,7 +36,6 @@ export const useHaeService = (haeService: IHaeService) => {
 	const handleCloseSnackbar = () => setOpenSnackbar(false);
 
 	const handleCreateHae = async (data: HaeDataType): Promise<boolean> => {
-		console.log("COMEÇOU A CADASTRAR HAE")
 		setIsSubmitting(true);
 		try {
 			const newHaeStartDate = new Date(data.startDate);

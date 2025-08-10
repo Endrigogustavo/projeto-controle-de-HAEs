@@ -13,7 +13,6 @@ import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -44,34 +43,36 @@ public class AuthService {
     }
 
     @Transactional
-    public String sendVerificationCode(String name, String email, String course, String plainPassword) {
+    public void sendVerificationCode(String name, String email, String course, String plainPassword) {
         if (employeeRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email já registrado.");
         }
 
         String encryptedPassword = textEncryptor.encrypt(plainPassword);
 
+        String verificationToken = UUID.randomUUID().toString();
+
         emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
-        String verificationCode = generateNumericCode();
 
         EmailVerification newVerification = new EmailVerification();
         newVerification.setEmail(email);
         newVerification.setName(name);
         newVerification.setCourse(course);
         newVerification.setPassword(encryptedPassword);
-        newVerification.setCode(verificationCode);
+        newVerification.setCode(verificationToken); // Salva o token no campo 'code'
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
         emailVerificationRepository.save(newVerification);
 
-        emailService.sendVerificationEmail(email, verificationCode);
-
-        return verificationCode;
+        emailService.sendAccountActivationEmail(email, verificationToken);
     }
 
     @Transactional
-    public Employee verifyEmailCode(String email, String code) {
-        EmailVerification verification = findValidVerification(email, code)
-                .orElseThrow(() -> new IllegalArgumentException("Código inválido ou expirado."));
+    public Employee verifyEmailCode(String token) {
+        EmailVerification verification = emailVerificationRepository.findByCode(token)
+                .filter(v -> v.getExpiresAt().isAfter(LocalDateTime.now()))
+                .orElseThrow(() -> new IllegalArgumentException("Token de ativação inválido ou expirado."));
+
+        String email = verification.getEmail();
 
         if (employeeRepository.findByEmail(email).isPresent()) {
             emailVerificationRepository.delete(verification);
@@ -80,7 +81,7 @@ public class AuthService {
 
         Employee newEmployee = new Employee();
         newEmployee.setName(verification.getName());
-        newEmployee.setEmail(verification.getEmail());
+        newEmployee.setEmail(email);
         newEmployee.setCourse(verification.getCourse());
         newEmployee.setPassword(verification.getPassword());
 
@@ -124,13 +125,4 @@ public class AuthService {
         passwordResetTokenRepository.delete(resetToken);
     }
 
-    private String generateNumericCode() {
-        return String.valueOf(100000 + new Random().nextInt(900000));
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<EmailVerification> findValidVerification(String email, String code) {
-        return emailVerificationRepository.findByEmailAndCode(email, code)
-                .filter(verification -> verification.getExpiresAt().isAfter(LocalDateTime.now()));
-    }
 }

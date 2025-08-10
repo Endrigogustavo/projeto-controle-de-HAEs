@@ -16,17 +16,13 @@ export const register = async (data: RegisterData) => {
 	}
 };
 
-interface VerifyEmailCode {
-	email: string;
-	code: string;
-}
 
-export const verifyEmailCode = async (data: VerifyEmailCode) => {
+export const verifyEmailCode = async (token: string) => {
 	try {
-		const response = await api.post("/auth/verify-email-code", data);
+		const response = await api.get(`/auth/verify-email?token=${token}`);
 		return response.data;
 	} catch (error) {
-		console.log("Erro ao verificar codigo. " + error);
+		console.log("Erro ao verificar token: " + error);
 		throw error;
 	}
 };
