@@ -50,17 +50,17 @@ export const Sidebar = () => {
 					<>
 						<SidebarItem
 							to="/dashboard"
-							icon={<DashboardOutlined />}
+							icon={<DashboardOutlined sx={{ fill: "white" }} />}
 							text="Minha Visão Geral"
 						/>
 						<SidebarItem
 							to="/requestHae"
-							icon={<ArticleOutlined />}
+							icon={<ArticleOutlined sx={{ fill: "white" }} />}
 							text="Solicitar HAE"
 						/>
 						<SidebarItem
 							to="/myrequests"
-							icon={<ListAltOutlined />}
+							icon={<ListAltOutlined sx={{ fill: "white" }} />}
 							text="Minhas Solicitações"
 						/>
 					</>
@@ -70,17 +70,17 @@ export const Sidebar = () => {
 					<>
 						<SidebarItem
 							to="/dashboard-coordenador"
-							icon={<DashboardOutlined />}
+							icon={<DashboardOutlined sx={{ fill: "white" }} />}
 							text="Visão Geral (Curso)"
 						/>
 						<SidebarItem
 							to="/requestHae"
-							icon={<ArticleOutlined />}
+							icon={<ArticleOutlined sx={{ fill: "white" }} />}
 							text="Solicitar HAE"
 						/>
 						<SidebarItem
 							to="/myrequests"
-							icon={<ListAltOutlined />}
+							icon={<ListAltOutlined sx={{ fill: "white" }} />}
 							text="Minhas Solicitações"
 						/>
 					</>
@@ -90,22 +90,22 @@ export const Sidebar = () => {
 					<>
 						<SidebarItem
 							to="/dashboard-admin"
-							icon={<DashboardOutlined />}
+							icon={<DashboardOutlined sx={{ fill: "white" }} />}
 							text="Visão Geral"
 						/>
 						<SidebarItem
 							to="/gerenciar-usuarios"
-							icon={<AdminPanelSettingsOutlined />}
+							icon={<AdminPanelSettingsOutlined sx={{ fill: "white" }} />}
 							text="Gerenciar Usuários"
 						/>
 						<SidebarItem
 							to="/requestHae"
-							icon={<ArticleOutlined />}
+							icon={<ArticleOutlined sx={{ fill: "white" }} />}
 							text="Solicitar HAE"
 						/>
 						<SidebarItem
 							to="/myrequests"
-							icon={<ListAltOutlined />}
+							icon={<ListAltOutlined sx={{ fill: "white" }} />}
 							text="Minhas Solicitações"
 						/>
 					</>
@@ -115,22 +115,22 @@ export const Sidebar = () => {
 					<>
 						<SidebarItem
 							to="/dashboard-diretor"
-							icon={<BarChartOutlined />}
+							icon={<BarChartOutlined sx={{ fill: "white" }} />}
 							text="Dashboard Geral"
 						/>
 						<SidebarItem
 							to="/haes"
-							icon={<ListAltOutlined />}
+							icon={<ListAltOutlined sx={{ fill: "white" }} />}
 							text="Visualizar HAEs"
 						/>
 						<SidebarItem
 							to="/professores"
-							icon={<PeopleOutline />}
+							icon={<PeopleOutline sx={{ fill: "white" }} />}
 							text="Visualizar Professores"
 						/>
 						<SidebarItem
 							to="/coordenadores"
-							icon={<PeopleOutline />}
+							icon={<PeopleOutline sx={{ fill: "white" }} />}
 							text="Visualizar Coordenadores"
 						/>
 					</>
