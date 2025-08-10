@@ -8,8 +8,8 @@ const authService: IAuthService = {
 	login: async (data) => {
 		return await login(data);
 	},
-	verifyCode: async (data) => {
-		return await verifyEmailCode(data);
+	verifyCode: async (token: string) => {
+		return await verifyEmailCode(token);
 	},
 	logout: async () => {
 		return await logout();

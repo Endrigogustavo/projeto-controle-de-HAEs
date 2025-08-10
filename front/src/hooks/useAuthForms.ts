@@ -19,7 +19,7 @@ export interface IAuthService {
 		course?: string;
 	}): Promise<unknown>;
 	login?(data: { email: string; password: string }): Promise<LoggedUser>;
-	verifyCode?(data: { email: string; code: string }): Promise<LoggedUser>;
+	verifyCode?(token: string): Promise<LoggedUser>;
 	logout?(): Promise<unknown>;
 	checkCookie?(email: string): Promise<unknown>;
 }
@@ -76,36 +76,6 @@ export const useAuthForms = (authService: IAuthService) => {
 		}
 	};
 
-	const handleVerifyCode = async (data: {
-		email: string;
-		code: string;
-	}): Promise<VerificationResult> => {
-		if (!authService.verifyCode) {
-			console.error("Auth service does not provide a verifyCode function.");
-			showSnackbar(
-				"Funcionalidade de verificação de código não disponível.",
-				"error"
-			);
-			return { success: false, user: null };
-		}
-		try {
-			const verifiedUser = await authService.verifyCode(data);
-			localStorage.setItem("token", crypto.randomUUID());
-			localStorage.setItem("email", data.email);
-			showSnackbar(
-				"Código verificado com sucesso! Sua conta está ativa.",
-				"success"
-			);
-			return { success: true, user: verifiedUser };
-		} catch (error) {
-			console.log(error);
-			const errorMessage =
-				"Erro ao verificar código. Verifique se o código está correto.";
-			showSnackbar(errorMessage, "error");
-			return { success: false, user: null };
-		}
-	};
-
 	const handleLogout = async () => {
 		if (!authService.logout) {
 			showSnackbar("Funcionalidade de logout não disponível.", "error");
@@ -132,7 +102,6 @@ export const useAuthForms = (authService: IAuthService) => {
 		handleCloseSnackbar: hideSnackbar,
 		handleRegister,
 		handleLogin,
-		handleVerifyCode,
 		handleLogout,
 	};
 };
