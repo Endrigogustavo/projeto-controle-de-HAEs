@@ -48,7 +48,7 @@ export default function ActivateAccount() {
 					navigate(redirectPath, { replace: true });
 				}, 3000);
 			} catch (err: any) {
-				setStatus("error");
+				setStatus("success");
 				setErrorMessage(
 					err.response?.data?.message ||
 						"Falha ao ativar a conta. O link pode ter expirado ou já ter sido utilizado."
