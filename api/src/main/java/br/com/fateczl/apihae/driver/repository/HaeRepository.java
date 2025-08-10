@@ -1,6 +1,8 @@
 package br.com.fateczl.apihae.driver.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.fateczl.apihae.domain.entity.Hae;
@@ -16,4 +18,6 @@ public interface HaeRepository extends JpaRepository<Hae, String> {
     List<Hae> findByProjectType(HaeType projectType);
 
     int countByEmployeeId(String employeeId);
+
+    List<Hae> findByEndDateBefore(LocalDate data);
 }

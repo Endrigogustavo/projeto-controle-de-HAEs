@@ -12,12 +12,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import jakarta.validation.Valid;
+
 import java.util.Collections;
 import java.util.List;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import br.com.fateczl.apihae.domain.entity.HaeQtd;
 
 @RestController
 @RequestMapping("/hae")
@@ -27,8 +32,11 @@ public class HaeController {
 
     private final HaeService haeService;
 
-    public HaeController(HaeService haeService) {
+    private final HaeQtd haeQtd;
+
+    public HaeController(HaeService haeService, HaeQtd haeQtd) {
         this.haeService = haeService;
+        this.haeQtd = haeQtd;
     }
 
     @PostMapping("/create")
@@ -102,7 +110,7 @@ public class HaeController {
     public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId,
             @PathVariable String haeId) {
         haeService.sendEmailToCoordinatorAboutHAECreated(coordinatorId, haeId);
-        // TODO Criar lógica para enviar email para o coordenador
+        
         return ResponseEntity.ok("Email enviado para o coordenador sobre a criação da HAE com ID: " + haeId);
     }
 
@@ -111,5 +119,18 @@ public class HaeController {
             @Valid @RequestBody HaeRequest request) {
         Hae hae = haeService.createHaeAsCoordinator(coordinatorId, employeeId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
+    }
+
+    //Novas todas da quantidade de HAEs disponiveis para criação
+    @GetMapping("/getAvailableHaesCount")
+    public ResponseEntity<Integer> getAvailableHaesCount() {
+        int count = haeQtd.getQuantidade();
+        return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/setAvailableHaesCount")
+    public ResponseEntity<?> setAvailableHaesCount(@RequestParam int count, @RequestParam String usuarioId) {
+        haeQtd.setQuantidade(count, usuarioId);
+        return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
     }
 }
