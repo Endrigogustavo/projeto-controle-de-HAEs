@@ -10,6 +10,7 @@ import {
 	BarChartOutlined,
 	ListAltOutlined,
 	AdminPanelSettingsOutlined,
+	SettingsOutlined,
 } from "@mui/icons-material";
 import React from "react";
 
@@ -132,6 +133,11 @@ export const Sidebar = () => {
 							to="/coordenadores"
 							icon={<PeopleOutline sx={{ fill: "white" }} />}
 							text="Visualizar Coordenadores"
+						/>
+						<SidebarItem
+							to="/configuracoes"
+							icon={<SettingsOutlined sx={{ fill: "white" }} />}
+							text="Configurações"
 						/>
 					</>
 				);

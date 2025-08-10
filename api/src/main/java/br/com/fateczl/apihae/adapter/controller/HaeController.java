@@ -121,7 +121,6 @@ public class HaeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
     }
 
-    //Novas todas da quantidade de HAEs disponiveis para criação
     @GetMapping("/getAvailableHaesCount")
     public ResponseEntity<Integer> getAvailableHaesCount() {
         int count = haeQtd.getQuantidade();

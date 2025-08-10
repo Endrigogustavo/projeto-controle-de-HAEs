@@ -16,6 +16,7 @@ import GerenciarUsuarios from "./pages/GerenciarUsuarios";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ActivateAccount from "./pages/ActivateAccount";
+import Configuracoes from "./pages/Configuracoes";
 
 function App() {
 	return (
@@ -125,6 +126,14 @@ function App() {
 					element={
 						<PrivateRoute>
 							<TodasHaes />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/configuracoes"
+					element={
+						<PrivateRoute>
+							<Configuracoes />
 						</PrivateRoute>
 					}
 				/>
