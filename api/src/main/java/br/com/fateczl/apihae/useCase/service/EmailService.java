@@ -3,10 +3,15 @@ package br.com.fateczl.apihae.useCase.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import br.com.fateczl.apihae.domain.entity.Hae;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +64,35 @@ public class EmailService {
     }
   }
 
+  public void sendAlertCoordenadorEmail(String toEmail, Hae hae) {
+    String subject = "Alerta - Sistema de HAEs FATEC";
+    String emailContent = buildAlertCoordenadorEmailTemplate(hae);
+    try {
+      sendEmail(toEmail, subject, emailContent);
+      System.out.println("E-mail de alerta enviado para: " + toEmail);
+    } catch (MessagingException e) {
+      System.err.println("Erro ao enviar e-mail de alerta para " + toEmail + ": " + e.getMessage());
+    }
+  }
+
+  /**
+   * Envia um e-mail de alerta para o professor com uma mensagem específica.
+   * 
+   * @param toEmail      O e-mail do professor destinatário.
+   * @param alertMessage A mensagem de alerta a ser enviada.
+   */
+
+  public void sendAlertProfessorHaeStatusEmail(String toEmail, Hae hae) {
+    String subject = "Alerta - Sistema de HAEs FATEC";
+    String emailContent = buildAlertProfessorHaeStatusEmailTemplate(hae);
+    try {
+      sendEmail(toEmail, subject, emailContent);
+      System.out.println("E-mail de alerta enviado para: " + toEmail);
+    } catch (MessagingException e) {
+      System.err.println("Erro ao enviar e-mail de alerta para " + toEmail + ": " + e.getMessage());
+    }
+  }
+
   private void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -107,4 +141,77 @@ public class EmailService {
         """
         .formatted(resetLink);
   }
+
+  private String buildAlertCoordenadorEmailTemplate(Hae hae) {
+    return """
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://fatweb.s3.amazonaws.com/vestibularfatec/assets/img/layout/logotipo-fatec.png" alt="Logo FATEC" style="max-width: 200px;" />
+          </div>
+          <h2 style="color: #a6192e; text-align: center;">Nova HAE Criada</h2>
+          <p><strong>Informações:</strong></p>
+          <ul>
+            <li><strong>Professor:</strong> %s</li>
+            <li><strong>Curso:</strong> %s</li>
+            <li><strong>Título do Projeto:</strong> %s</li>
+            <li><strong>Tipo de Projeto:</strong> %s</li>
+            <li><strong>Modalidade:</strong> %s</li>
+            <li><strong>Período:</strong> %s até %s</li>
+            <li><strong>Carga Horária Semanal:</strong> %d horas</li>
+            <li><strong>Horários:</strong><br/>%s</li>
+            <li><strong>Descrição:</strong> %s</li>
+          </ul>
+        </div>
+        """
+        .formatted(
+            hae.getNameEmployee(),
+            hae.getCourse(),
+            hae.getProjectTitle(),
+            hae.getProjectType(),
+            hae.getModality(),
+            hae.getStartDate(),
+            hae.getEndDate(),
+            hae.getWeeklyHours(),
+            formatWeeklySchedule(hae.getWeeklySchedule()),
+            hae.getProjectDescription());
+  }
+
+  private String buildAlertProfessorHaeStatusEmailTemplate(Hae hae) {
+    return """
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://fatweb.s3.amazonaws.com/vestibularfatec/assets/img/layout/logotipo-fatec.png" alt="Logo FATEC" style="max-width: 200px;" />
+          </div>
+          <h2 style="color: #a6192e; text-align: center;">Sua HAE foi %s</h2>
+          <p><strong>Informações:</strong></p>
+          <ul>
+            <li><strong>Título do Projeto:</strong> %s</li>
+            <li><strong>Tipo:</strong> %s</li>
+            <li><strong>Modalidade:</strong> %s</li>
+            <li><strong>Período:</strong> %s até %s</li>
+            <li><strong>Carga Horária Semanal:</strong> %d horas</li>
+            <li><strong>Horários:</strong><br/>%s</li>
+          </ul>
+          <p>Obrigado por utilizar o sistema de HAEs da FATEC.</p>
+        </div>
+        """
+        .formatted(
+            hae.getStatus().name(),
+            hae.getProjectTitle(),
+            hae.getProjectType(),
+            hae.getModality(),
+            hae.getStartDate(),
+            hae.getEndDate(),
+            hae.getWeeklyHours(),
+            formatWeeklySchedule(hae.getWeeklySchedule()));
+  }
+
+  private String formatWeeklySchedule(Map<String, String> schedule) {
+    if (schedule == null || schedule.isEmpty())
+      return "Não informado";
+    StringBuilder sb = new StringBuilder();
+    schedule.forEach((dia, horario) -> sb.append("<li>").append(dia).append(": ").append(horario).append("</li>"));
+    return "<ul>" + sb.toString() + "</ul>";
+  }
+
 }

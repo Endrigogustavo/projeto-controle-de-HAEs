@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import br.com.fateczl.apihae.domain.entity.HaeQtd;
+
 @Service
 public class HaeService {
 
@@ -29,17 +31,28 @@ public class HaeService {
     private final EmployeeRepository employeeRepository;
     private final StudentRepository studentRepository;
     private final CalendarioSingleton calendarioSingleton;
+    private final HaeQtd haeQtd;
+    private final EmailService emailService;
 
     public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository,
-            StudentRepository studentRepository, CalendarioSingleton calendarioSingleton) {
+            StudentRepository studentRepository, CalendarioSingleton calendarioSingleton, HaeQtd haeQtd, EmailService emailService) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
         this.studentRepository = studentRepository;
         this.calendarioSingleton = calendarioSingleton;
+        this.haeQtd = haeQtd;
+        this.emailService = emailService;
     }
 
     @Transactional
     public Hae createHae(HaeRequest request) {
+        int qtdHaeFatec = haeQtd.getQuantidade();
+        List<Hae> haesDoSemestre = haeRepository.findAll();
+
+        if (haesDoSemestre.size() >= qtdHaeFatec) {
+            throw new IllegalArgumentException("Limite de HAEs atingido no semestre. Não é possível criar mais HAEs.");
+        }
+
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
                         + " não encontrado. Não é possível criar HAE."));
@@ -218,8 +231,24 @@ public class HaeService {
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
         Employee coordinator = employeeRepository.findById(coordinatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
-        System.out.println("Email enviado para o coordenador " + coordinator.getName()
-                + " sobre a criação da HAE com ID: " + haeId);
+        if (coordinator.getRole() != Role.COORDENADOR) {
+            throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
+        }
+
+        emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae);
+    }
+
+    @Transactional
+    public void sendEmailToProfessorAboutHaeStatus(String professorId, String haeId) {
+        Hae hae = haeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
+        Employee professor = employeeRepository.findById(professorId)
+                .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado com ID: " + professorId));
+        if (professor.getRole() != Role.PROFESSOR) {
+            throw new IllegalArgumentException("O empregado com ID " + professorId + " não é um professor.");
+        }
+
+        emailService.sendAlertProfessorHaeStatusEmail(professor.getEmail(), hae);
     }
 
     @Transactional
