@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import br.com.fateczl.apihae.adapter.dto.FeedbackRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
 
 @Service
@@ -93,6 +94,17 @@ public class EmailService {
     }
   }
 
+  public void sendEmailFeedback(String to, String subject, String htmlContent) throws MessagingException {
+    MimeMessage message = javaMailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+    helper.setTo(to);
+    helper.setSubject(subject);
+    helper.setText(htmlContent, true);
+
+    javaMailSender.send(message);
+  }
+
   private void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
     MimeMessage message = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -120,6 +132,43 @@ public class EmailService {
         </div>
         """
         .formatted(activationLink);
+  }
+
+  public String buildFeedbackEmailTemplate(FeedbackRequest feedback) {
+    return """
+        <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+          <div style="max-width: 650px; margin: auto; background-color: #ffffff; padding: 25px 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://fatweb.s3.amazonaws.com/vestibularfatec/assets/img/layout/logotipo-fatec.png"
+                   alt="Logo FATEC" style="max-width: 180px;" />
+            </div>
+
+            <h2 style="color: #a6192e; text-align: center; margin-bottom: 10px;">📝 Novo Feedback Recebido</h2>
+            <p style="text-align: center; font-size: 15px; color: #555; margin-bottom: 30px;">
+              Um usuário enviou um novo feedback através do sistema de HAEs.
+            </p>
+
+            <div style="font-size: 15px; color: #333;">
+              <p><strong>👤 Nome:</strong> %s</p>
+              <p><strong>📧 E-mail:</strong> <a href="mailto:%s" style="color: #a6192e;">%s</a></p>
+              <p><strong>💬 Mensagem:</strong></p>
+              <div style="background-color: #fafafa; padding: 15px; border-left: 4px solid #a6192e; border-radius: 5px; white-space: pre-line;">
+                %s
+              </div>
+            </div>
+
+            <p style="text-align: center; font-size: 13px; color: #999; margin-top: 40px;">
+              Este e-mail foi gerado automaticamente pelo sistema de HAEs FATEC.
+            </p>
+          </div>
+        </div>
+        """
+        .formatted(
+            feedback.getName(),
+            feedback.getEmail(),
+            feedback.getEmail(),
+            feedback.getFeedback());
   }
 
   private String buildPasswordResetEmailTemplate(String resetLink) {
