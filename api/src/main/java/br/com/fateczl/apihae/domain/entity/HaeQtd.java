@@ -5,7 +5,9 @@ import br.com.fateczl.apihae.domain.singleton.HaeQtdSingleton;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HaeQtd {
 
     @Autowired
@@ -26,7 +28,8 @@ public class HaeQtd {
         }
 
         if (employee.getRole() != Role.DIRETOR) {
-            throw new IllegalArgumentException("Usuário não é um diretor da unidade, impossivel definir a quantidade de HAEs.");
+            throw new IllegalArgumentException(
+                    "Usuário não é um diretor da unidade, impossivel definir a quantidade de HAEs.");
         }
 
         // Atualiza a quantidade de HAEs no singleton
