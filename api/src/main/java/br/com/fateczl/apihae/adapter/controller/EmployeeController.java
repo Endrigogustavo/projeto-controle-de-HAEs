@@ -5,7 +5,6 @@ import br.com.fateczl.apihae.adapter.dto.EmployeeUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
-import br.com.fateczl.apihae.useCase.util.JWTUtils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +20,11 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final JWTUtils TokenService;
 
-    public EmployeeController(EmployeeService employeeService, JWTUtils TokenService) {
+
+    public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
-        this.TokenService = TokenService;
+       
     }
 
     @GetMapping("/getAllEmployee")

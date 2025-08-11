@@ -3,7 +3,6 @@ package br.com.fateczl.apihae.adapter.controller;
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
-import br.com.fateczl.apihae.domain.entity.Student;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.useCase.service.HaeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
