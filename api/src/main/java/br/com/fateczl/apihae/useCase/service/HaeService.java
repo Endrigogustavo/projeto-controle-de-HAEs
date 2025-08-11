@@ -9,8 +9,6 @@ import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.domain.singleton.CalendarioSingleton;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
-import br.com.fateczl.apihae.driver.repository.StudentRepository;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +27,15 @@ public class HaeService {
 
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
-    private final StudentRepository studentRepository;
     private final CalendarioSingleton calendarioSingleton;
     private final HaeQtd haeQtd;
     private final EmailService emailService;
 
     public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository,
-            StudentRepository studentRepository, CalendarioSingleton calendarioSingleton, HaeQtd haeQtd, EmailService emailService) {
+             CalendarioSingleton calendarioSingleton, HaeQtd haeQtd,
+            EmailService emailService) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
-        this.studentRepository = studentRepository;
         this.calendarioSingleton = calendarioSingleton;
         this.haeQtd = haeQtd;
         this.emailService = emailService;

@@ -12,7 +12,6 @@ import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

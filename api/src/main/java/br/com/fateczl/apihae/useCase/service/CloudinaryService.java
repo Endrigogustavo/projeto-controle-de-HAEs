@@ -24,16 +24,18 @@ public class CloudinaryService {
     @Autowired
     private HaeRepository haeRepository;
 
+    
+
     public String uploadImage(MultipartFile file, String haeId) throws IOException {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
-        
+
         List<String> comprovanteDocs = new ArrayList<>();
         comprovanteDocs.add(uploadResult.get("secure_url").toString());
         hae.setComprovanteDoc(comprovanteDocs);
         haeRepository.save(hae);
-        
+
         return uploadResult.get("secure_url").toString();
     }
 
@@ -68,7 +70,7 @@ public class CloudinaryService {
             urls.add(url);
         }
 
-         Hae hae = haeRepository.findById(haeId)
+        Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
 
         hae.setComprovanteDoc(urls);
