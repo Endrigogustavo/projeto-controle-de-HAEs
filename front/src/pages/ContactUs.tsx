@@ -1,19 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TextField } from "@mui/material";
-import { Sidebar } from "@components/Sidebar";
-import { Header } from "@components/Header";
-import { MobileHeader } from "@components/MobileHeader";
-import Drawer from "@mui/material/Drawer";
 import * as yup from "yup";
+import { ErrorFields, supportSchema } from "@/validation/supportSchema";
+import { AppLayout } from "@/layouts";
 
-type ErrorFields = {
-  email: string;
-  subject: string;
-  description: string;
-};
-
-export default function SupportError() {
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+export const ContactUs = () => {
   const [formData, setFormData] = useState({
     email: "",
     subject: "",
@@ -25,29 +16,17 @@ export default function SupportError() {
     description: "",
   });
 
-  const toggleDrawer = (open: boolean) => () => {
-    setDrawerOpen(open);
-  };
-
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   // Schema Yup
-  const schema = yup.object().shape({
-    email: yup
-      .string()
-      .email("Por favor, insira um email válido.")
-      .required("O email é obrigatório."),
-    subject: yup.string().required("O assunto é obrigatório."),
-    description: yup.string().required("Por favor, descreva o erro."),
-  });
 
   const handleSubmit = async () => {
     try {
-      await schema.validate(formData, { abortEarly: false });
-      // Se passou na validação:
+      await supportSchema.validate(formData, { abortEarly: false });
+
       alert("Erro relatado com sucesso!");
       setFormData({ email: "", subject: "", description: "" });
       setErrors({ email: "", subject: "", description: "" });
@@ -60,7 +39,6 @@ export default function SupportError() {
         };
         validationErrors.inner.forEach((error) => {
           if (error.path) {
-            // Aqui dizemos para TS que error.path é chave de ErrorFields
             newErrors[error.path as keyof ErrorFields] = error.message;
           }
         });
@@ -70,42 +48,22 @@ export default function SupportError() {
   };
 
   return (
-    <div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr] bg-background">
-      {/* Sidebar Desktop */}
-      <div className="hidden md:block row-span-2">
-        <Sidebar />
-      </div>
-
-      {/* Mobile Header */}
-      <div className="md:hidden">
-        <MobileHeader onMenuClick={toggleDrawer(true)} />
-      </div>
-
-      {/* Drawer para Mobile Sidebar */}
-      <Drawer open={isDrawerOpen} onClose={toggleDrawer(false)}>
-        <div className="w-64 h-full bg-gray-fatec">
-          <Sidebar />
-        </div>
-      </Drawer>
-
-      {/* Header Desktop */}
-      <div className="hidden md:block col-start-2 row-start-1">
-        <Header />
-      </div>
-
-      <main className="p-6 overflow-auto w-full h-full justify-center flex flex-col pt-20 md:pt-6">
-        <h2 className="subtitle font-semibold mb-2">Relatar Erro</h2>
+    <AppLayout>
+      <main className="p-6 overflow-auto w-full h-200 justify-center flex flex-col pt-20 md:pt-6">
+        <h2 className="subtitle font-semibold mb-2">Entre em Contato</h2>
         <p className="mb-8 text-gray-600">
-          Por favor, descreva o problema que você está enfrentando para que
-          possamos ajudar.
+          Preencha o formulário abaixo para entrar em contato com nossa equipe
+          de suporte. Descreva o problema ou dúvida para que possamos ajudá-lo
+          da melhor forma.
         </p>
-        <div className="bg-white flex flex-col gap-5 p-10 br-2 flex-grow">
+
+        <div className="bg-white flex flex-col gap-10 p-10 br-2 flex-grow rounded-xl shadow-md justify-center">
           <div className="flex justify-center">
-            <h2 className="subtitle font-bold mb-2">Relatar Erro</h2>
+            <h2 className="subtitle font-bold mb-2">Formulário de Contato</h2>
           </div>
 
           <TextField
-            label="Seu Email"
+            label="Seu e-mail"
             variant="outlined"
             fullWidth
             value={formData.email}
@@ -127,7 +85,7 @@ export default function SupportError() {
           />
 
           <TextField
-            label="Descrição do Erro"
+            label="Mensagem"
             variant="outlined"
             fullWidth
             multiline
@@ -139,17 +97,18 @@ export default function SupportError() {
             helperText={errors.description}
             className="mb-8"
           />
+
           <div className="flex justify-end">
             <button
               type="button"
               onClick={handleSubmit}
               className="w-full py-2 btnFatec"
             >
-              <p>Enviar</p>
+              <p>Enviar Mensagem</p>
             </button>
           </div>
         </div>
       </main>
-    </div>
+    </AppLayout>
   );
-}
+};

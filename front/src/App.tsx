@@ -1,23 +1,26 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import Login from "@pages/Login";
-import Register from "@pages/Register";
-import RequestHae from "@pages/RequestHae";
-import Dashboard from "@pages/Dashboard";
-import DashboardCoordenador from "@pages/DashboardCoordenador";
-import DashboardAdmin from "@pages/DashboardAdmin";
-import MyRequests from "@pages/MyRequests";
-import ViewHae from "@pages/ViewHae";
-import { PrivateRoute } from "@components/PrivateRoute";
-import DashboardDiretor from "./pages/DashboardDiretor";
-import Professores from "./pages/Professores";
-import TodasHaes from "./pages/TodasHaes";
-import Coordenadores from "./pages/Coordenadores";
-import GerenciarUsuarios from "./pages/GerenciarUsuarios";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import ActivateAccount from "./pages/ActivateAccount";
-import Configuracoes from "./pages/Configuracoes";
-import SupportError from "./pages/SupportError";
+
+import {
+  ActivateAccount,
+  Configuracoes,
+  Coordenadores,
+  Dashboard,
+  DashboardAdmin,
+  DashboardCoordenador,
+  DashboardDiretor,
+  ForgotPassword,
+  GerenciarUsuarios,
+  Login,
+  MyRequests,
+  Professores,
+  Register,
+  RequestHae,
+  ResetPassword,
+  ContactUs,
+  TodasHaes,
+  ViewHae,
+} from "./pages";
+import { PrivateRoute } from "./components/PrivateRoute";
 
 function PrivateWrapper() {
   return (
@@ -56,7 +59,7 @@ export default function App() {
           <Route path="/haes" element={<TodasHaes />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/hae/:id" element={<ViewHae />} />
-          <Route path="/support" element={<SupportError />} />
+          <Route path="/support" element={<ContactUs />} />
         </Route>
       </Routes>
     </BrowserRouter>

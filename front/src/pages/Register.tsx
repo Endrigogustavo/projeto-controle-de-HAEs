@@ -16,7 +16,7 @@ type FormData = {
 	course: string;
 };
 
-export default function Register() {
+export const Register = () => {
 	const {
 		openSnackbar,
 		snackbarMessage,

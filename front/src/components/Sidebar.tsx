@@ -25,8 +25,8 @@ const SidebarItem = ({
   text: string;
 }) => (
   <li className="text-white flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/10 transition-colors">
-    <span className="text-white">{icon}</span>
-    <Link to={to} className="w-full mt-0.5q">
+    <span className="text-white mb-0.5">{icon}</span>
+    <Link to={to} className="w-full ">
       {text}
     </Link>
   </li>
