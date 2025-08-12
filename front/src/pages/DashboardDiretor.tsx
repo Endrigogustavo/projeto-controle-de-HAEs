@@ -125,6 +125,30 @@ export const DashboardDiretor = () => {
     ],
   };
 
+  // Cálculo para HAEs por semestre
+  const haesPorSemestre = haes.reduce((acc: Record<string, number>, hae) => {
+    const semestre = getSemestreFromDate(hae.startDate);
+    acc[semestre] = (acc[semestre] || 0) + 1;
+    return acc;
+  }, {});
+
+  const semestreData = {
+    labels: Object.keys(haesPorSemestre),
+    datasets: [
+      {
+        label: "HAEs por Semestre",
+        data: Object.values(haesPorSemestre),
+        backgroundColor: [
+          "#3b82f6",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+          "#8b5cf6",
+        ],
+      },
+    ],
+  };
+
   return (
     <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
@@ -136,40 +160,56 @@ export const DashboardDiretor = () => {
         {loading ? (
           <p>Carregando dados...</p>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-1 relative">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
-                Uso de HAEs no Semestre Atual
-              </h3>
-              <Doughnut data={limitChartData} options={limitChartOptions} />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                <span className="text-4xl font-bold text-gray-800">
-                  {haesNoSemestreAtual}
-                </span>
-                <span className="text-sm text-gray-500 block">
-                  de {haeLimit}
-                </span>
+          <>
+            {/* Linha de cima com 3 gráficos */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* Uso de HAEs no Semestre Atual */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative">
+                <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
+                  Uso de HAEs no Semestre Atual
+                </h3>
+                <Doughnut data={limitChartData} options={limitChartOptions} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                  <span className="text-4xl font-bold text-gray-800">
+                    {haesNoSemestreAtual}
+                  </span>
+                  <span className="text-sm text-gray-500 block">
+                    de {haeLimit}
+                  </span>
+                </div>
+              </div>
+
+              {/* Gráfico de Status */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+                <h3 className="font-semibold text-lg text-gray-700 mb-4">
+                  Distribuição por Status
+                </h3>
+                <div className="w-full max-w-xs flex-grow flex justify-center items-center">
+                  <Pie data={statusData} />
+                </div>
+              </div>
+
+              {/* Gráfico novo: HAEs por semestre */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+                <h3 className="font-semibold text-lg text-gray-700 mb-4">
+                  HAEs por Semestre - Historico
+                </h3>
+                <div className="w-full max-w-xs flex-grow flex justify-center items-center">
+                  <Pie data={semestreData} />
+                </div>
               </div>
             </div>
 
-            {/* Gráfico de Status */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-1 flex flex-col items-center">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                Distribuição por Status
-              </h3>
-              <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-                <Pie data={statusData} />
+            {/* Linha de baixo: Gráfico de Cursos ocupando 3 colunas */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-3">
+                <h3 className="font-semibold text-lg text-gray-700 mb-4">
+                  Volume por Curso
+                </h3>
+                <Bar data={courseData} options={{ responsive: true }} />
               </div>
             </div>
-
-            {/* Gráfico de Cursos */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-3">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                Volume por Curso
-              </h3>
-              <Bar data={courseData} options={{ responsive: true }} />
-            </div>
-          </div>
+          </>
         )}
       </main>
     </AppLayout>

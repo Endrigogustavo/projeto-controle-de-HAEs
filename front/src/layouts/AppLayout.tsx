@@ -1,6 +1,6 @@
 import { useState, ReactNode } from "react";
 import Drawer from "@mui/material/Drawer";
-import { Sidebar } from "@components/Sidebar";
+import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { Header } from "@components/Header";
 import { MobileHeader } from "@components/MobileHeader";
 

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { authService } from "@/services";
@@ -12,27 +12,11 @@ import {
   SettingsOutlined,
   ReportGmailerrorred,
 } from "@mui/icons-material";
-import React from "react";
-
-const SidebarItem = ({
-  to,
-  icon,
-  text,
-}: {
-  to: string;
-  icon: React.ReactElement;
-  text: string;
-}) => (
-  <li className="text-white flex items-center gap-2 px-2 py-2 rounded-md hover:bg-white/10 transition-colors">
-    <span className="text-white mb-0.5">{icon}</span>
-    <Link to={to} className="w-full ">
-      {text}
-    </Link>
-  </li>
-);
+import { SidebarItem } from "./SidebarItem";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { user } = useAuth();
   const { handleLogout } = useAuthForms(authService);
@@ -43,8 +27,13 @@ export const Sidebar = () => {
     }
   };
 
+  // Passa o path atual para o SidebarItem pra ele saber se está ativo
   const renderNavLinks = () => {
     if (!user) return null;
+
+    const currentPath = location.pathname;
+
+    const isActive = (path: string) => currentPath === path;
 
     switch (user.role) {
       case "PROFESSOR":
@@ -54,21 +43,25 @@ export const Sidebar = () => {
               to="/dashboard"
               icon={<DashboardOutlined sx={{ fill: "white" }} />}
               text="Minha Visão Geral"
+              active={isActive("/dashboard")}
             />
             <SidebarItem
               to="/requestHae"
               icon={<ArticleOutlined sx={{ fill: "white" }} />}
               text="Solicitar HAE"
+              active={isActive("/requestHae")}
             />
             <SidebarItem
               to="/myrequests"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Minhas Solicitações"
+              active={isActive("/myrequests")}
             />
             <SidebarItem
               to="/support"
               icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
               text="Relatar Erro"
+              active={isActive("/support")}
             />
           </>
         );
@@ -79,16 +72,19 @@ export const Sidebar = () => {
               to="/dashboard-coordenador"
               icon={<DashboardOutlined sx={{ fill: "white" }} />}
               text="Visão Geral (Curso)"
+              active={isActive("/dashboard-coordenador")}
             />
             <SidebarItem
               to="/requestHae"
               icon={<ArticleOutlined sx={{ fill: "white" }} />}
               text="Solicitar HAE"
+              active={isActive("/requestHae")}
             />
             <SidebarItem
               to="/myrequests"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Minhas Solicitações"
+              active={isActive("/myrequests")}
             />
           </>
         );
@@ -99,21 +95,25 @@ export const Sidebar = () => {
               to="/dashboard-admin"
               icon={<DashboardOutlined sx={{ fill: "white" }} />}
               text="Visão Geral"
+              active={isActive("/dashboard-admin")}
             />
             <SidebarItem
               to="/gerenciar-usuarios"
               icon={<AdminPanelSettingsOutlined sx={{ fill: "white" }} />}
               text="Gerenciar Usuários"
+              active={isActive("/gerenciar-usuarios")}
             />
             <SidebarItem
               to="/requestHae"
               icon={<ArticleOutlined sx={{ fill: "white" }} />}
               text="Solicitar HAE"
+              active={isActive("/requestHae")}
             />
             <SidebarItem
               to="/myrequests"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Minhas Solicitações"
+              active={isActive("/myrequests")}
             />
           </>
         );
@@ -124,26 +124,31 @@ export const Sidebar = () => {
               to="/dashboard-diretor"
               icon={<BarChartOutlined sx={{ fill: "white" }} />}
               text="Dashboard Geral"
+              active={isActive("/dashboard-diretor")}
             />
             <SidebarItem
               to="/haes"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Visualizar HAEs"
+              active={isActive("/haes")}
             />
             <SidebarItem
               to="/professores"
               icon={<PeopleOutline sx={{ fill: "white" }} />}
               text="Visualizar Professores"
+              active={isActive("/professores")}
             />
             <SidebarItem
               to="/coordenadores"
               icon={<PeopleOutline sx={{ fill: "white" }} />}
               text="Visualizar Coordenadores"
+              active={isActive("/coordenadores")}
             />
             <SidebarItem
               to="/configuracoes"
               icon={<SettingsOutlined sx={{ fill: "white" }} />}
               text="Configurações"
+              active={isActive("/configuracoes")}
             />
           </>
         );
