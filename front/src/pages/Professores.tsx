@@ -25,8 +25,8 @@ export const Professores = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
-        <h2 className="subtitle">Visão Geral de Professores</h2>
+      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
+        <h2 className="subtitle font-semibold">Visão Geral de Professores</h2>
         <p className="text-gray-600 mb-6">
           Lista de todos os professores cadastrados e suas atividades.
         </p>

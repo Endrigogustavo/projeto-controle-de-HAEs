@@ -151,8 +151,8 @@ export const DashboardDiretor = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
-        <h2 className="subtitle">Dashboard Geral</h2>
+      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
+        <h2 className="subtitle font-semibold">Dashboard Geral</h2>
         <p className="text-gray-600 mb-6">
           Análise de todas as Horas de Atividades Específicas do sistema.
         </p>
@@ -169,8 +169,8 @@ export const DashboardDiretor = () => {
                   Uso de HAEs no Semestre Atual
                 </h3>
                 <Doughnut data={limitChartData} options={limitChartOptions} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                  <span className="text-4xl font-bold text-gray-800">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-20">
+                  <span className="text-4xl font-bold text-gray-800 ">
                     {haesNoSemestreAtual}
                   </span>
                   <span className="text-sm text-gray-500 block">

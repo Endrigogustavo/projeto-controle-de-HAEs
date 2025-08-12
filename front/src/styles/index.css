@@ -30,7 +30,7 @@
 
 	.btnFatec {
 		background-color: var(--color-red-fatec);
-		border-radius: 15px;
+		border-radius: 5px;
 		padding: 0.5rem 1.5rem;
 	}
 

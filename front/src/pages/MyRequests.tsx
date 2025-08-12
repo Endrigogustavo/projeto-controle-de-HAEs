@@ -73,8 +73,8 @@ export const MyRequests = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 overflow-auto bg-background pt-20 md:pt-4">
-        <h2 className="subtitle">Minhas Solicitações</h2>
+      <main className="col-start-2 row-start-2 p-4 overflow-auto bg-background pt-20 md:pt-4 h-full">
+        <h2 className="subtitle font-semibold">Minhas Solicitações</h2>
         <p>
           Nesta seção, você pode gerenciar suas solicitações de HAEs com status
           "Pendente". Tenha a opção de editar ou excluir atividades, conforme
@@ -105,7 +105,7 @@ export const MyRequests = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
+        <DialogTitle id="alert-dialog-title" className="font-semibold subtitle">
           {"Confirmar Exclusão"}
         </DialogTitle>
         <DialogContent>
@@ -115,8 +115,15 @@ export const MyRequests = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>Cancelar</Button>
-          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+          <Button variant="contained" onClick={closeDeleteDialog}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleDeleteConfirm}
+            color="error"
+            autoFocus
+          >
             Confirmar Exclusão
           </Button>
         </DialogActions>

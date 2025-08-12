@@ -233,7 +233,7 @@ const StepperForm: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center my-6">
-      <div className="p-8 rounded-xl w-full shadow-md bg-white">
+      <div className="p-8 rounded-md w-full shadow-lg bg-white">
         <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
           {isEditMode ? "Editar Solicitação de HAE" : "Criar Nova HAE"}
         </h2>

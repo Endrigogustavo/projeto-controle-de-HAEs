@@ -60,7 +60,7 @@ export const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-red-fatec text-white p-2 rounded mt-4 uppercase"
+                className="bg-red-fatec text-white p-2 rounded mt-2  mb-4 uppercase"
               >
                 {isSubmitting ? "Enviando..." : "Enviar Link"}
               </button>
@@ -71,8 +71,14 @@ export const ForgotPassword = () => {
             {message}
           </p>
         )}
-        <Button onClick={() => navigate("/login")} className="mt-4">
-          Voltar para o Login
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={() => navigate("/login")}
+          className="mt-10  "
+          sx={{ fontSize: 16}}
+        >
+          Voltar
         </Button>
       </div>
     </div>

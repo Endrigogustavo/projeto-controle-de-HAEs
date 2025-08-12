@@ -60,7 +60,7 @@ export const Sidebar = () => {
             <SidebarItem
               to="/support"
               icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
-              text="Relatar Erro"
+              text="Entre Em Contato"
               active={isActive("/support")}
             />
           </>
@@ -85,6 +85,12 @@ export const Sidebar = () => {
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Minhas Solicitações"
               active={isActive("/myrequests")}
+            />
+            <SidebarItem
+              to="/support"
+              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              text="Entre Em Contato"
+              active={isActive("/support")}
             />
           </>
         );
@@ -114,6 +120,12 @@ export const Sidebar = () => {
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Minhas Solicitações"
               active={isActive("/myrequests")}
+            />
+            <SidebarItem
+              to="/support"
+              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              text="Entre Em Contato"
+              active={isActive("/support")}
             />
           </>
         );
@@ -150,6 +162,12 @@ export const Sidebar = () => {
               text="Configurações"
               active={isActive("/configuracoes")}
             />
+            <SidebarItem
+              to="/support"
+              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              text="Entre Em Contato"
+              active={isActive("/support")}
+            />
           </>
         );
       default:
@@ -171,7 +189,7 @@ export const Sidebar = () => {
         <div className="flex-1" />
         <button
           onClick={onLogout}
-          className="btnFatec mb-4 px-3 py-2 text-white"
+          className="btnFatec mb-4 px-3 py-2 text-white uppercase"
         >
           Sair da Conta
         </button>

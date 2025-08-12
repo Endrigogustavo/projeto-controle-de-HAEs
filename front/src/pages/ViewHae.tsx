@@ -216,7 +216,10 @@ export const ViewHae = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
+      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
+        <div>
+          <p className="subtitle font-semibold mb-6 ml-1">Informações da HAE</p>
+        </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-4 border-b border-gray-200">
             <div>
@@ -352,7 +355,7 @@ export const ViewHae = () => {
         </div>
 
         {isCoordinator && (
-          <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4 p-4 bg-gray-100 rounded-lg">
+          <div className="bg-white mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4 p-4  rounded-lg shadow-md">
             <p className="font-semibold text-gray-700">Ações do Coordenador:</p>
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="status-select-label">Alterar Status</InputLabel>
