@@ -11,6 +11,9 @@ import {
   AdminPanelSettingsOutlined,
   SettingsOutlined,
   ReportGmailerrorred,
+  Call,
+  CallOutlined,
+  AlternateEmail,
 } from "@mui/icons-material";
 import { SidebarItem } from "./SidebarItem";
 
@@ -59,7 +62,7 @@ export const Sidebar = () => {
             />
             <SidebarItem
               to="/support"
-              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
               active={isActive("/support")}
             />
@@ -88,7 +91,7 @@ export const Sidebar = () => {
             />
             <SidebarItem
               to="/support"
-              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
               active={isActive("/support")}
             />
@@ -123,7 +126,7 @@ export const Sidebar = () => {
             />
             <SidebarItem
               to="/support"
-              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
               active={isActive("/support")}
             />
@@ -164,7 +167,7 @@ export const Sidebar = () => {
             />
             <SidebarItem
               to="/support"
-              icon={<ReportGmailerrorred sx={{ fill: "white" }} />}
+              icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
               active={isActive("/support")}
             />
