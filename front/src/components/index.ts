@@ -10,7 +10,6 @@ export * from "./EmployeeInfoDisplay";
 export * from "./Header";
 export * from "./MobileHeader";
 export * from "./PasswordField";
-export * from "./PrivateRoute";
 export * from "./Sidebar";
 export * from "./StatusBadge";
 export * from "./ToastNotification";
