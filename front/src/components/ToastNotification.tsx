@@ -34,7 +34,7 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({
 			anchorOrigin={{ vertical: "top", horizontal: "center" }}
 		>
 			<Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
-				{message}
+				<p className="text-green-800 font-semibold">{message}</p>
 			</Alert>
 		</Snackbar>
 	);
