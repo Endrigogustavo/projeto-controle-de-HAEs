@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "@/services/axios.config";
+import { api } from "@/services";
 import { EmployeeSummary } from "@/types/employee";
 import { AppLayout } from "@/layouts";
 

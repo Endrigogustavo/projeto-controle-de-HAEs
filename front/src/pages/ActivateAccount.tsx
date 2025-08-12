@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyEmailCode as verifyCodeApi } from "@/services/authService";
+import { authService } from "@/services";
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 export const ActivateAccount = () => {
@@ -22,7 +22,7 @@ export const ActivateAccount = () => {
 
     const activate = async () => {
       try {
-        const user = await verifyCodeApi(token);
+        const user = await authService.verifyCode(token);
 
         localStorage.setItem("email", user.email);
         localStorage.setItem("token", "session_active");

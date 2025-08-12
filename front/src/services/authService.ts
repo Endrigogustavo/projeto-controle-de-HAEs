@@ -2,16 +2,16 @@ import { LoggedUser } from "@/hooks/useAuth";
 import { api } from "./axios.config";
 
 export interface IAuthService {
-  register?(data: {
+  register(data: {
     name: string;
     email: string;
     password: string;
     course?: string;
   }): Promise<unknown>;
-  login?(data: { email: string; password: string }): Promise<LoggedUser>;
-  verifyCode?(token: string): Promise<LoggedUser>;
-  logout?(): Promise<unknown>;
-  checkCookie?(email: string): Promise<unknown>;
+  login(data: { email: string; password: string }): Promise<LoggedUser>;
+  verifyCode(token: string): Promise<LoggedUser>;
+  logout(): Promise<unknown>;
+  checkCookie(email: string): Promise<unknown>;
 }
 
 interface RegisterRequest {

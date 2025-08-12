@@ -21,9 +21,9 @@ export const ContactUs = () => {
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  // Schema Yup
+  
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
     try {
       await supportSchema.validate(formData, { abortEarly: false });
 

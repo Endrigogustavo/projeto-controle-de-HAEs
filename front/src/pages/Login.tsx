@@ -16,7 +16,7 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { loginSchema } from "@/validation/loginSchema";
-import { login as loginApi } from "@/services/authService";
+import { authService } from "@/services";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
 
@@ -38,7 +38,7 @@ export const Login = () => {
     snackbarSeverity,
     handleCloseSnackbar,
     handleLogin,
-  } = useAuthForms({ login: loginApi });
+  } = useAuthForms(authService);
 
   const {
     register,

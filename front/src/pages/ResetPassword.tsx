@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PasswordField } from "@/components/PasswordField";
-import api from "@/services/axios.config";
+import { api } from "@/services";
 import { useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
