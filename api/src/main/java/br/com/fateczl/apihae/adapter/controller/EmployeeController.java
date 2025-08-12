@@ -7,11 +7,16 @@ import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import jakarta.validation.Valid;
+
 import java.util.Collections;
 import java.util.List;
+
+import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
 
 @RestController
 @RequestMapping("/employee")
@@ -21,10 +26,8 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
-       
     }
 
     @GetMapping("/getAllEmployee")
@@ -71,5 +74,11 @@ public class EmployeeController {
         Employee employee = employeeService.getEmployeeByEmail(email);
         System.out.println(employee);
         return ResponseEntity.ok(employee);
+    }
+
+    @PostMapping("/createEmployeeByDiretorOrAdmin")
+    public ResponseEntity<?> createEmployeeByDiretorOrAdmin(@Valid @RequestBody EmployeeCreateByDiretorOrAdmRequest request) {
+        Employee newEmployee = employeeService.createEmployeeByDiretorOrAdmin(request);
+        return ResponseEntity.ok(newEmployee);
     }
 }

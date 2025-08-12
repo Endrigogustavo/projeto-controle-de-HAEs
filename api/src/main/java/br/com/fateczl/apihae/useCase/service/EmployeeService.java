@@ -6,12 +6,15 @@ import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
 
 @RequiredArgsConstructor
 @Service
@@ -87,6 +90,17 @@ public class EmployeeService {
                 .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com ID: " + id));
 
         employee.setRole(newRole);
+        return employeeRepository.save(employee);
+    }
+
+    @Transactional
+    public Employee createEmployeeByDiretorOrAdmin(EmployeeCreateByDiretorOrAdmRequest request) {
+        Employee employee = new Employee();
+        employee.setName(request.getName());
+        employee.setEmail(request.getEmail());
+        employee.setCourse(request.getCourse());
+        employee.setPassword(request.getProvisoryPassword());
+        employee.setRole(Role.PROFESSOR); 
         return employeeRepository.save(employee);
     }
 }
