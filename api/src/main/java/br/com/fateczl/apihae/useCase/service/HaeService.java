@@ -314,5 +314,5 @@ public class HaeService {
         int month = date.getMonthValue(); // 1 (Jan) a 12 (Dez)
         int semestre = (month <= 6) ? 1 : 2; // Semestre 1: Jan-Jun, Semestre 2: Jul-Dez
         return year + "/" + semestre;
-    }
+    }    
 }

@@ -17,10 +17,6 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import br.com.fateczl.apihae.domain.entity.HaeQtd;
 
 @RestController
@@ -33,9 +29,12 @@ public class HaeController {
 
     private final HaeQtd haeQtd;
 
-    public HaeController(HaeService haeService, HaeQtd haeQtd) {
+    private final HaeCacheTransientService haeCacheTransientService;
+
+    public HaeController(HaeService haeService, HaeQtd haeQtd, HaeCacheTransientService haeCacheTransientService) {
         this.haeService = haeService;
         this.haeQtd = haeQtd;
+        this.haeCacheTransientService = haeCacheTransientService;
     }
 
     @PostMapping("/create")
@@ -130,5 +129,21 @@ public class HaeController {
     public ResponseEntity<?> setAvailableHaesCount(@RequestParam int count, @RequestParam String usuarioId) {
         haeQtd.setQuantidade(count, usuarioId);
         return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
+    }
+
+    @PostMapping("/{id}/visualizeHae")
+    public String visualizeHae(@PathVariable String id) {
+        haeCacheTransientService.markAsViewed(id);
+        return "Documento " + id + " marcado como visualizado";
+    }
+
+    @GetMapping("/{id}/statusViewed")
+    public boolean statusHae(@PathVariable String id) {
+        return haeCacheTransientService.wasViewed(id);
+    }
+
+    @GetMapping("/getAllHaeWithoutViewed")
+    public List<Hae> getAllHaeWithoutViewed() {
+        return haeCacheTransientService.getAllUnviewed();
     }
 }
