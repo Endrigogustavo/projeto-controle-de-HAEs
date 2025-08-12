@@ -167,7 +167,7 @@ public class EmailService {
             feedback.getName(),
             feedback.getEmail(),
             feedback.getEmail(),
-            feedback.getFeedback());
+            feedback.getDescription());
   }
 
   private String buildPasswordResetEmailTemplate(String resetLink) {

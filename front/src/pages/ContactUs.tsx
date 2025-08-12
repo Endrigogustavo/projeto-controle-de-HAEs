@@ -1,152 +1,208 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-  FormHelperText,
+	TextField,
+	MenuItem,
+	Select,
+	InputLabel,
+	FormControl,
+	FormHelperText,
+	Button,
 } from "@mui/material";
 import * as yup from "yup";
 import { AppLayout } from "@/layouts";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { useAuth } from "@/hooks/useAuth";
+import { ToastNotification } from "@/components/ToastNotification";
+import { emailService } from "@/services/emailService";
+import { FeedbackFormType } from "@/types/feedbackFormType";
 
-// Schema de validação atualizado com category
-const supportSchema = yup.object().shape({
-  email: yup.string().email("E-mail inválido").required("E-mail obrigatório"),
-  subject: yup.string().required("Assunto obrigatório"),
-  description: yup.string().required("Mensagem obrigatória"),
-  category: yup.string().required("Categoria obrigatória"),
+const supportSchema: yup.ObjectSchema<FeedbackFormType> = yup.object().shape({
+	name: yup.string().required(),
+	email: yup
+		.string()
+		.email("E-mail inválido")
+		.required("O e-mail de contato é obrigatório"),
+	subject: yup.string().required("O assunto é obrigatório"),
+	category: yup
+		.mixed<"BUG" | "DOUBT" | "FEEDBACK">()
+		.oneOf(["BUG", "DOUBT", "FEEDBACK"], "Selecione uma categoria válida")
+		.required("A categoria é obrigatória"),
+	description: yup.string().required("A mensagem é obrigatória"),
 });
 
-type ErrorFields = {
-  email: string;
-  subject: string;
-  description: string;
-  category: string;
-};
+type ErrorFields = Partial<Record<keyof FeedbackFormType, string>>;
 
 export const ContactUs = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    subject: "",
-    description: "",
-    category: "",
-  });
-  const [errors, setErrors] = useState<ErrorFields>({
-    email: "",
-    subject: "",
-    description: "",
-    category: "",
-  });
+	const { open, message, severity, showSnackbar, hideSnackbar } = useSnackbar();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { user } = useAuth();
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
+	const [formData, setFormData] = useState<FeedbackFormType>({
+		name: "",
+		email: "",
+		subject: "",
+		category: "BUG",
+		description: "",
+	});
+	const [errors, setErrors] = useState<ErrorFields>({});
 
-  const handleSubmit = async () => {
-    try {
-      await supportSchema.validate(formData, { abortEarly: false });
+	useEffect(() => {
+		if (user) {
+			setFormData((prev) => ({
+				...prev,
+				name: user.name,
+			}));
+		}
+	}, [user]);
 
-      alert("Erro relatado com sucesso!");
-      setFormData({ email: "", subject: "", description: "", category: "" });
-      setErrors({ email: "", subject: "", description: "", category: "" });
-    } catch (validationErrors) {
-      if (validationErrors instanceof yup.ValidationError) {
-        const newErrors: ErrorFields = {
-          email: "",
-          subject: "",
-          description: "",
-          category: "",
-        };
-        validationErrors.inner.forEach((error) => {
-          if (error.path) {
-            newErrors[error.path as keyof ErrorFields] = error.message;
-          }
-        });
-        setErrors(newErrors);
-      }
-    }
-  };
+	const handleChange = (
+		field: keyof FeedbackFormType,
+		value: string | FeedbackFormType["category"]
+	) => {
+		setFormData((prev) => ({ ...prev, [field]: value }));
+		if (errors[field]) {
+			setErrors((prev) => ({ ...prev, [field]: undefined }));
+		}
+	};
 
-  return (
-    <AppLayout>
-      <main className="p-6 overflow-auto w-full justify-center flex flex-col pt-20 md:pt-6 ">
-        <h2 className="subtitle font-semibold mb-2 ">Entre em Contato</h2>
-        <p className="mb-8 text-gray-600">
-          Preencha o formulário abaixo para entrar em contato com nossa equipe
-          de suporte. Descreva o problema ou dúvida para que possamos ajudá-lo
-          da melhor forma.
-        </p>
+	const handleSubmit = async () => {
+		if (!user) {
+			showSnackbar(
+				"Não foi possível identificar o usuário. Por favor, faça login novamente.",
+				"error"
+			);
+			return;
+		}
 
-        <div className="bg-white flex flex-col gap-13 p-10 flex-grow rounded-md shadow-lg justify-center">
-          <div className="flex justify-center">
-            <h2 className="subtitle font-bold">Formulário de Contato</h2>
-          </div>
+		try {
+			setErrors({});
+			await supportSchema.validate(formData, { abortEarly: false });
 
-          <TextField
-            label="Seu e-mail"
-            variant="outlined"
-            fullWidth
-            value={formData.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-            error={!!errors.email}
-            helperText={errors.email}
-            className="mb-6"
-          />
+			setIsSubmitting(true);
+			await emailService.sendFeedbackEmail(formData);
+			showSnackbar("Sua mensagem foi enviada com sucesso!", "success");
 
-          <TextField
-            label="Assunto"
-            variant="outlined"
-            fullWidth
-            value={formData.subject}
-            onChange={(e) => handleChange("subject", e.target.value)}
-            error={!!errors.subject}
-            helperText={errors.subject}
-            className="mb-6"
-          />
+			setFormData((prev) => ({
+				...prev,
+				email: "",
+				subject: "",
+				category: "BUG",
+				description: "",
+			}));
+		} catch (err) {
+			if (err instanceof yup.ValidationError) {
+				const newErrors: ErrorFields = {};
+				err.inner.forEach((error) => {
+					if (error.path) {
+						newErrors[error.path as keyof FeedbackFormType] = error.message;
+					}
+				});
+				setErrors(newErrors);
+				showSnackbar("Por favor, corrija os erros no formulário.", "warning");
+			} else {
+				console.error("Erro ao enviar feedback:", err);
+				showSnackbar("Erro ao enviar mensagem. Tente novamente.", "error");
+			}
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
-          <FormControl fullWidth error={!!errors.category} className="mb-6">
-            <InputLabel id="category-label">Categoria</InputLabel>
-            <Select
-              labelId="category-label"
-              value={formData.category}
-              label="Categoria"
-              onChange={(e) => handleChange("category", e.target.value)}
-            >
-              <MenuItem value="">Selecione a categoria</MenuItem>
-              <MenuItem value="bug">Bug</MenuItem>
-              <MenuItem value="question">Dúvida</MenuItem>
-              <MenuItem value="feedback">Feedback</MenuItem>
-            </Select>
-            <FormHelperText>{errors.category}</FormHelperText>
-          </FormControl>
+	return (
+		<AppLayout>
+			<main className="p-4 md:p-8 overflow-auto w-full h-full flex flex-col pt-20 md:pt-6 bg-gray-50">
+				<h2 className="subtitle font-semibold mb-2">Entre em Contato</h2>
+				<p className="mb-6 text-gray-600">
+					Preencha o formulário abaixo para relatar um problema ou nos enviar
+					sua dúvida ou sugestão.
+				</p>
 
-          <TextField
-            label="Mensagem"
-            variant="outlined"
-            fullWidth
-            multiline
-            minRows={4}
-            maxRows={8}
-            value={formData.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            error={!!errors.description}
-            helperText={errors.description}
-            className=""
-          />
+				<div className="bg-white flex flex-col gap-6 p-6 md:p-10 rounded-lg shadow-lg border border-gray-200">
+					<div className="text-center">
+						<h2 className="subtitle font-bold text-2xl">
+							Formulário de Contato
+						</h2>
+					</div>
 
-          <div className="flex justify-end ">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="w-full py-2 btnFatec uppercase"
-            >
-              <p>Enviar</p>
-            </button>
-          </div>
-        </div>
-      </main>
-    </AppLayout>
-  );
+					<TextField
+						label="Nome"
+						variant="outlined"
+						fullWidth
+						value={formData.name}
+						disabled
+					/>
+
+					<TextField
+						label="E-mail de Contato"
+						variant="outlined"
+						fullWidth
+						value={formData.email}
+						onChange={(e) => handleChange("email", e.target.value)}
+						error={!!errors.email}
+						helperText={errors.email}
+					/>
+
+					<TextField
+						label="Assunto"
+						variant="outlined"
+						fullWidth
+						value={formData.subject}
+						onChange={(e) => handleChange("subject", e.target.value)}
+						error={!!errors.subject}
+						helperText={errors.subject}
+					/>
+					<FormControl fullWidth error={!!errors.category}>
+						<InputLabel id="category-label">Categoria</InputLabel>
+						<Select
+							labelId="category-label"
+							value={formData.category}
+							label="Categoria"
+							onChange={(e) =>
+								handleChange(
+									"category",
+									e.target.value as FeedbackFormType["category"]
+								)
+							}
+						>
+							<MenuItem value="BUG">Relatar um Bug</MenuItem>
+							<MenuItem value="DOUBT">Tirar uma Dúvida</MenuItem>
+							<MenuItem value="FEEDBACK">Enviar Sugestão/Feedback</MenuItem>
+						</Select>
+						<FormHelperText>{errors.category}</FormHelperText>
+					</FormControl>
+					<TextField
+						label="Mensagem"
+						variant="outlined"
+						fullWidth
+						multiline
+						minRows={4}
+						maxRows={8}
+						value={formData.description}
+						onChange={(e) => handleChange("description", e.target.value)}
+						error={!!errors.description}
+						helperText={errors.description}
+					/>
+
+					<div className="flex justify-end mt-4">
+						<Button
+							type="button"
+							onClick={handleSubmit}
+							variant="contained"
+							disabled={isSubmitting || !user}
+							className="w-full md:w-auto py-2 btnFatec uppercase"
+						>
+							{isSubmitting ? "Enviando..." : "Enviar Mensagem"}
+						</Button>
+					</div>
+				</div>
+			</main>
+
+			<ToastNotification
+				open={open}
+				message={message}
+				severity={severity}
+				onClose={hideSnackbar}
+			/>
+		</AppLayout>
+	);
 };
