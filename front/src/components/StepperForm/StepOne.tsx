@@ -202,6 +202,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         helperText={errors.modality}
       >
         <MenuItem value="PRESENCIAL">Presencial</MenuItem>
+        <MenuItem value="HIBRIDO">Híbrido</MenuItem>
         <MenuItem value="ONLINE">Online</MenuItem>
       </TextField>
 

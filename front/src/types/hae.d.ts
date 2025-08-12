@@ -17,7 +17,7 @@ export interface Hae {
 	startDate: string;
 	endDate: string;
 	comprovanteDoc: any[];
-	modality: "ONLINE" | "PRESENCIAL";
+	modality: "ONLINE" | "HIBRIDO" | "PRESENCIAL";
 	employee: EmployeeDetails;
 	students: string[];
 	weeklySchedule: Record<string, string>;
