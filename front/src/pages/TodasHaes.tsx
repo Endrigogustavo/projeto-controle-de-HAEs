@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { CardHaeCoordenador } from "@/components/CardHaeCoordenador";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";

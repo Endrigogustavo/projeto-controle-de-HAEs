@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyEmailCode as verifyCodeApi } from "@/services/auth";
+import { verifyEmailCode as verifyCodeApi } from "@/services/authService";
 import { CircularProgress, Box, Typography } from "@mui/material";
 
 export const ActivateAccount = () => {

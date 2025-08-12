@@ -1,5 +1,6 @@
 import { useSnackbar } from "./useSnackbar";
 import { LoggedUser } from "./useAuth";
+import { IAuthService } from "@/services";
 
 export interface LoginResult {
 	success: boolean;
@@ -11,18 +12,7 @@ export interface VerificationResult {
 	user: LoggedUser | null;
 }
 
-export interface IAuthService {
-	register?(data: {
-		name: string;
-		email: string;
-		password: string;
-		course?: string;
-	}): Promise<unknown>;
-	login?(data: { email: string; password: string }): Promise<LoggedUser>;
-	verifyCode?(token: string): Promise<LoggedUser>;
-	logout?(): Promise<unknown>;
-	checkCookie?(email: string): Promise<unknown>;
-}
+
 
 export const useAuthForms = (authService: IAuthService) => {
 	const { open, message, severity, showSnackbar, hideSnackbar } = useSnackbar();

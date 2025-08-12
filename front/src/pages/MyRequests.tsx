@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { CardRequestHae } from "@components/CardRequestHae";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { Employee } from "@/types/employee";
 import {
   Dialog,

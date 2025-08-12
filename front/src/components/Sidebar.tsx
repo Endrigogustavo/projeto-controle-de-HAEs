@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthForms } from "@/hooks/useAuthForms";
-import { logout } from "@/services/auth";
-
+import { authService } from "@/services";
 import {
   ArticleOutlined,
   DashboardOutlined,
@@ -34,8 +33,9 @@ const SidebarItem = ({
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+
   const { user } = useAuth();
-  const { handleLogout } = useAuthForms({ logout });
+  const { handleLogout } = useAuthForms(authService);
 
   const onLogout = async () => {
     if (await handleLogout()) {

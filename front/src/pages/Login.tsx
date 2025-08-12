@@ -16,7 +16,7 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { loginSchema } from "@/validation/loginSchema";
-import { login as loginApi } from "@services/auth";
+import { login as loginApi } from "@/services/authService";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
 

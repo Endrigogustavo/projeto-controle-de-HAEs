@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { useAuth, LoggedUser } from "@/hooks/useAuth";
 import {
   CircularProgress,

@@ -1,13 +1,11 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PasswordField } from "@/components/PasswordField";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPasswordSchema } from "@/validation/resetPasswordSchema";
-
-
 
 type FormData = yup.InferType<typeof resetPasswordSchema>;
 

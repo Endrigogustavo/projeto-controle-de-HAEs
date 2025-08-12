@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { useState } from "react";
 
 type FormData = { email: string };

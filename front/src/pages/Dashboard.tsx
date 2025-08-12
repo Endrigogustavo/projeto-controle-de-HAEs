@@ -1,6 +1,6 @@
 import { CardHae } from "@components/CardHae";
 import { useEffect, useState } from "react";
-import api from "@/services";
+import api from "@/services/axios.config";
 import { Employee } from "@/types/employee";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
