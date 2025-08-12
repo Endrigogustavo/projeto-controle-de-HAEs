@@ -12,6 +12,7 @@ import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,22 +44,22 @@ public class AuthService {
 
     @Transactional
     public void sendVerificationCode(String name, String email, String course, String plainPassword) {
-        if (employeeRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email já registrado.");
-        }
-
         String encryptedPassword = textEncryptor.encrypt(plainPassword);
 
         String verificationToken = UUID.randomUUID().toString();
 
-        emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
+        Optional<EmailVerification> existing = emailVerificationRepository.findByEmail(email);
+        if (existing.isPresent()) {
+            emailVerificationRepository.delete(existing.get());
+            emailVerificationRepository.flush();
+        }
 
         EmailVerification newVerification = new EmailVerification();
         newVerification.setEmail(email);
         newVerification.setName(name);
         newVerification.setCourse(course);
         newVerification.setPassword(encryptedPassword);
-        newVerification.setCode(verificationToken); // Salva o token no campo 'code'
+        newVerification.setCode(verificationToken);
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
         emailVerificationRepository.save(newVerification);
 

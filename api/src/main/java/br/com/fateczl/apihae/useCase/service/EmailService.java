@@ -3,16 +3,15 @@ package br.com.fateczl.apihae.useCase.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
 import br.com.fateczl.apihae.adapter.dto.FeedbackRequest;
+import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
 
 @Service
 @RequiredArgsConstructor
