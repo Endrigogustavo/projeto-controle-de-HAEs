@@ -71,8 +71,8 @@ export const ContactUs = () => {
 
   return (
     <AppLayout>
-      <main className="p-6 overflow-auto w-full h-full justify-center flex flex-col pt-20 md:pt-6 bg-background">
-        <h2 className="subtitle font-semibold mb-2">Entre em Contato</h2>
+      <main className="p-6 overflow-auto w-full justify-center flex flex-col pt-20 md:pt-6 ">
+        <h2 className="subtitle font-semibold mb-2 ">Entre em Contato</h2>
         <p className="mb-8 text-gray-600">
           Preencha o formulário abaixo para entrar em contato com nossa equipe
           de suporte. Descreva o problema ou dúvida para que possamos ajudá-lo

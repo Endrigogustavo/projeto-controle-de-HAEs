@@ -10,9 +10,6 @@ import {
   ListAltOutlined,
   AdminPanelSettingsOutlined,
   SettingsOutlined,
-  ReportGmailerrorred,
-  Call,
-  CallOutlined,
   AlternateEmail,
 } from "@mui/icons-material";
 import { SidebarItem } from "./SidebarItem";
@@ -30,7 +27,6 @@ export const Sidebar = () => {
     }
   };
 
-  // Passa o path atual para o SidebarItem pra ele saber se está ativo
   const renderNavLinks = () => {
     if (!user) return null;
 

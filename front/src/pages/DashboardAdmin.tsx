@@ -22,7 +22,7 @@ export const DashboardAdmin = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 overflow-auto bg-background pt-20 md:pt-4 h-full">
+      <main className="col-start-2 row-start-2 p-4 overflow-auto  pt-20 md:pt-4 h-full">
         <h2 className="subtitle font-semibold">Visão Geral das HAEs (Admin)</h2>
         <p>
           Abaixo estão listadas todas as HAEs submetidas pelos professores. Você
