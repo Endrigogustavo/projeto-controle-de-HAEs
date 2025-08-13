@@ -1,3 +1,4 @@
+import { FeedbackFormType } from "@/types/feedbackFormType";
 import * as yup from "yup";
 
 export type ErrorFields = {
@@ -6,11 +7,16 @@ export type ErrorFields = {
   description: string;
 };
 
-export const supportSchema = yup.object().shape({
+export const supportSchema: yup.ObjectSchema<FeedbackFormType> = yup.object().shape({
+  name: yup.string().required(),
   email: yup
     .string()
-    .email("Por favor, insira um email válido.")
-    .required("O email é obrigatório."),
-  subject: yup.string().required("O assunto é obrigatório."),
-  description: yup.string().required("Por favor, descreva o erro."),
+    .email("E-mail inválido")
+    .required("O e-mail de contato é obrigatório"),
+  subject: yup.string().required("O assunto é obrigatório"),
+  category: yup
+    .mixed<"BUG" | "DOUBT" | "FEEDBACK">()
+    .oneOf(["BUG", "DOUBT", "FEEDBACK"], "Selecione uma categoria válida")
+    .required("A categoria é obrigatória"),
+  description: yup.string().required("A mensagem é obrigatória"),
 });
