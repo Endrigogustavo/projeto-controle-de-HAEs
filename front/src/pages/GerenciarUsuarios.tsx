@@ -3,7 +3,6 @@ import { api } from "@/services";
 import { useAuth, LoggedUser } from "@/hooks/useAuth";
 import {
   CircularProgress,
-  Box,
   Select,
   MenuItem,
   FormControl,

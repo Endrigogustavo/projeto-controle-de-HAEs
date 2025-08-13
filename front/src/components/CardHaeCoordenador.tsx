@@ -3,7 +3,6 @@ import {
   SchoolOutlined,
   PersonOutline,
   NotesOutlined,
-  ArrowForward,
 } from "@mui/icons-material";
 import { StatusBadge } from "@components/StatusBadge";
 import { Button } from "@mui/material";

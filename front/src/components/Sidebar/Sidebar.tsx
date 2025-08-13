@@ -13,8 +13,6 @@ import {
   AlternateEmail,
 } from "@mui/icons-material";
 import { SidebarItem } from "./SidebarItem";
-import { useState, useEffect } from "react";
-import { CircularProgress } from "@mui/material";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -22,16 +20,6 @@ export const Sidebar = () => {
 
   const { user } = useAuth();
   const { handleLogout } = useAuthForms(authService);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const onLogout = async () => {
     if (await handleLogout()) {
@@ -184,21 +172,6 @@ export const Sidebar = () => {
         return null;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center bg-gray-fatec">
-        <CircularProgress
-          size={50}
-          sx={{
-            "& .MuiCircularProgress-circle": {
-              stroke: "#fff", // Branco
-            },
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <aside>
