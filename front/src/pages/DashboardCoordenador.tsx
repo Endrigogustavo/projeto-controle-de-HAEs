@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/services";
 import { CardHaeCoordenador } from "../components/CardHaeCoordenador";
 import { useAuth } from "@/hooks/useAuth";
-import { CircularProgress, Box } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 
@@ -41,14 +41,16 @@ export const DashboardCoordenador = () => {
 
   if (isLoadingUser || isLoadingHaes) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
+      <div className="h-screen flex justify-center items-center">
+        <CircularProgress
+          size={70}
+          sx={{
+            "& .MuiCircularProgress-circle": {
+              stroke: "#c10007",
+            },
+          }}
+        />
+      </div>
     );
   }
 

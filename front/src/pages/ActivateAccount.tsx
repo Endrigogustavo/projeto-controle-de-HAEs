@@ -71,7 +71,15 @@ export const ActivateAccount = () => {
     >
       {status === "activating" && (
         <>
-          <CircularProgress />
+          <CircularProgress
+            size={40}
+            sx={{
+              "& .MuiCircularProgress-circle": {
+                stroke: "#c10007",
+              },
+            }}
+          />
+
           <Typography variant="h6" mt={2}>
             Ativando sua conta, por favor aguarde...
           </Typography>

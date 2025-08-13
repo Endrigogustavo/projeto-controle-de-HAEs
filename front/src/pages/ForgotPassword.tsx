@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TextField, Button } from "@mui/material";
+import { TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/services";
 import { useState } from "react";
@@ -60,7 +60,7 @@ export const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-red-fatec text-white p-2 rounded mt-2  mb-4 uppercase"
+                className="bg-red-fatec text-white p-2 rounded mt-2  mb-4 uppercase hover:bg-red-900"
               >
                 {isSubmitting ? "Enviando..." : "Enviar Link"}
               </button>
@@ -71,15 +71,12 @@ export const ForgotPassword = () => {
             {message}
           </p>
         )}
-        <Button
-          variant="contained"
-          fullWidth
+        <button
+          className="btnFatec w-full bg-gray-600  text-white uppercase hover:bg-gray-900"
           onClick={() => navigate("/login")}
-          className="mt-10  "
-          sx={{ fontSize: 16}}
         >
           Voltar
-        </Button>
+        </button>
       </div>
     </div>
   );

@@ -13,6 +13,8 @@ import {
   AlternateEmail,
 } from "@mui/icons-material";
 import { SidebarItem } from "./SidebarItem";
+import { useState, useEffect } from "react";
+import { CircularProgress } from "@mui/material";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -20,6 +22,16 @@ export const Sidebar = () => {
 
   const { user } = useAuth();
   const { handleLogout } = useAuthForms(authService);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const onLogout = async () => {
     if (await handleLogout()) {
@@ -31,7 +43,6 @@ export const Sidebar = () => {
     if (!user) return null;
 
     const currentPath = location.pathname;
-
     const isActive = (path: string) => currentPath === path;
 
     switch (user.role) {
@@ -174,6 +185,21 @@ export const Sidebar = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center bg-gray-fatec">
+        <CircularProgress
+          size={50}
+          sx={{
+            "& .MuiCircularProgress-circle": {
+              stroke: "#fff", // Branco
+            },
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <aside>
       <div className="h-screen bg-gray-fatec flex flex-col items-center p-2">
@@ -182,13 +208,14 @@ export const Sidebar = () => {
           alt="Logo da Fatec da Zona Leste"
           className="w-50 p-4"
         />
-        <nav className="w-full mx-2">
+        <nav className="w-full h-full items-center">
           <ul className="flex flex-col gap-2">{renderNavLinks()}</ul>
         </nav>
+
         <div className="flex-1" />
         <button
           onClick={onLogout}
-          className="btnFatec mb-4 px-3 py-2 text-white uppercase"
+          className="btnFatec mb-4 px-3 py-2 text-white uppercase bg-red-800 hover:bg-red-900"
         >
           Sair da Conta
         </button>

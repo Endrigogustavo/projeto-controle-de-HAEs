@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { EmployeeSummary } from "@/types/employee";
 import { AppLayout } from "@/layouts";
 import { api } from "@/services";
+import { LinearProgress } from "@mui/material";
 
 export const Coordenadores = () => {
   const [professores, setProfessores] = useState<EmployeeSummary[]>([]);
@@ -53,7 +54,13 @@ export const Coordenadores = () => {
               {loading ? (
                 <tr>
                   <td colSpan={4} className="text-center p-4">
-                    Carregando...
+                    <LinearProgress
+                      sx={{
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "#c10007",
+                        },
+                      }}
+                    />
                   </td>
                 </tr>
               ) : (

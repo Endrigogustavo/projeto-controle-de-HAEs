@@ -3,6 +3,7 @@ import { api } from "@/services";
 import { CardHaeCoordenador } from "@/components/CardHaeCoordenador";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
+import { CircularProgress } from "@mui/material";
 
 export const TodasHaes = () => {
   const [haes, setHaes] = useState<Hae[]>([]);
@@ -24,14 +25,27 @@ export const TodasHaes = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
+      <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-screen">
         <h2 className="subtitle font-semibold">Todas as HAEs do Sistema</h2>
         <p className="text-gray-600 mb-6">
           Lista completa de todas as HAEs cadastradas.
         </p>
 
         {loading ? (
-          <p>Carregando...</p>
+          <div className="h-screen flex justify-center items-center ">
+            <CircularProgress
+              size={50}
+              sx={{
+                "& .MuiCircularProgress-circle": {
+                  stroke: "#c10007", // Branco
+                },
+              }}
+            />
+          </div>
+        ) : haes.length === 0 ? (
+          <p className="text-center text-gray-500 py-10">
+            Nenhuma HAE cadastrada no sistema.
+          </p>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {haes.map((hae) => (

@@ -13,6 +13,7 @@ import {
 import { Pie, Bar, Doughnut } from "react-chartjs-2";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
+import { CircularProgress } from "@mui/material";
 
 ChartJS.register(
   ArcElement,
@@ -158,7 +159,16 @@ export const DashboardDiretor = () => {
         </p>
 
         {loading ? (
-          <p>Carregando dados...</p>
+          <div className="h-screen flex justify-center items-center">
+            <CircularProgress
+              size={70}
+              sx={{
+                "& .MuiCircularProgress-circle": {
+                  stroke: "#c10007",
+                },
+              }}
+            />
+          </div>
         ) : (
           <>
             {/* Linha de cima com 3 gráficos */}

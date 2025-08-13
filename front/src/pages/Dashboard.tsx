@@ -4,6 +4,7 @@ import { api } from "@/services";
 import { Employee } from "@/types/employee";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
+import { CircularProgress } from "@mui/material";
 
 export const Dashboard = () => {
   const [haes, setHaes] = useState<Hae[]>([]);
@@ -44,7 +45,19 @@ export const Dashboard = () => {
           cada uma.
         </p>
 
-        {loading && <p>Carregando suas HAEs...</p>}
+        {loading && (
+          <div className="h-screen flex justify-center items-center ">
+            <CircularProgress
+              size={70}
+              sx={{
+                "& .MuiCircularProgress-circle": {
+                  stroke: "#c10007",
+                },
+              }}
+            />
+          </div>
+        )}
+
         {!loading && haes.length === 0 && (
           <p className="mt-4 text-gray-500">
             Você ainda não solicitou nenhuma HAE.

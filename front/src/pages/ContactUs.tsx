@@ -6,7 +6,6 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
-  Button,
 } from "@mui/material";
 import * as yup from "yup";
 import { AppLayout } from "@/layouts";
@@ -175,9 +174,9 @@ export const ContactUs = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || !user}
-              className=" py-2 btnFatec uppercase"
+              className=" py-2 btnFatec uppercase hover:bg-red-900"
             >
-              <p> {isSubmitting ? "Enviando..." : "Enviar"}</p>
+              <p> {isSubmitting ? "Enviando..." : "Enviar Mensagem"}</p>
             </button>
           </div>
         </div>

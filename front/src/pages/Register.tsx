@@ -1,6 +1,11 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { MenuItem, TextField, Typography } from "@mui/material";
+import {
+  MenuItem,
+  TextField,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { registerSchema } from "@/validation/registerSchema";
@@ -50,23 +55,23 @@ export const Register = () => {
           <img
             src="/fatec_zona_leste_icon.png"
             alt="Logo da Fatec da Zona Leste"
-            className="mb-4 w-24 mx-auto"
+            className="mb-4 w-26 mx-auto"
           />
           <Typography
             variant="h5"
             component="h1"
-            className="font-semibold text-green-700"
+            className="font-semibold text-green-700 mt-3"
           >
             Cadastro enviado com sucesso!
           </Typography>
-          <Typography className="my-4 text-gray-600">
+          <Typography className=" text-gray-600 py-5">
             Enviamos um link de ativação para o seu e-mail institucional. Por
             favor, verifique sua caixa de entrada (e a pasta de spam) para
             ativar sua conta.
           </Typography>
           <button
             onClick={() => navigate("/login")}
-            className="bg-red-fatec text-white p-2 rounded mt-4 uppercase w-full"
+            className="bg-red-fatec text-white p-2 rounded mt-4 uppercase w-full hover:bg-red-900 "
           >
             Voltar para o Login
           </button>
@@ -152,9 +157,20 @@ export const Register = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-red-fatec text-white p-2 rounded my-2 uppercase"
+              className="bg-red-fatec text-white p-2 rounded my-2 uppercase hover:bg-red-900 flex items-center justify-center"
             >
-              {isSubmitting ? "Enviando..." : "Cadastrar"}
+              {isSubmitting ? (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    "& .MuiCircularProgress-circle": {
+                      stroke: "#fff",
+                    },
+                  }}
+                />
+              ) : (
+                "Cadastrar"
+              )}
             </button>
           </form>
 

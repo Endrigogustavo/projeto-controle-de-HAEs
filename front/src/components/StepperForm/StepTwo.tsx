@@ -266,14 +266,14 @@ const StepTwo: React.FC<StepTwoProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="btnFatec bg-gray-600  text-white uppercase"
+          className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
         >
           Voltar
         </button>
         <button
           type="button"
           onClick={validateAndProceed}
-          className="btnFatec uppercase text-white"
+          className="btnFatec uppercase text-white hover:bg-red-900"
         >
           CONTINUAR
         </button>

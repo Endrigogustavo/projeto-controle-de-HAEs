@@ -36,7 +36,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       </div>
 
       {/* Main Content */}
-      <main className="col-start-2 row-start-2 overflow-auto bg-background">
+      <main className="col-start-2 row-start-2 overflow-auto bg-background ">
         {children}
       </main>
     </div>

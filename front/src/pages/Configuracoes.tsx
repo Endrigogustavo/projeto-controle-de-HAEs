@@ -4,7 +4,6 @@ import { api } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
 import {
   CircularProgress,
-  Box,
   TextField,
   Button,
   Snackbar,
@@ -92,14 +91,16 @@ export const Configuracoes = () => {
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
+      <div className="h-screen flex justify-center items-center">
+        <CircularProgress
+          size={70}
+          sx={{
+            "& .MuiCircularProgress-circle": {
+              stroke: "#c10007",
+            },
+          }}
+        />
+      </div>
     );
   }
 

@@ -30,14 +30,14 @@ export const CardRequestHae = ({
       </p>
       <div className="flex  gap-3 justify-end">
         <button
-          className="btnFatec bg-gray-600  text-white uppercase"
+          className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
           onClick={handleEdit}
         >
           Editar Solicitação
         </button>
         <button
           color="error"
-          className="btnFatec  text-white uppercase"
+          className="btnFatec  text-white uppercase hover:bg-red-900"
           onClick={onDelete}
         >
           Excluir

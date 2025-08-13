@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { SchoolOutlined, PersonOutline } from "@mui/icons-material";
+import {
+  SchoolOutlined,
+  PersonOutline,
+  NotesOutlined,
+  ArrowForward,
+} from "@mui/icons-material";
 import { StatusBadge } from "@components/StatusBadge";
+import { Button } from "@mui/material";
 
 type CardHaeProps = {
   id: string;
@@ -27,34 +33,41 @@ export const CardHaeCoordenador = ({
       onClick={handleVerMais}
       className="bg-white shadow-md rounded-lg border border-gray-200 p-5 flex flex-col gap-4 hover:shadow-xl hover:border-blue-300 transition-all duration-300"
     >
-      <div className="flex justify-between items-start gap-4">
+      <div className="flex justify-between items-start ">
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-900 leading-tight">
+          <h3 className="text-lg font-bold text-gray-900 leading-tight  ">
             {titulo}
           </h3>
-          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-            <PersonOutline sx={{ fontSize: "1.1rem" }} />
-            <span>{professor}</span>
-          </div>
         </div>
-        <StatusBadge status={status} />
+        <StatusBadge status={status} isFullView={false} />
       </div>
       <div className="flex-grow">
         <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
-          <SchoolOutlined sx={{ fontSize: "1rem" }} />
+          <PersonOutline sx={{ fontSize: "1.3rem" }} />
+          <span>{professor}</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
+          <SchoolOutlined sx={{ fontSize: "1.3rem" }} />
           <span>{curso}</span>
         </div>
-        <p className="text-gray-700 text-sm line-clamp-2" title={descricao}>
-          {descricao}
-        </p>
+        <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
+          <NotesOutlined sx={{ fontSize: "1.3rem" }} />
+          <span>{descricao}</span>
+        </div>
       </div>
       <div className="mt-auto pt-4 flex justify-end border-t border-gray-100">
-        <button
+        <Button
           onClick={handleVerMais}
-          className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          sx={{
+            bgcolor: "#c10007",
+            color: "white",
+            "&:hover": {
+              bgcolor: "#a30006", // tom um pouco mais escuro
+            },
+          }}
         >
-          Ver mais detalhes →
-        </button>
+          Ver mais detalhes
+        </Button>
       </div>
     </div>
   );

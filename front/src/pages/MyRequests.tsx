@@ -9,6 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
@@ -73,7 +74,7 @@ export const MyRequests = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 overflow-auto  pt-20 md:pt-4 h-full">
+      <main className="col-start-2 row-start-2 p-4 overflow-auto  pt-20 md:pt-4   ">
         <h2 className="subtitle font-semibold">Minhas Solicitações</h2>
         <p>
           Nesta seção, você pode gerenciar suas solicitações de HAEs com status
@@ -81,7 +82,18 @@ export const MyRequests = () => {
           sua necessidade.
         </p>
 
-        {loading && <p>Carregando HAEs...</p>}
+        {loading && (
+          <div className="h-screen flex justify-center items-center ">
+            <CircularProgress
+              size={70}
+              sx={{
+                "& .MuiCircularProgress-circle": {
+                  stroke: "#c10007",
+                },
+              }}
+            />
+          </div>
+        )}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && haes.length === 0 && (
           <p className="mt-4">Você não possui solicitações pendentes.</p>

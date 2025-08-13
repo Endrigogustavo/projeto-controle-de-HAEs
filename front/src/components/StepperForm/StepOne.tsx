@@ -318,7 +318,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         <button
           type="button"
           onClick={handleNext}
-          className=" py-2 btnFatec uppercase"
+          className=" py-2 btnFatec uppercase hover:bg-red-900"
         >
           <p>CONTINUAR</p>
         </button>

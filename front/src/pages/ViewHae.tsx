@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { api } from "@/services";
 import {
   Snackbar,
@@ -18,14 +18,11 @@ import {
   AccessTime as AccessTimeIcon,
   NotesOutlined,
   InfoOutlined,
-  CheckCircleOutline,
-  HighlightOffOutlined,
-  HourglassEmpty,
   CalendarMonthOutlined,
-  WorkspacePremiumOutlined,
   CategoryOutlined,
   GroupOutlined,
   VerifiedUserOutlined,
+  ArrowBack,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { Hae } from "@/types/hae";
@@ -163,14 +160,16 @@ export const ViewHae = () => {
 
   if (isLoadingUser || !hae) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
+      <div className="h-screen flex justify-center items-center">
+        <CircularProgress
+          size={70}
+          sx={{
+            "& .MuiCircularProgress-circle": {
+              stroke: "#c10007",
+            },
+          }}
+        />
+      </div>
     );
   }
 
@@ -190,7 +189,7 @@ export const ViewHae = () => {
                 Solicitado por: {hae.employee.name ?? "N/A"}
               </p>
             </div>
-            <StatusBadge status={hae.status} />
+            <StatusBadge status={hae.status} isFullView />
           </div>
 
           <div className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
@@ -342,6 +341,15 @@ export const ViewHae = () => {
                 </div>
               </>
             )}
+            <div className="flex justify-end">
+              <ArrowBack sx={{ fill: "white", width: 19, mb: 0.3 }} />
+              <a
+                href="/"
+                className="ml-1 font-medium btnFatec  text-white uppercase hover:bg-red-900"
+              >
+                Voltar
+              </a>
+            </div>
           </div>
         </div>
       </main>

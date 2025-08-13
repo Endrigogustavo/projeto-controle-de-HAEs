@@ -11,6 +11,7 @@ import {
   Button,
   Box,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { PasswordField } from "@components/PasswordField";
@@ -60,9 +61,7 @@ export const Login = () => {
     const result = await handleLogin(data);
 
     if (result.success && result.user) {
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      navigate("/");
     }
   };
 
@@ -112,9 +111,20 @@ export const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-red-fatec text-white p-2 rounded mt-6 mb-2 uppercase"
+              className="bg-red-fatec text-white p-2.5 rounded mt-6 mb-2 uppercase hover:bg-red-900 flex items-center justify-center"
             >
-              {isSubmitting ? "Entrando..." : "Entrar"}
+              {isSubmitting ? (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    "& .MuiCircularProgress-circle": {
+                      stroke: "#fff",
+                    },
+                  }}
+                />
+              ) : (
+                "Entrar"
+              )}
             </button>
           </form>
 

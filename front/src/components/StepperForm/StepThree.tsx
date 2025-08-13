@@ -54,16 +54,18 @@ const StepThree: React.FC<StepThreeProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="btnFatec bg-gray-600 text-white uppercase"
+          className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-900"
         >
           Voltar
         </button>
         <button
           type="button"
           onClick={handleSendClick}
-          className={`btnFatec text-white uppercase ${
+          className={`btnFatec text-white uppercase  ${
             isEditMode ? "bg-blue-600" : "bg-red-700"
-          }`}
+          }
+           ${isEditMode ? "hover:bg-blue-900" : "hover:bg-red-900"}
+          `}
         >
           {isEditMode ? "Atualizar" : "Enviar"}
         </button>
