@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 type CardHaeProps = {
@@ -29,23 +28,20 @@ export const CardRequestHae = ({
       <p className="text-sm text-gray-700 mb-6 leading-relaxed">
         Descrição: {descricao}
       </p>
-      <div className="flex gap-3">
-        <Button
-          variant="contained"
-          color="info"
-          className="  px-6"
+      <div className="flex  gap-3 justify-end">
+        <button
+          className="btnFatec bg-gray-600  text-white uppercase"
           onClick={handleEdit}
         >
           Editar Solicitação
-        </Button>
-        <Button
-          variant="contained"
+        </button>
+        <button
           color="error"
-          className="  px-6"
+          className="btnFatec  text-white uppercase"
           onClick={onDelete}
         >
           Excluir
-        </Button>
+        </button>
       </div>
     </div>
   );
