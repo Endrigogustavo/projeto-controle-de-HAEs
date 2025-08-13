@@ -9,6 +9,7 @@ import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.domain.singleton.CalendarioSingleton;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import br.com.fateczl.apihae.domain.entity.HaeQtd;
+import br.com.fateczl.apihae.domain.entity.Institution;
+import static br.com.fateczl.apihae.useCase.util.DataUtils.getSemestre;
 
 @Service
 public class HaeService {
@@ -28,23 +30,25 @@ public class HaeService {
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
     private final CalendarioSingleton calendarioSingleton;
-    private final HaeQtd haeQtd;
     private final EmailService emailService;
+    private final InstitutionService institutionService;
 
-    public HaeService(HaeRepository haeRepository, EmployeeRepository employeeRepository,
-             CalendarioSingleton calendarioSingleton, HaeQtd haeQtd,
-            EmailService emailService) {
+    public HaeService(HaeRepository haeRepository,
+            EmployeeRepository employeeRepository,
+            CalendarioSingleton calendarioSingleton,
+            EmailService emailService,
+            InstitutionService institutionService) {
         this.haeRepository = haeRepository;
         this.employeeRepository = employeeRepository;
         this.calendarioSingleton = calendarioSingleton;
-        this.haeQtd = haeQtd;
         this.emailService = emailService;
+        this.institutionService = institutionService;
     }
 
     @Transactional
-    public Hae createHae(HaeRequest request) {
-        int qtdHaeFatec = haeQtd.getQuantidade();
-        List<Hae> haesDoSemestre = haeRepository.findAll();
+    public Hae createHae(HaeRequest request, String id) {
+        int qtdHaeFatec = institutionService.getHaeQtd(id);
+        List<Hae> haesDoSemestre = findByCurrentSemester();
 
         if (haesDoSemestre.size() >= qtdHaeFatec) {
             throw new IllegalArgumentException("Limite de HAEs atingido no semestre. Não é possível criar mais HAEs.");
@@ -109,6 +113,9 @@ public class HaeService {
         newHae.setTimeRange(request.getTimeRange());
         newHae.setProjectDescription(request.getProjectDescription());
         newHae.setWeeklySchedule(weeklyScheduleFlattened);
+
+        Institution institution = institutionService.getInstitutionById(id);
+        newHae.setInstitution(institution);
 
         if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
             newHae.setStudents(request.getStudentRAs());
@@ -303,16 +310,15 @@ public class HaeService {
         return haeRepository.save(hae);
     }
 
-    /**
-     * Função auxiliar para determinar o semestre de uma data.
-     * 
-     * @param date A data da HAE.
-     * @return Uma string no formato "AAAA/S" (ex: "2025/1").
-     */
-    private String getSemestre(LocalDate date) {
-        int year = date.getYear();
-        int month = date.getMonthValue(); // 1 (Jan) a 12 (Dez)
-        int semestre = (month <= 6) ? 1 : 2; // Semestre 1: Jan-Jun, Semestre 2: Jul-Dez
-        return year + "/" + semestre;
-    }    
+    public List<Hae> findByCurrentSemester() {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
+        int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
+        return haeRepository.findBySemestre(year, monthStart, monthEnd);
+    }
+
+    public List<Hae> getHaesByInstitutionId(String institutionId) {
+        return haeRepository.findByInstitutionId(institutionId);
+    }
 }

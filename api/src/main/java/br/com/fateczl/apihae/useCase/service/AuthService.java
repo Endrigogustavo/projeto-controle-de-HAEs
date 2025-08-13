@@ -3,17 +3,22 @@ package br.com.fateczl.apihae.useCase.service;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
+import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.entity.PasswordResetToken;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
+import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailService emailService;
     private final BasicTextEncryptor textEncryptor;
+    private final InstitutionRepository institutionRepository;
 
     @Transactional(readOnly = true)
     public Employee login(String email, String plainPassword) {
@@ -67,7 +73,7 @@ public class AuthService {
     }
 
     @Transactional
-    public Employee verifyEmailCode(String token) {
+    public Employee verifyEmailCode(String token, String institutionId) {
         EmailVerification verification = emailVerificationRepository.findByCode(token)
                 .filter(v -> v.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Token de ativação inválido ou expirado."));
@@ -84,6 +90,10 @@ public class AuthService {
         newEmployee.setEmail(email);
         newEmployee.setCourse(verification.getCourse());
         newEmployee.setPassword(verification.getPassword());
+
+        Institution institution = institutionRepository.findById(institutionId)
+                .orElseThrow(() -> new RuntimeException("Institution not found"));
+        newEmployee.setInstitution(institution);
 
         if (email.toLowerCase().endsWith("@cps.sp.gov.br")) {
             newEmployee.setRole(Role.COORDENADOR);

@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.adapter.controller;
+package br.com.fateczl.apihae.useCase.service;
 
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
 import br.com.fateczl.apihae.domain.entity.Hae;
-import br.com.fateczl.apihae.useCase.service.HaeService;
 
 @Service
 public class HaeCacheTransientService {

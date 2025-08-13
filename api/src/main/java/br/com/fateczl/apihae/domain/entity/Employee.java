@@ -36,10 +36,9 @@ public class Employee {
 
     @Column(name = "password", nullable = false)
     private String password;
-    
+
     @Column(name = "course", nullable = false)
     private String course;
-
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -48,6 +47,11 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Hae> haes;
+
+    @ManyToOne
+    @JoinColumn(name = "institution_id", nullable = false)
+    @JsonBackReference
+    private Institution institution;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

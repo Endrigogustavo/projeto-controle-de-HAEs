@@ -12,4 +12,5 @@ public class EmployeeCreateByDiretorOrAdmRequest {
     private String email;
     private String course;
     private String provisoryPassword;
+    private String institutionId;
 }

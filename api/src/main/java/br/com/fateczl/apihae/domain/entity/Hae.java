@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Modality;
@@ -107,6 +109,11 @@ public class Hae {
     @MapKeyColumn(name = "day_of_week")
     @Column(name = "time_range")
     private Map<String, String> weeklySchedule;
+
+    @ManyToOne
+    @JoinColumn(name = "institution_id", nullable = false)
+    @JsonBackReference
+    private Institution institution;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

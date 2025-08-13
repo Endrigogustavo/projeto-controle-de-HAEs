@@ -4,6 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
+import br.com.fateczl.apihae.useCase.service.HaeCacheTransientService;
 import br.com.fateczl.apihae.useCase.service.HaeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +18,6 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
-import br.com.fateczl.apihae.domain.entity.HaeQtd;
 
 @RestController
 @RequestMapping("/hae")
@@ -27,19 +27,16 @@ public class HaeController {
 
     private final HaeService haeService;
 
-    private final HaeQtd haeQtd;
-
     private final HaeCacheTransientService haeCacheTransientService;
 
-    public HaeController(HaeService haeService, HaeQtd haeQtd, HaeCacheTransientService haeCacheTransientService) {
+    public HaeController(HaeService haeService, HaeCacheTransientService haeCacheTransientService) {
         this.haeService = haeService;
-        this.haeQtd = haeQtd;
         this.haeCacheTransientService = haeCacheTransientService;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request) {
-        Hae createdHae = haeService.createHae(request);
+    public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request, @RequestParam String institutionId) {
+        Hae createdHae = haeService.createHae(request, institutionId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHae);
     }
 
@@ -117,18 +114,6 @@ public class HaeController {
             @Valid @RequestBody HaeRequest request) {
         Hae hae = haeService.createHaeAsCoordinator(coordinatorId, employeeId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
-    }
-
-    @GetMapping("/getAvailableHaesCount")
-    public ResponseEntity<Integer> getAvailableHaesCount() {
-        int count = haeQtd.getQuantidade();
-        return ResponseEntity.ok(count);
-    }
-
-    @PostMapping("/setAvailableHaesCount")
-    public ResponseEntity<?> setAvailableHaesCount(@RequestParam int count, @RequestParam String usuarioId) {
-        haeQtd.setQuantidade(count, usuarioId);
-        return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
     }
 
     @PostMapping("/{id}/visualizeHae")

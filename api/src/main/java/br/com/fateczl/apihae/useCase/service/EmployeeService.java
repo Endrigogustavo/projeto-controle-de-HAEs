@@ -2,9 +2,11 @@ package br.com.fateczl.apihae.useCase.service;
 
 import br.com.fateczl.apihae.adapter.dto.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
+import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
+import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final HaeRepository haeRepository;
+    private final InstitutionRepository institutionRepository;
 
     @Transactional(readOnly = true)
     public List<Employee> getAllEmployees() {
@@ -100,7 +103,15 @@ public class EmployeeService {
         employee.setEmail(request.getEmail());
         employee.setCourse(request.getCourse());
         employee.setPassword(request.getProvisoryPassword());
-        employee.setRole(Role.PROFESSOR); 
+        employee.setRole(Role.PROFESSOR);
+
+        Institution institution = institutionRepository.findById(request.getInstitutionId())
+                .orElseThrow(() -> new RuntimeException("Institution not found"));
+        employee.setInstitution(institution);
         return employeeRepository.save(employee);
+    }
+
+    public List<Employee> getEmployeesByInstitutionId(String institutionId) {
+        return employeeRepository.findByInstitutionId(institutionId);
     }
 }
