@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
+import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +26,7 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final HaeRepository haeRepository;
     private final InstitutionRepository institutionRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Transactional(readOnly = true)
     public List<Employee> getAllEmployees() {
@@ -61,9 +63,9 @@ public class EmployeeService {
 
     @Transactional
     public void deleteEmployeeAccount(String id) {
-        if (!employeeRepository.existsById(id)) {
-            throw new IllegalArgumentException("Empregado não encontrado com ID: " + id);
-        }
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com ID: " + id));
+        passwordResetTokenRepository.deleteByEmployee(employee);
         employeeRepository.deleteById(id);
     }
 

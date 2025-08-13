@@ -2,7 +2,6 @@ package br.com.fateczl.apihae.useCase.service;
 
 import java.util.List;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
@@ -13,7 +12,9 @@ import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class InstitutionService {
 
@@ -21,14 +22,6 @@ public class InstitutionService {
     private final EmployeeRepository employeeRepository;
     private final HaeRepository haeRepository;
     private final EmployeeService employeeService;
-
-    public InstitutionService(@Lazy InstitutionRepository institutionRepository,
-            EmployeeRepository employeeRepository, HaeRepository haeRepository, EmployeeService employeeService) {
-        this.institutionRepository = institutionRepository;
-        this.employeeRepository = employeeRepository;
-        this.haeRepository = haeRepository;
-        this.employeeService = employeeService;
-    }
 
 public void createInstitution(InstitutionCreateRequest request) {
     Institution institution = new Institution();
