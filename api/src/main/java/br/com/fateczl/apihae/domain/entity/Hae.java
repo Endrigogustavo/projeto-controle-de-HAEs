@@ -85,6 +85,9 @@ public class Hae {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "viewed", nullable = false)
+    private Boolean viewed = false;
+
     @ElementCollection
     @CollectionTable(name = "hae_docs", joinColumns = @JoinColumn(name = "hae_id"))
     @Column(name = "comprovanteDoc")

@@ -4,8 +4,9 @@ import br.com.fateczl.apihae.adapter.dto.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
-import br.com.fateczl.apihae.useCase.service.HaeCacheTransientService;
 import br.com.fateczl.apihae.useCase.service.HaeService;
+import br.com.fateczl.apihae.useCase.service.HaeStatusService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -18,21 +19,17 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/hae")
 @SecurityRequirement(name = "cookieAuth")
+@RequiredArgsConstructor
 @Tag(name = "Hae", description = "Endpoints para manipular HAEs (Horas de Atividades Específicas)")
 public class HaeController {
 
     private final HaeService haeService;
-
-    private final HaeCacheTransientService haeCacheTransientService;
-
-    public HaeController(HaeService haeService, HaeCacheTransientService haeCacheTransientService) {
-        this.haeService = haeService;
-        this.haeCacheTransientService = haeCacheTransientService;
-    }
+    private final HaeStatusService haeStatusService;
 
     @PostMapping("/create")
     public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request, @RequestParam String institutionId) {
@@ -73,7 +70,7 @@ public class HaeController {
     @PutMapping("/change-status/{id}")
     public ResponseEntity<Object> changeHaeStatus(@PathVariable String id,
             @Valid @RequestBody HaeStatusUpdateRequest request) {
-        Hae updatedHae = haeService.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
+        Hae updatedHae = haeStatusService.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
         return ResponseEntity.ok(updatedHae);
     }
 
@@ -116,19 +113,27 @@ public class HaeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
     }
 
-    @PostMapping("/{id}/visualizeHae")
-    public String visualizeHae(@PathVariable String id) {
-        haeCacheTransientService.markAsViewed(id);
-        return "Documento " + id + " marcado como visualizado";
+    @Operation(summary = "Marcar como visualizada", description = "Marca uma HAE como visualizada")
+    @PutMapping("/viewed/{haeId}")
+    public ResponseEntity<String> markAsViewed(@PathVariable String haeId) {
+        try {
+            haeStatusService.wasViewed(haeId);
+            return ResponseEntity.ok("HAE marcada como visualizada.");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
-    @GetMapping("/{id}/statusViewed")
-    public boolean statusHae(@PathVariable String id) {
-        return haeCacheTransientService.wasViewed(id);
+    @Operation(summary = "Listar HAEs visualizadas", description = "Retorna todas as HAEs que já foram visualizadas")
+    @GetMapping("/viewed")
+    public ResponseEntity<List<Hae>> getViewed() {
+        return ResponseEntity.ok(haeStatusService.getHaeWasViewed());
     }
 
-    @GetMapping("/getAllHaeWithoutViewed")
-    public List<Hae> getAllHaeWithoutViewed() {
-        return haeCacheTransientService.getAllUnviewed();
+    @Operation(summary = "Listar HAEs não visualizadas", description = "Retorna todas as HAEs que ainda não foram visualizadas")
+    @GetMapping("/not-viewed")
+    public ResponseEntity<List<Hae>> getNotViewed() {
+        return ResponseEntity.ok(haeStatusService.getHaeWasNotViewed());
     }
+
 }

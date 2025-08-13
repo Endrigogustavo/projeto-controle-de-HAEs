@@ -6,7 +6,6 @@ import com.cloudinary.utils.ObjectUtils;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,19 +14,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class CloudinaryService {
 
-    @Autowired
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
+    private final HaeRepository haeRepository;
 
-    @Autowired
-    private HaeRepository haeRepository;
+    public String uploadFile(MultipartFile file, String haeId) throws IOException {
+        String resourceType = file.getContentType() != null && file.getContentType().startsWith("image")
+                ? "image"
+                : "raw";
 
-    
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap("resource_type", resourceType));
 
-    public String uploadImage(MultipartFile file, String haeId) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
 
@@ -39,19 +43,17 @@ public class CloudinaryService {
         return uploadResult.get("secure_url").toString();
     }
 
-    public String uploadImageSupport(MultipartFile file) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-        return uploadResult.get("secure_url").toString();
-    }
-
-    public List<String> uploadMultipleImages(MultipartFile[] files, String haeId) throws IOException {
+    public List<String> uploadMultipleFiles(MultipartFile[] files, String haeId) throws IOException {
         List<String> urls = new ArrayList<>();
         for (MultipartFile file : files) {
-            String url = uploadImageSupport(file);
-            urls.add(url);
-        }
-        if (urls.isEmpty()) {
-            throw new IOException("Nenhuma imagem foi enviada.");
+            String resourceType = file.getContentType() != null && file.getContentType().startsWith("image")
+                    ? "image"
+                    : "raw";
+
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", resourceType));
+            urls.add(uploadResult.get("secure_url").toString());
         }
 
         Hae hae = haeRepository.findById(haeId)
@@ -63,26 +65,13 @@ public class CloudinaryService {
         return urls;
     }
 
-    public List<String> updateImages(MultipartFile[] files, String haeId) throws IOException {
-        List<String> urls = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String url = uploadImageSupport(file);
-            urls.add(url);
-        }
-
-        Hae hae = haeRepository.findById(haeId)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
-
-        hae.setComprovanteDoc(urls);
-        haeRepository.save(hae);
-
-        return urls;
+    public void deleteFile(String url) throws IOException {
+        cloudinary.uploader().destroy(url, ObjectUtils.emptyMap());
     }
 
-    private List<String> getComprovanteDoc(Hae hae) {
-        if (hae.getComprovanteDoc() == null) {
-            hae.setComprovanteDoc(new ArrayList<>());
+    public void deleteFiles(List<String> urls) throws IOException {
+        for (String url : urls) {
+            cloudinary.uploader().destroy(url, ObjectUtils.emptyMap());
         }
-        return hae.getComprovanteDoc();
     }
 }

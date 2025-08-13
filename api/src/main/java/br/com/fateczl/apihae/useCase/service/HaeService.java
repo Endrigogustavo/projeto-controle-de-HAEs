@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
 import static br.com.fateczl.apihae.useCase.util.DataUtils.getSemestre;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class HaeService {
 
@@ -32,18 +34,6 @@ public class HaeService {
     private final CalendarioSingleton calendarioSingleton;
     private final EmailService emailService;
     private final InstitutionService institutionService;
-
-    public HaeService(HaeRepository haeRepository,
-            EmployeeRepository employeeRepository,
-            CalendarioSingleton calendarioSingleton,
-            EmailService emailService,
-            InstitutionService institutionService) {
-        this.haeRepository = haeRepository;
-        this.employeeRepository = employeeRepository;
-        this.calendarioSingleton = calendarioSingleton;
-        this.emailService = emailService;
-        this.institutionService = institutionService;
-    }
 
     @Transactional
     public Hae createHae(HaeRequest request, String id) {
@@ -169,24 +159,6 @@ public class HaeService {
         return haeRepository.findAll();
     }
 
-    @Transactional
-    public Hae changeHaeStatus(String id, Status newStatus, String coordenadorId) {
-        Hae hae = haeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + id));
-
-        Employee coordenador = employeeRepository.findById(coordenadorId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Coordenador com id " + coordenadorId + " não encontrado."));
-
-        if (coordenador.getRole() != Role.COORDENADOR) {
-            throw new IllegalArgumentException("Empregado com ID " + coordenadorId
-                    + " não é um coordenador. Apenas coordenadores podem mudar o status da HAE.");
-        }
-
-        hae.setStatus(newStatus);
-        hae.setCoordenatorId(coordenadorId);
-        return haeRepository.save(hae);
-    }
 
     @Transactional
     public List<Hae> getHaesByCourse(String course) {
@@ -238,7 +210,6 @@ public class HaeService {
         if (coordinator.getRole() != Role.COORDENADOR) {
             throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
         }
-
         emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae);
     }
 
@@ -320,5 +291,14 @@ public class HaeService {
 
     public List<Hae> getHaesByInstitutionId(String institutionId) {
         return haeRepository.findByInstitutionId(institutionId);
+    }
+
+    public int getHaeCountByCurrentSemester() {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
+        int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
+        List<Hae> countSemesterHae = haeRepository.findBySemestre(year, monthStart, monthEnd);
+        return countSemesterHae.size();
     }
 }

@@ -18,6 +18,7 @@ public interface HaeRepository extends JpaRepository<Hae, String> {
     int countByEmployeeId(String employeeId);
     List<Hae> findByEndDateBefore(LocalDate data);
     List<Hae> findByInstitutionId(String institutionId);
+    List<Hae> findByViewed(Boolean viewed);
 
     @Query("""
                 SELECT h FROM Hae h
