@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Hae } from "@/types/hae";
 import { Employee } from "@/types/employee";
 import { AppLayout } from "@/layouts";
+import { StatusBadge } from "@/components";
 
 /**
  * Formata uma string de data (YYYY-MM-DD) para o formato local do usuário.
@@ -68,47 +69,6 @@ const DetailItem: React.FC<DetailItemProps> = ({
     <p className="text-gray-800 text-base">{value}</p>
   </div>
 );
-
-interface StatusBadgeProps {
-  status: Hae["status"];
-}
-
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  const statusStyles: Record<
-    string,
-    { bg: string; text: string; icon: React.ReactElement }
-  > = {
-    PENDENTE: {
-      bg: "bg-yellow-100",
-      text: "text-yellow-800",
-      icon: <HourglassEmpty fontSize="small" />,
-    },
-    APROVADO: {
-      bg: "bg-green-100",
-      text: "text-green-800",
-      icon: <CheckCircleOutline fontSize="small" />,
-    },
-    REPROVADO: {
-      bg: "bg-red-100",
-      text: "text-red-800",
-      icon: <HighlightOffOutlined fontSize="small" />,
-    },
-    COMPLETO: {
-      bg: "bg-blue-100",
-      text: "text-blue-800",
-      icon: <WorkspacePremiumOutlined fontSize="small" />,
-    },
-  };
-  const style = statusStyles[status] || statusStyles.PENDENTE;
-  return (
-    <div
-      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-semibold text-sm ${style.bg} ${style.text}`}
-    >
-      {style.icon}
-      {status}
-    </div>
-  );
-};
 
 const STATUS_OPTIONS: Hae["status"][] = [
   "PENDENTE",
@@ -351,39 +311,46 @@ export const ViewHae = () => {
                 className="col-span-full"
               />
             )}
+
+            {isCoordinator && (
+              <>
+                <Divider />
+                <div className="bg-white mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4  rounded-lg ">
+                  <p className="font-semibold text-gray-700">
+                    Ações do Coordenador:
+                  </p>
+                  <FormControl size="small" sx={{ minWidth: 200 }}>
+                    <InputLabel id="status-select-label">
+                      Alterar Status
+                    </InputLabel>
+                    <Select
+                      labelId="status-select-label"
+                      label="Alterar Status"
+                      value={hae.status}
+                      onChange={(e) =>
+                        handleStatusChange(e.target.value as Hae["status"])
+                      }
+                      disabled={isSubmitting}
+                    >
+                      {STATUS_OPTIONS.map((statusOption) => (
+                        <MenuItem key={statusOption} value={statusOption}>
+                          {statusOption}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
+              </>
+            )}
           </div>
         </div>
-
-        {isCoordinator && (
-          <div className="bg-white mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4 p-4  rounded-lg shadow-md">
-            <p className="font-semibold text-gray-700">Ações do Coordenador:</p>
-            <FormControl size="small" sx={{ minWidth: 200 }}>
-              <InputLabel id="status-select-label">Alterar Status</InputLabel>
-              <Select
-                labelId="status-select-label"
-                label="Alterar Status"
-                value={hae.status}
-                onChange={(e) =>
-                  handleStatusChange(e.target.value as Hae["status"])
-                }
-                disabled={isSubmitting}
-              >
-                {STATUS_OPTIONS.map((statusOption) => (
-                  <MenuItem key={statusOption} value={statusOption}>
-                    {statusOption}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-        )}
       </main>
 
       <Snackbar
         open={snackbar?.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={() => setSnackbar(null)}

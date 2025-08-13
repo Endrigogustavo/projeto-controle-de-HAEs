@@ -266,7 +266,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="btnFatec bg-gray-400 text-black uppercase"
+          className="btnFatec bg-gray-600  text-white uppercase"
         >
           Voltar
         </button>

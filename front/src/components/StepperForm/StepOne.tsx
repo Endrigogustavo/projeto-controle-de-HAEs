@@ -318,7 +318,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         <button
           type="button"
           onClick={handleNext}
-          className="w-full py-2 btnFatec uppercase"
+          className=" py-2 btnFatec uppercase"
         >
           <p>CONTINUAR</p>
         </button>

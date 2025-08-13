@@ -58,7 +58,7 @@ export const useHaeService = (haeService: IHaeService) => {
       }
 
       await haeService.createHae(data);
-      setSnackbarMessage("HAE criada com sucesso!");
+      setSnackbarMessage("HAE solicitada com sucesso!");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
       return true;
