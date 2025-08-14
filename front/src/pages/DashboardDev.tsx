@@ -5,6 +5,7 @@ import Drawer from "@mui/material/Drawer";
 import { Paper, Typography } from "@mui/material";
 import { dashboardService, DashboardStats } from "@/services/dashboardService";
 import { Sidebar } from "@/components";
+import { AppLayout } from "@/layouts";
 
 const StatCard = ({
   title,
@@ -51,22 +52,7 @@ export const DashboardDev = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
-      <div className="hidden md:block row-span-2">
-        <Sidebar />
-      </div>
-      <div className="md:hidden">
-        <MobileHeader onMenuClick={() => setDrawerOpen(true)} />
-      </div>
-      <Drawer open={isDrawerOpen} onClose={() => setDrawerOpen(false)}>
-        <div className="w-64 h-full bg-gray-fatec">
-          <Sidebar />
-        </div>
-      </Drawer>
-      <div className="hidden md:block col-start-2 row-start-1">
-        <Header />
-      </div>
-
+    <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4">
         <h2 className="subtitle">Painel do Desenvolvedor</h2>
         <p className="text-gray-600 mb-6">
@@ -93,6 +79,6 @@ export const DashboardDev = () => {
           />
         </div>
       </main>
-    </div>
+    </AppLayout>
   );
 };

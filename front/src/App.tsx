@@ -1,5 +1,10 @@
+import { EmployeeProvider } from "./context/EmployeeContext";
 import { AppRoutes } from "./routes";
 
 export default function App() {
-  return <AppRoutes />;
+  return (
+    <EmployeeProvider>
+      <AppRoutes />
+    </EmployeeProvider>
+  );
 }
