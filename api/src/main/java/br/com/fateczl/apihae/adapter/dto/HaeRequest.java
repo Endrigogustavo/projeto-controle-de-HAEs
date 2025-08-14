@@ -66,5 +66,8 @@ public class HaeRequest {
     @Size(min = 1, message = "Pelo menos um dia do cronograma deve ser informado.")
     private Map<String, WeeklyScheduleEntry> weeklySchedule;
 
+    @NotBlank(message = "O ID da instituição é obrigatório")
+    private String institutionId;
+
     private List<String> studentRAs;
 }

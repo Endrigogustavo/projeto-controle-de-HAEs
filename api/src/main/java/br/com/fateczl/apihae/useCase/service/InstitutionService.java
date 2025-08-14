@@ -1,11 +1,15 @@
 package br.com.fateczl.apihae.useCase.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
+import br.com.fateczl.apihae.adapter.dto.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.InstitutionCreateRequest;
+import br.com.fateczl.apihae.adapter.dto.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Role;
@@ -23,34 +27,36 @@ public class InstitutionService {
     private final HaeRepository haeRepository;
     private final EmployeeService employeeService;
 
-public void createInstitution(InstitutionCreateRequest request) {
-    Institution institution = new Institution();
-    institution.setName(request.getInstitutionName());
-    institution.setInstitutionCode(request.getInstitutionCode());
-    institution.setHaeQtd(request.getHaeQtd());
-    institution.setAddress(request.getAddress());
-    institution.setActive(true);
+    public void createInstitution(InstitutionCreateRequest request) {
+        Institution institution = new Institution();
+        institution.setName(request.getInstitutionName());
+        institution.setInstitutionCode(request.getInstitutionCode());
+        institution.setHaeQtd(request.getHaeQtd());
+        institution.setAddress(request.getAddress());
+        institution.setActive(true);
 
-    institutionRepository.save(institution);
-}
+        institutionRepository.save(institution);
+    }
 
-
-    public int getHaeQtd(String id) throws IllegalArgumentException{
-        Institution inst = institutionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada com ID: " + id));
+    @Transactional(readOnly = true)
+    public int getHaeQtd(String id) throws IllegalArgumentException {
+        Institution inst = institutionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada com ID: " + id));
         return inst.getHaeQtd();
     }
 
+    @Transactional()
     public void setHaeQtd(int quantidade, String userId, String institutionId) {
         if (quantidade < 0) {
             throw new IllegalArgumentException("Quantidade não pode ser negativa.");
         }
 
-        Employee employee = employeeService.getEmployeeById(userId);
+        EmployeeResponseDTO employee = employeeService.getEmployeeById(userId);
         if (employee == null) {
             throw new IllegalArgumentException("Usuário não encontrado.");
         }
 
-        if (employee.getRole() != Role.DIRETOR && employee.getRole() != Role.ADMIN){
+        if (employee.getRole() != Role.DIRETOR && employee.getRole() != Role.ADMIN && employee.getRole() != Role.DEV) {
             throw new IllegalArgumentException(
                     "Usuário não é um diretor ou administrador da unidade, impossivel definir a quantidade de HAEs.");
         }
@@ -62,21 +68,49 @@ public void createInstitution(InstitutionCreateRequest request) {
 
     }
 
+    @Transactional(readOnly = true)
     public List<Institution> listAllInstitutions() {
         return institutionRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Employee> getEmployeesByInstitutionId(String institutionId) {
         return employeeRepository.findByInstitutionId(institutionId);
     }
 
+    @Transactional(readOnly = true)
     public List<Hae> getHaesByInstitutionId(String institutionId) {
         return haeRepository.findByInstitutionId(institutionId);
     }
 
+    @Transactional(readOnly = true)
     public Institution getInstitutionById(String institutionId) {
         return institutionRepository.findById(institutionId)
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com ID: " + institutionId));
+    }
+
+    @Transactional()
+    public Institution updateInstitution(String id, InstitutionUpdateRequest request) {
+        Institution institution = institutionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com ID: " + id));
+
+        Optional<Institution> existingByName = institutionRepository.findByName(request.getName());
+        if (existingByName.isPresent() && !existingByName.get().getId().equals(institution.getId())) {
+            throw new IllegalArgumentException(
+                    "O nome '" + request.getName() + "' já está em uso por outra instituição.");
+        }
+
+        Optional<Institution> existingByCode = institutionRepository.findByInstitutionCode(request.getInstitutionCode());
+        if (existingByCode.isPresent() && !existingByCode.get().getId().equals(institution.getId())) {
+            throw new IllegalArgumentException("O código '" + request.getInstitutionCode() + "' já está em uso.");
+        }
+
+        institution.setName(request.getName());
+        institution.setAddress(request.getAddress());
+        institution.setHaeQtd(request.getHaeQtd());
+        institution.setInstitutionCode(request.getInstitutionCode());
+
+        return institutionRepository.save(institution);
     }
 
 }

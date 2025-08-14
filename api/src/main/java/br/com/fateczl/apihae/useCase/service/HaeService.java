@@ -6,9 +6,9 @@ import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
-import br.com.fateczl.apihae.domain.singleton.CalendarioSingleton;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
+import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,18 +31,22 @@ public class HaeService {
 
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
-    private final CalendarioSingleton calendarioSingleton;
     private final EmailService emailService;
     private final InstitutionService institutionService;
+    private final InstitutionRepository institutionRepository;
 
     @Transactional
-    public Hae createHae(HaeRequest request, String id) {
-        int qtdHaeFatec = institutionService.getHaeQtd(id);
+    public Hae createHae(HaeRequest request) {
+        int qtdHaeFatec = institutionService.getHaeQtd(request.getInstitutionId());
         List<Hae> haesDoSemestre = findByCurrentSemester();
 
         if (haesDoSemestre.size() >= qtdHaeFatec) {
             throw new IllegalArgumentException("Limite de HAEs atingido no semestre. Não é possível criar mais HAEs.");
         }
+
+        Institution institution = institutionRepository.findById(request.getInstitutionId())
+                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o ID fornecido."));
+
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -65,19 +69,6 @@ public class HaeService {
 
         LocalDate inicio = request.getStartDate();
         LocalDate fim = request.getEndDate();
-        Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
-
-        List<LocalDate> datasInvalidas = new ArrayList<>();
-
-        if (diasNaoLetivos.contains(inicio)) {
-            datasInvalidas.add(inicio);
-        }
-        if (diasNaoLetivos.contains(fim)) {
-            datasInvalidas.add(fim);
-        }
-        if (!datasInvalidas.isEmpty()) {
-            throw new IllegalArgumentException("As seguintes datas não são letivas: " + datasInvalidas);
-        }
 
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
@@ -104,7 +95,6 @@ public class HaeService {
         newHae.setProjectDescription(request.getProjectDescription());
         newHae.setWeeklySchedule(weeklyScheduleFlattened);
 
-        Institution institution = institutionService.getInstitutionById(id);
         newHae.setInstitution(institution);
 
         if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
@@ -236,20 +226,6 @@ public class HaeService {
 
         LocalDate inicio = request.getStartDate();
         LocalDate fim = request.getEndDate();
-        Set<LocalDate> diasNaoLetivos = calendarioSingleton.getCalendario().getDiasNaoLetivos();
-
-        List<LocalDate> datasInvalidas = new ArrayList<>();
-
-        if (diasNaoLetivos.contains(inicio)) {
-            datasInvalidas.add(inicio);
-        }
-        if (diasNaoLetivos.contains(fim)) {
-            datasInvalidas.add(fim);
-        }
-
-        if (!datasInvalidas.isEmpty()) {
-            throw new IllegalArgumentException("As seguintes datas não são letivas: " + datasInvalidas);
-        }
 
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado com ID: " + employeeId));

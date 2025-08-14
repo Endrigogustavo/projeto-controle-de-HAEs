@@ -31,9 +31,9 @@ public class HaeController {
     private final HaeService haeService;
     private final HaeStatusService haeStatusService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request, @RequestParam String institutionId) {
-        Hae createdHae = haeService.createHae(request, institutionId);
+      @PostMapping("/create")
+    public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request) {
+        Hae createdHae = haeService.createHae(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHae);
     }
 

@@ -8,4 +8,5 @@ import br.com.fateczl.apihae.domain.entity.Institution;
 
 public interface InstitutionRepository extends JpaRepository<Institution, String> {
     Optional<Institution> findByName(String name);
+    Optional<Institution> findByInstitutionCode(Integer code);
 }
