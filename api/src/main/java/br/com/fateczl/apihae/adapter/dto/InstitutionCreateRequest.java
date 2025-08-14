@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InstitutionCreateRequest {
-    private String institutionName;
+    private String name;
     private Integer institutionCode;
     private int haeQtd;
     private String address;

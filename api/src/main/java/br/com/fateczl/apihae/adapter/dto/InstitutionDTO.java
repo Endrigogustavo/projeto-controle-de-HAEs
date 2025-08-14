@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InstitutionDTO {
     private String id;
-    private String institutionName;
+    private String name;
     private Integer institutionCode;
 }

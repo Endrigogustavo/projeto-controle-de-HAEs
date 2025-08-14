@@ -27,9 +27,17 @@ public class InstitutionService {
     private final HaeRepository haeRepository;
     private final EmployeeService employeeService;
 
-    public void createInstitution(InstitutionCreateRequest request) {
+      public void createInstitution(InstitutionCreateRequest request) {
+        if (institutionRepository.findByName(request.getName()).isPresent()){
+            throw new IllegalArgumentException("Nome de instituição já em uso.");
+        }
+        
+        if (institutionRepository.findByInstitutionCode(request.getInstitutionCode()).isPresent()) {
+            throw new IllegalArgumentException("Código de instituição já em uso.");
+        }
+
         Institution institution = new Institution();
-        institution.setName(request.getInstitutionName());
+        institution.setName(request.getName());
         institution.setInstitutionCode(request.getInstitutionCode());
         institution.setHaeQtd(request.getHaeQtd());
         institution.setAddress(request.getAddress());
