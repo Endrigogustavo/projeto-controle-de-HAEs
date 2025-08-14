@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { api } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -9,6 +8,7 @@ import {
   Snackbar,
   Alert,
   Typography,
+  Box,
 } from "@mui/material";
 import { AppLayout } from "@/layouts";
 
@@ -16,6 +16,7 @@ export const Configuracoes = () => {
   const [currentLimit, setCurrentLimit] = useState<number | null>(null);
   const [newLimit, setNewLimit] = useState<string>("");
 
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
@@ -24,19 +25,31 @@ export const Configuracoes = () => {
     severity: "success" | "error";
   } | null>(null);
 
-  const { user } = useAuth();
-
   useEffect(() => {
+    if (!user) {
+      if (!authLoading) {
+        setLoading(false);
+      }
+      return;
+    }
+
     const fetchCurrentLimit = async () => {
+      setLoading(true);
       try {
-        const response = await api.get<number>("/hae/getAvailableHaesCount");
+        const institutionId = user.institution.id;
+        const response = await api.get<number>(
+          "/institution/getAvailableHaesCount",
+          {
+            params: { institutionId },
+          }
+        );
         setCurrentLimit(response.data);
         setNewLimit(response.data.toString());
       } catch (err) {
         console.error("Erro ao buscar o limite de HAEs:", err);
         setSnackbar({
           open: true,
-          message: "Falha ao carregar a configuração atual.",
+          message: "Falha ao carregar a configuração atual da instituição.",
           severity: "error",
         });
       } finally {
@@ -44,14 +57,15 @@ export const Configuracoes = () => {
       }
     };
     fetchCurrentLimit();
-  }, []);
+  }, [user, authLoading]);
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!user || !user.id) {
+    if (!user?.institution.id || !user?.id) {
       setSnackbar({
         open: true,
-        message: "Sua identidade não pôde ser verificada. Tente novamente.",
+        message:
+          "Sua identidade ou instituição não pôde ser verificada. Tente novamente.",
         severity: "error",
       });
       return;
@@ -61,7 +75,7 @@ export const Configuracoes = () => {
     if (isNaN(count) || count < 0) {
       setSnackbar({
         open: true,
-        message: "Por favor, insira um número válido.",
+        message: "Por favor, insira um número válido e positivo.",
         severity: "error",
       });
       return;
@@ -69,14 +83,20 @@ export const Configuracoes = () => {
 
     setIsSubmitting(true);
     try {
-      await api.post(
-        `/hae/setAvailableHaesCount?count=${count}&usuarioId=${user.id}`
-      );
+      const institutionId = user.institution.id;
+
+      await api.post(`/institution/setAvailableHaesCount`, null, {
+        params: {
+          count: count,
+          institutionId: institutionId,
+          userId: user.id,
+        },
+      });
 
       setCurrentLimit(count);
       setSnackbar({
         open: true,
-        message: "Limite de HAEs atualizado com sucesso!",
+        message: "Limite de HAEs da instituição atualizado com sucesso!",
         severity: "success",
       });
     } catch (error: any) {
@@ -89,63 +109,67 @@ export const Configuracoes = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
-      <div className="h-screen flex justify-center items-center">
-        <CircularProgress
-          size={70}
-          sx={{
-            "& .MuiCircularProgress-circle": {
-              stroke: "#c10007",
-            },
-          }}
-        />
-      </div>
+      <AppLayout>
+        <main className="h-full flex justify-center items-center">
+          <CircularProgress
+            size={70}
+            sx={{ "& .MuiCircularProgress-circle": { stroke: "#c10007" } }}
+          />
+        </main>
+      </AppLayout>
     );
   }
 
   return (
     <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
-        <h2 className="subtitle font-semibold">Configurações do Sistema</h2>
+        <h2 className="subtitle font-semibold">Configurações da Instituição</h2>
         <p className="text-gray-600 mb-6">
-          Ajuste os parâmetros globais do sistema de HAEs.
+          Ajuste os parâmetros da instituição:{" "}
+          <span className="font-bold text-gray-800">
+            {user?.institution.name}
+          </span>
+          .
         </p>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 max-w-md">
-          <form onSubmit={handleSave} className="flex flex-col gap-4">
-            <Typography variant="h6" className="font-semibold text-gray-800">
-              Limite de HAEs por Semestre
-            </Typography>
-            <Typography variant="body2" className="text-gray-500 mb-2">
-              Defina o número máximo de HAEs que um professor pode solicitar por
-              semestre. O limite atual é:{" "}
-              <span className="font-bold text-blue-600">
-                {currentLimit ?? "..."}
-              </span>
-            </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSave}
+          className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 max-w-md flex flex-col gap-4"
+        >
+          <Typography variant="h6" className="font-semibold text-gray-800">
+            Limite de HAEs por Semestre
+          </Typography>
+          <Typography variant="body2" className="text-gray-500 mb-2">
+            Defina o número máximo de HAEs que podem ser criadas na sua
+            instituição. O limite atual é:{" "}
+            <span className="font-bold text-blue-600">
+              {currentLimit ?? "..."}
+            </span>
+          </Typography>
 
-            <TextField
-              fullWidth
-              label="Novo Limite de HAEs"
-              type="number"
-              variant="outlined"
-              value={newLimit}
-              onChange={(e) => setNewLimit(e.target.value)}
-              InputProps={{ inputProps: { min: 0 } }}
-              required
-            />
+          <TextField
+            fullWidth
+            label="Novo Limite de HAEs"
+            type="number"
+            variant="outlined"
+            value={newLimit}
+            onChange={(e) => setNewLimit(e.target.value)}
+            InputProps={{ inputProps: { min: 0 } }}
+            required
+            disabled={isSubmitting}
+          />
 
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={isSubmitting}
-              sx={{ mt: 2 }}
-            >
-              {isSubmitting ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={isSubmitting || loading}
+            className="btnFatec text-white uppercase hover:bg-red-900"
+          >
+            {isSubmitting ? "Salvando..." : "Salvar Alterações"}
+          </button>
+        </Box>
       </main>
 
       <Snackbar
