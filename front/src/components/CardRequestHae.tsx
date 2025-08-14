@@ -37,7 +37,7 @@ export const CardRequestHae = ({
         </button>
         <button
           color="error"
-          className="btnFatec  text-white uppercase hover:bg-red-900"
+          className="btnFatec text-white uppercase hover:bg-red-900"
           onClick={onDelete}
         >
           Excluir
