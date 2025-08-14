@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
-import { MobileHeader } from "@/components/MobileHeader";
-import Drawer from "@mui/material/Drawer";
 import { Paper, Typography } from "@mui/material";
 import { dashboardService, DashboardStats } from "@/services/dashboardService";
-import { Sidebar } from "@/components";
 import { AppLayout } from "@/layouts";
 
 const StatCard = ({
@@ -27,7 +23,6 @@ const StatCard = ({
 );
 
 export const DashboardDev = () => {
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [stats, setStats] = useState<DashboardStats>({
     haeCount: 0,
     userCount: 0,

@@ -135,16 +135,45 @@ export const DashboardDiretor = () => {
   }, {});
 
   const courseData = {
-    labels: Object.keys(haesPorCurso),
+    labels: [
+      "Análise e Desenvolvimento de Sistemas AMS",
+      "Análise e Desenvolvimento de Sistemas",
+      "Comercio Exterior",
+      "Desenvolvimento de Produtos Plásticos",
+      "Desenvolvimento de Software Multiplataforma",
+      "Gestão de Recursos Humanos",
+      "Gestão Empresarial",
+      "Logística",
+      "Polímeros",
+    ],
     datasets: [
       {
         label: "Total de HAEs por Curso",
-        data: Object.values(haesPorCurso),
-        backgroundColor: "#8b5cf6",
+        data: [
+          haesPorCurso["Análise e Desenvolvimento de Sistemas AMS"] || 0,
+          haesPorCurso["Análise e Desenvolvimento de Sistemas"] || 0,
+          haesPorCurso["Comercio Exterior"] || 0,
+          haesPorCurso["Desenvolvimento de Produtos Plásticos"] || 0,
+          haesPorCurso["Desenvolvimento de Software Multiplataforma"] || 0,
+          haesPorCurso["Gestão de Recursos Humanos"] || 0,
+          haesPorCurso["Gestão Empresarial"] || 0,
+          haesPorCurso["Logística"] || 0,
+          haesPorCurso["Polímeros"] || 0,
+        ],
+        backgroundColor: [
+          "#8b5cf6", // roxo
+          "#1366f1", // azul índigo
+          "#f97316", // laranja (Comercio Exterior)
+          "#f43f5e", // rosa/vermelho
+          "#06b6d4", // ciano
+          "#10b981", // verde esmeralda
+          "#f59e0b", // âmbar
+          "#6ea5e9", // azul claro (sky)
+          "#af4444", // vermelho escuro
+        ],
       },
     ],
   };
-
   const haesPorSemestre = haes.reduce((acc: Record<string, number>, hae) => {
     const semestre = getSemestreFromDate(hae.startDate);
     acc[semestre] = (acc[semestre] || 0) + 1;
@@ -194,50 +223,56 @@ export const DashboardDiretor = () => {
         <p className="text-gray-600 mb-6">
           Análise das Horas de Atividades Específicas da sua instituição.
         </p>
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative ">
-              <h3 className="font-semibold text-lg text-gray-700 text-center">
-                Uso de HAEs no Semestre Atual
-              </h3>
-              <Doughnut data={limitChartData} options={limitChartOptions} />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-12 md:mt-8">
-                <span className="text-4xl font-bold text-gray-800 ">
-                  {haesNoSemestreAtual}
-                </span>
-                <span className="text-sm text-gray-500 block">
-                  de {haeLimit}
-                </span>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                HAEs por Semestre - Historico
-              </h3>
-              <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-                <Pie data={semestreData} />
-              </div>
-            </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                Distribuição por Status
-              </h3>
-              <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-                <Doughnut data={statusData} />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-7">
+          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative ">
+            <h3 className="font-semibold text-lg text-gray-700 text-center">
+              Uso de HAEs no Semestre Atual
+            </h3>
+            <Doughnut
+              data={limitChartData}
+              options={limitChartOptions}
+              className="mb-10"
+            />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-12 md:mt-8">
+              <span className="text-3xl font-bold text-gray-800 mt-4">
+                {haesNoSemestreAtual}
+              </span>
+              <span className="text-sm text-gray-500 block">de {haeLimit}</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 h-50 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-3">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                Volume por Curso
-              </h3>
-              <Bar data={courseData} />
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4">
+              HAEs por Semestre - Historico
+            </h3>
+            <div className="w-full max-w-xs flex-grow flex justify-center items-center">
+              <Pie data={semestreData} />
             </div>
           </div>
-        </>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4">
+              Volume por Curso
+            </h3>
+            <div
+              className="flex justify-center items-center mt-14"
+              style={{ height: 250, width: 250 }}
+            >
+              <Pie
+                data={courseData}
+                options={{ plugins: { legend: { display: false } } }}
+              />
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4">
+              Distribuição por Status
+            </h3>
+            <div className="w-full max-w-xs flex-grow flex justify-center items-center">
+              <Doughnut data={statusData} />
+            </div>
+          </div>
+        </div>
       </main>
     </AppLayout>
   );

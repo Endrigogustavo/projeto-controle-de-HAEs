@@ -237,7 +237,7 @@ export const Sidebar = () => {
           className="w-50 p-4"
         />
         <nav className="w-full h-full items-center">
-          <ul className="flex flex-col gap-3">{renderNavLinks()}</ul>
+          <ul className="flex flex-col gap-2.5  ">{renderNavLinks()}</ul>
         </nav>
 
         <div className="flex-1" />
