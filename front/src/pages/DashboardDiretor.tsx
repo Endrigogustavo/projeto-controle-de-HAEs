@@ -10,7 +10,7 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { Pie, Bar, Doughnut } from "react-chartjs-2";
+import { Pie, Doughnut } from "react-chartjs-2";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { CircularProgress } from "@mui/material";
