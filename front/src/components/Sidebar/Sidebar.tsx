@@ -11,6 +11,8 @@ import {
   AdminPanelSettingsOutlined,
   SettingsOutlined,
   AlternateEmail,
+  AddBusinessOutlined,
+  BusinessOutlined,
 } from "@mui/icons-material";
 import { SidebarItem } from "./SidebarItem";
 
@@ -165,6 +167,59 @@ export const Sidebar = () => {
               icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
               active={isActive("/support")}
+            />
+          </>
+        );
+      case "DEV":
+        return (
+          <>
+            <SidebarItem
+              to="/dashboard-dev"
+              icon={<DashboardOutlined sx={{ fill: "white" }} />}
+              text="Painel DEV"
+            />
+            <SidebarItem
+              to="/gerenciar-usuarios"
+              icon={<AdminPanelSettingsOutlined sx={{ fill: "white" }} />}
+              text="Gerenciar Usuários"
+            />
+            <SidebarItem
+              to="/haes"
+              icon={<ListAltOutlined sx={{ fill: "white" }} />}
+              text="Todas as HAEs"
+            />
+            <SidebarItem
+              to="/requestHae"
+              icon={<ArticleOutlined sx={{ fill: "white" }} />}
+              text="Solicitar HAE"
+              active={isActive("/requestHae")}
+            />
+            <SidebarItem
+              to="/myrequests"
+              icon={<ListAltOutlined sx={{ fill: "white" }} />}
+              text="Minhas Solicitações"
+              active={isActive("/myrequests")}
+            />
+            <SidebarItem
+              to="/professores"
+              icon={<PeopleOutline sx={{ fill: "white" }} />}
+              text="Todos os Professores"
+            />
+            <SidebarItem
+              to="/coordenadores"
+              icon={<PeopleOutline sx={{ fill: "white" }} />}
+              text="Visualizar Coordenadores"
+              active={isActive("/coordenadores")}
+            />
+            <SidebarItem
+              to="/create-institution"
+              icon={<AddBusinessOutlined sx={{ fill: "white" }} />}
+              text="Criar Instituição"
+            />
+            <SidebarItem
+              to="/institutions"
+              icon={<BusinessOutlined sx={{ fill: "white" }} />}
+              text="Gerenciar Instituições"
             />
           </>
         );

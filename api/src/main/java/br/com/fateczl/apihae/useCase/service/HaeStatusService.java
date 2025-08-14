@@ -44,7 +44,7 @@ public class HaeStatusService {
                 .orElseThrow(
                         () -> new IllegalArgumentException("Coordenador com id " + coordenadorId + " não encontrado."));
 
-        if (coordenador.getRole() != Role.COORDENADOR) {
+        if (coordenador.getRole() != Role.COORDENADOR && coordenador.getRole() != Role.DEV) {
             throw new IllegalArgumentException("Empregado com ID " + coordenadorId
                     + " não é um coordenador. Apenas coordenadores podem mudar o status da HAE.");
         }

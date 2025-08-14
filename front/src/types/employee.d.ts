@@ -1,8 +1,11 @@
+import { InstitutionInfo } from "@/hooks/useAuth";
+
 export interface Employee {
 	id: string;
 	name: string;
 	email: string;
 	role: string;
+	institution: InstitutionInfo
 }
 
 export interface EmployeeDetails {

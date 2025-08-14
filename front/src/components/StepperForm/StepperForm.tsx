@@ -3,11 +3,10 @@ import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
 import { HaeDataType, StepProps, FormErrors } from "./types/haeFormTypes";
-import { useLoggedEmployee } from "@/hooks/useLoggedEmployee";
+import { useAuth } from "@/hooks/useAuth";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useHaeService } from "@/hooks/useHaeService";
-
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import * as yup from "yup";
@@ -22,9 +21,12 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 interface HaeApiResponse
-  extends Omit<HaeDataType, "employeeId" | "studentRAs"> {
+  extends Omit<HaeDataType, "employeeId" | "studentRAs" | "institutionId"> {
   employee: {
     id: string;
+    institution?: {
+      id: string;
+    };
   };
   students: string[];
 }
@@ -32,10 +34,10 @@ interface HaeApiResponse
 const StepperForm: React.FC = () => {
   const [step, setStep] = useState(1);
   const {
-    employee,
-    isLoadingEmployee,
+    user: employee,
+    loading: isLoadingEmployee,
     error: employeeError,
-  } = useLoggedEmployee();
+  } = useAuth();
 
   const location = useLocation();
   const haeIdToEdit = location.state?.haeId;
@@ -57,6 +59,7 @@ const StepperForm: React.FC = () => {
     projectDescription: "",
     weeklySchedule: {},
     studentRAs: [],
+    institutionId: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -84,6 +87,7 @@ const StepperForm: React.FC = () => {
             ...haeData,
             employeeId: haeData.employee.id,
             studentRAs: haeData.students,
+            institutionId: haeData.employee.institution?.id || "",
           });
         } catch (error) {
           console.error("Erro ao buscar HAE para edição:", error);
@@ -100,6 +104,7 @@ const StepperForm: React.FC = () => {
       setFormData((prevData) => ({
         ...prevData,
         employeeId: employee.id || "",
+        institutionId: employee?.institution.id || "",
       }));
     }
     if (employeeError) {
@@ -127,7 +132,6 @@ const StepperForm: React.FC = () => {
   const handleFormSubmit = useCallback(async () => {
     try {
       setErrors({});
-      console.log(formData);
       await haeFormSchema.validate(formData, { abortEarly: false });
 
       let success = false;

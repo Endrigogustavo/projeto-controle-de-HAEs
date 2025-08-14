@@ -2,12 +2,19 @@ import { api } from "@/services";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
+export interface InstitutionInfo {
+  id: string;
+  name: string;
+  institutionCode: number;
+}
+
 export interface LoggedUser {
   id: string;
   name: string;
   email: string;
-  role: "PROFESSOR" | "COORDENADOR" | "ADMIN" | "DIRETOR";
+  role: "PROFESSOR" | "COORDENADOR" | "ADMIN" | "DIRETOR" | "DEV";
   course: string;
+  institution: InstitutionInfo;
 }
 
 /**

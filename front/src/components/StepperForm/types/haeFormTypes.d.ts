@@ -21,6 +21,7 @@ export interface HaeDataType {
 	startDate: string;
 	endDate: string;
 	studentRAs: string[];
+	institutionId: string;
 }
 
 export interface FormErrors {

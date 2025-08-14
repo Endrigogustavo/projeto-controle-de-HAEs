@@ -19,6 +19,10 @@ import {
   ContactUs,
   TodasHaes,
   ViewHae,
+  DashboardDev,
+  CreateInstitution,
+  EditInstitution,
+  ListInstitutions
 } from "../pages";
 import { PrivateRouteLayout } from "./layout/PrivateRouteLayout";
 
@@ -60,6 +64,11 @@ export const AppRoutes = () => {
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/hae/:id" element={<ViewHae />} />
           <Route path="/support" element={<ContactUs />} />
+          <Route path="/dashboard-dev" element={<DashboardDev />} />
+          <Route path="/create-institution" element={<CreateInstitution />} />
+          <Route path="/institution/edit/:id" element={<EditInstitution />} />
+          <Route path="/institutions" element={<ListInstitutions />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

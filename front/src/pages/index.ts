@@ -16,3 +16,7 @@ export * from "./ResetPassword";
 export * from "./ContactUs";
 export * from "./TodasHaes";
 export * from "./ViewHae";
+export * from "./CreateInstitution"
+export * from "./DashboardDev"
+export * from "./ListInstitutions"
+export * from "./EditInstitution"
