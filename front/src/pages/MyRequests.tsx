@@ -133,14 +133,13 @@ export const MyRequests = () => {
           >
             Cancelar
           </button>
-          <Button
-            variant="contained"
+          <button
+            className="btnFatec   text-white uppercase hover:bg-red-900"
             onClick={handleDeleteConfirm}
-            color="error"
             autoFocus
           >
             Confirmar Exclusão
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
     </AppLayout>

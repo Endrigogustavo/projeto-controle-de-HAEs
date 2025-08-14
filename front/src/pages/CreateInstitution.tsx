@@ -49,7 +49,7 @@ export const CreateInstitution = () => {
       });
 
       setIsSubmitting(true);
-      console.log(payloadToValidate)
+      console.log(payloadToValidate);
 
       await institutionService.createInstitution(payloadToValidate);
 
@@ -62,7 +62,7 @@ export const CreateInstitution = () => {
       });
       setErrors({});
     } catch (err: any) {
-      console.log(err)
+      console.log(err);
       if (err instanceof yup.ValidationError) {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
         err.inner.forEach((error) => {
@@ -145,7 +145,14 @@ export const CreateInstitution = () => {
               className="btnFatec  text-white uppercase hover:bg-red-900"
             >
               {isSubmitting ? (
-                <CircularProgress size={24} />
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    "& .MuiCircularProgress-circle": {
+                      stroke: "#fff",
+                    },
+                  }}
+                />
               ) : (
                 "Salvar Instituição"
               )}

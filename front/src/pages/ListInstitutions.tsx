@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MobileHeader } from "@/components/MobileHeader";
-import { Drawer, CircularProgress } from "@mui/material";
+import { Drawer, CircularProgress, LinearProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components";
 import { api } from "@/services";
@@ -72,7 +72,6 @@ export const ListInstitutions = () => {
           >
             Adicionar Nova Instituição
           </button>
-          
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
@@ -89,7 +88,7 @@ export const ListInstitutions = () => {
                   Endereço
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  <span className="sr-only">Ações</span>
+                  Ações
                 </th>
               </tr>
             </thead>
@@ -97,7 +96,13 @@ export const ListInstitutions = () => {
               {loading ? (
                 <tr>
                   <td colSpan={4} className="text-center p-6">
-                    <CircularProgress size={24} />
+                    <LinearProgress
+                      sx={{
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "#c10007",
+                        },
+                      }}
+                    />
                   </td>
                 </tr>
               ) : error ? (
@@ -122,10 +127,10 @@ export const ListInstitutions = () => {
                       {inst.name}
                     </th>
                     <td className="px-6 py-4">{inst.address}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className=" py-4 text-left">
                       <button
                         onClick={() => navigate(`/institution/edit/${inst.id}`)}
-                        className="font-medium text-blue-600 hover:underline"
+                        className="btnFatec text-white uppercase hover:bg-red-900"
                       >
                         Editar
                       </button>

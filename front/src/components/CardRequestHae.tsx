@@ -28,7 +28,7 @@ export const CardRequestHae = ({
       <p className="text-sm text-gray-700 mb-6 leading-relaxed">
         Descrição: {descricao}
       </p>
-      <div className="flex  gap-3 justify-end">
+      <div className="flex flex-col md:flex-row gap-3 justify-end">
         <button
           className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
           onClick={handleEdit}

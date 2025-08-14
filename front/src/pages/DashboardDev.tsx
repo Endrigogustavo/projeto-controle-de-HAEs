@@ -19,7 +19,7 @@ const StatCard = ({
     <Typography variant="h6" color="text.secondary">
       {title}
     </Typography>
-    <Typography variant="h3" fontWeight="bold" color="primary">
+    <Typography variant="h3" fontWeight="bold" color="error">
       {loading ? "..." : value}
     </Typography>
   </Paper>

@@ -230,14 +230,14 @@ export const Sidebar = () => {
 
   return (
     <aside>
-      <div className="h-screen bg-gray-fatec flex flex-col items-center p-2">
+      <div className="h-screen bg-gray-fatec flex flex-col items-center p-1  ">
         <img
           src="/fatec_zona_leste_icon_branco.png"
           alt="Logo da Fatec da Zona Leste"
           className="w-50 p-4"
         />
         <nav className="w-full h-full items-center">
-          <ul className="flex flex-col gap-2">{renderNavLinks()}</ul>
+          <ul className="flex flex-col gap-3">{renderNavLinks()}</ul>
         </nav>
 
         <div className="flex-1" />

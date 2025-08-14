@@ -12,7 +12,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
+    <div className="h-screen flex flex-col md:grid md:grid-cols-[22%_78%] md:grid-rows-[auto_1fr]">
       {/* Sidebar Desktop */}
       <div className="hidden md:block row-span-2">
         <Sidebar />
@@ -36,7 +36,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       </div>
 
       {/* Main Content */}
-      <main className="col-start-2 row-start-2 overflow-auto bg-background ">
+      <main className="col-start-2 row-start-2 overflow-auto bg-background h-full">
         {children}
       </main>
     </div>

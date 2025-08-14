@@ -110,6 +110,7 @@ export const DashboardDiretor = () => {
       legend: { display: false },
       tooltip: { enabled: true },
     },
+    backgroundColor: ["#f59e0b", "#10b981", "#ef4444", "#3b82f6"],
   };
 
   const statusData = {
@@ -195,18 +196,26 @@ export const DashboardDiretor = () => {
         </p>
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
+            <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative ">
+              <h3 className="font-semibold text-lg text-gray-700 text-center">
                 Uso de HAEs no Semestre Atual
               </h3>
               <Doughnut data={limitChartData} options={limitChartOptions} />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-20">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-12 md:mt-8">
                 <span className="text-4xl font-bold text-gray-800 ">
                   {haesNoSemestreAtual}
                 </span>
                 <span className="text-sm text-gray-500 block">
                   de {haeLimit}
                 </span>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
+              <h3 className="font-semibold text-lg text-gray-700 mb-4">
+                HAEs por Semestre - Historico
+              </h3>
+              <div className="w-full max-w-xs flex-grow flex justify-center items-center">
+                <Pie data={semestreData} />
               </div>
             </div>
 
@@ -216,15 +225,6 @@ export const DashboardDiretor = () => {
               </h3>
               <div className="w-full max-w-xs flex-grow flex justify-center items-center">
                 <Doughnut data={statusData} />
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-              <h3 className="font-semibold text-lg text-gray-700 mb-4">
-                HAEs por Semestre - Historico
-              </h3>
-              <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-                <Pie data={semestreData} />
               </div>
             </div>
           </div>

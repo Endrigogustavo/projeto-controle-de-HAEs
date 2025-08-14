@@ -41,7 +41,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       text: "text-gray-900",
       icon: (
         <HighlightOffOutlined
-          sx={{ ontSize: isFullView ? "1.3rem" : "1.2rem" }}
+          sx={{ fontSize: isFullView ? "1.3rem" : "1.2rem" }}
         />
       ),
     },
