@@ -40,7 +40,7 @@ export const PrivateRouteLayout = ({ children }: { children: JSX.Element }) => {
         redirectPath = "/dashboard-diretor";
         break;
       case "DEV":
-        redirectPath = "/dashboard-admin"
+        redirectPath = "/dashboard-dev"
         break;
       default:
         redirectPath = "/dashboard";
