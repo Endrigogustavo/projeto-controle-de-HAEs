@@ -49,9 +49,10 @@ export const CardHaeCoordenador = ({
           <SchoolOutlined sx={{ fontSize: "1.3rem" }} />
           <span>{curso}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
-          <NotesOutlined sx={{ fontSize: "1.3rem" }} />
-          <span>{descricao}</span>
+        <div className="flex items-start gap-1.5 text-sm text-gray-600 mb-2">
+          <NotesOutlined sx={{ fontSize: "1.3rem", marginTop: "2px" }} />
+
+          <p className="truncate w-full">{descricao}</p>
         </div>
       </div>
       <div className="mt-auto pt-4 flex justify-end border-t border-gray-100">

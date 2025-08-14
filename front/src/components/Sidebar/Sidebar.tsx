@@ -177,16 +177,19 @@ export const Sidebar = () => {
               to="/dashboard-dev"
               icon={<DashboardOutlined sx={{ fill: "white" }} />}
               text="Painel DEV"
+              active={isActive("/dashboard-dev")}
             />
             <SidebarItem
               to="/gerenciar-usuarios"
               icon={<AdminPanelSettingsOutlined sx={{ fill: "white" }} />}
               text="Gerenciar Usuários"
+              active={isActive("/gerenciar-usuarios")}
             />
             <SidebarItem
               to="/haes"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Todas as HAEs"
+              active={isActive("/haes")}
             />
             <SidebarItem
               to="/requestHae"
@@ -204,6 +207,7 @@ export const Sidebar = () => {
               to="/professores"
               icon={<PeopleOutline sx={{ fill: "white" }} />}
               text="Todos os Professores"
+              active={isActive("/professores")}
             />
             <SidebarItem
               to="/coordenadores"
@@ -215,11 +219,13 @@ export const Sidebar = () => {
               to="/create-institution"
               icon={<AddBusinessOutlined sx={{ fill: "white" }} />}
               text="Criar Instituição"
+              active={isActive("/create-institution")}
             />
             <SidebarItem
               to="/institutions"
               icon={<BusinessOutlined sx={{ fill: "white" }} />}
               text="Gerenciar Instituições"
+              active={isActive("/institutions")}
             />
           </>
         );

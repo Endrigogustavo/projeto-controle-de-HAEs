@@ -343,7 +343,7 @@ export const ViewHae = () => {
             <div className="flex justify-end">
               <ArrowBack sx={{ fill: "white", width: 19, mb: 0.3 }} />
               <a
-                href="/"
+                href="/haes"
                 className="ml-1 font-medium btnFatec  text-white uppercase hover:bg-red-900"
               >
                 Voltar

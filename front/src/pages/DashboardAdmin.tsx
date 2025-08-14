@@ -33,7 +33,7 @@ export const DashboardAdmin = () => {
         {haes.length === 0 ? (
           <p className="mt-4 text-gray-500">Nenhuma HAE encontrada.</p>
         ) : (
-          <div className="grid gap-4 mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
             {haes.map((hae) => (
               <CardHaeCoordenador
                 key={hae.id}
