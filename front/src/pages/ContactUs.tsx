@@ -6,6 +6,7 @@ import {
   InputLabel,
   FormControl,
   FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import * as yup from "yup";
 import { AppLayout } from "@/layouts";
@@ -174,9 +175,20 @@ export const ContactUs = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || !user}
-              className=" py-2 btnFatec uppercase hover:bg-red-900"
+              className=" py-2 btnFatec uppercase hover:bg-red-900 text-white"
             >
-              <p> {isSubmitting ? "Enviando..." : "Enviar Mensagem"}</p>
+              {isSubmitting ? (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    "& .MuiCircularProgress-circle": {
+                      stroke: "#fff",
+                    },
+                  }}
+                />
+              ) : (
+                "Enviar Mensagem"
+              )}
             </button>
           </div>
         </div>
