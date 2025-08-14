@@ -22,15 +22,19 @@ export const CardRequestHae = ({
   };
 
   return (
-    <div className="bg-white rounded-md shadow p-6 mx-auto my-4 border border-gray-200">
-      <h2 className="text-xl font-semibold text-gray-800 mb-1">{titulo}</h2>
-      <h3 className="text-sm text-gray-600 font-medium mb-4">{curso}</h3>
-      <p className="text-sm text-gray-700 mb-6 leading-relaxed">
-        Descrição: {descricao}
-      </p>
-      <div className="flex flex-col md:flex-row gap-3 justify-end">
+    <div className="bg-white rounded-md shadow p-6 mx-auto my-4 border border-gray-200 flex flex-col h-64">
+      <div>
+        <h2 className="text-xl font-semibold text-gray-800 mb-1">{titulo}</h2>
+        <h3 className="text-sm text-gray-600 font-medium mb-4">{curso}</h3>
+        
+        <p className="text-sm text-gray-700 mb-6 leading-relaxed line-clamp-3">
+          Descrição: {descricao}
+        </p>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-3 justify-end mt-auto">
         <button
-          className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
+          className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-900"
           onClick={handleEdit}
         >
           Editar Solicitação
