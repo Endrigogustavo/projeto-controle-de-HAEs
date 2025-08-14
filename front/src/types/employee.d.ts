@@ -5,7 +5,7 @@ export interface Employee {
 	name: string;
 	email: string;
 	role: string;
-	institution: InstitutionInfo
+	institution: InstitutionInfo;
 }
 
 export interface EmployeeDetails {

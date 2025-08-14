@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CircularProgress, Box, Typography, Alert } from "@mui/material";
+import { CircularProgress, Box, Typography } from "@mui/material";
 import { authService } from "@/services";
 
 export const ActivateAccount = () => {
