@@ -215,7 +215,7 @@ export const DashboardDiretor = () => {
                 Distribuição por Status
               </h3>
               <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-                <Pie data={statusData} />
+                <Doughnut data={statusData} />
               </div>
             </div>
 
@@ -229,30 +229,12 @@ export const DashboardDiretor = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 h-50 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 lg:col-span-3">
               <h3 className="font-semibold text-lg text-gray-700 mb-4">
                 Volume por Curso
               </h3>
-              <Bar
-                data={courseData}
-                options={{
-                  responsive: true,
-                  plugins: {                    
-                    tooltip: {
-                      enabled: true,
-                    },
-                  },
-                  scales: {
-                    x: {
-                      ticks: {
-                        maxRotation: 90,
-                        minRotation: 90,
-                      },
-                    },
-                  },
-                }}
-              />
+              <Bar data={courseData} />
             </div>
           </div>
         </>
