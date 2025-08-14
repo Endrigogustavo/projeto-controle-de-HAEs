@@ -33,9 +33,9 @@ public class EmailService {
    * @param toEmail O e-mail do destinatário.
    * @param token   O token de ativação gerado.
    */
-  public void sendAccountActivationEmail(String toEmail, String token) {
+  public void sendAccountActivationEmail(String toEmail, String token, String institutionId) {
     String subject = "Ativação de Conta - Sistema de HAEs FATEC";
-    String activationLink = frontendActivationUrl + "?token=" + token;
+    String activationLink = String.format("%s?token=%s&institutionId=%s", frontendActivationUrl, token, institutionId);
     String emailContent = buildActivationEmailTemplate(activationLink);
     try {
       sendEmail(toEmail, subject, emailContent);

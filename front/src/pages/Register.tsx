@@ -9,16 +9,23 @@ import {
 import { PasswordField } from "@components/PasswordField";
 import { ToastNotification } from "@components/ToastNotification";
 import { registerSchema } from "@/validation/registerSchema";
-import { authService } from "@/services";
+import { api, authService } from "@/services";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Institution {
+    id: string;
+    institutionCode: number;
+    name: string;
+}
 
 type FormData = {
   name: string;
   email: string;
   password: string;
   course: string;
+  institution: string;
 };
 
 export const Register = () => {
@@ -32,6 +39,10 @@ export const Register = () => {
   const navigate = useNavigate();
 
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [isLoadingInstitutions, setIsLoadingInstitutions] = useState(true);
+
+  console.log(institutions)
 
   const {
     register,
@@ -41,8 +52,22 @@ export const Register = () => {
     resolver: yupResolver(registerSchema),
   });
 
+  useEffect(() => {
+    const fetchInstitutions = async () => {
+        try {
+            const response = await api.get<Institution[]>("/institution/getAllInstitutions");
+            setInstitutions(response.data);
+        } catch (error) {
+            console.error("Erro ao buscar instituições:", error);
+        } finally {
+            setIsLoadingInstitutions(false);
+        }
+    };
+    fetchInstitutions();
+  }, []);
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const success = await handleRegister(data);
+    const success = await handleRegister(data); 
     if (success) {
       setRegistrationSuccess(true);
     }
@@ -116,7 +141,29 @@ export const Register = () => {
               sx={{ margin: "1rem 0" }}
               required
             />
-
+            
+            <TextField
+              label="Instituição"
+              select
+              defaultValue=""
+              {...register("institution")}
+              error={!!errors.institution}
+              helperText={errors.institution?.message}
+              sx={{ margin: "1rem 0" }}
+              required
+              disabled={isLoadingInstitutions}
+            >
+              {isLoadingInstitutions ? (
+                <MenuItem disabled>Carregando instituições...</MenuItem>
+              ) : (
+                institutions.map((inst) => (
+                    <MenuItem key={inst.id} value={inst.name}>
+                        {inst.name}
+                    </MenuItem>
+                ))
+              )}
+            </TextField>
+            
             <TextField
               label="Curso"
               select

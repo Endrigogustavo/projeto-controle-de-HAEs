@@ -18,9 +18,11 @@ export const useAuthForms = (authService: IAuthService) => {
 	const { open, message, severity, showSnackbar, hideSnackbar } = useSnackbar();
 
 	const handleRegister = async (data: {
-		name: string;
 		email: string;
-		password: string;
+  		password: string;
+  		name: string;
+  		course: string;
+  		institution: string;
 	}) => {
 		if (!authService.register) {
 			showSnackbar("Funcionalidade de cadastro não disponível.", "error");

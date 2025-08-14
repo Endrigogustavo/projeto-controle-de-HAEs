@@ -27,6 +27,10 @@ public class EmailVerification {
     @Column(name = "code", nullable = false)
     private String code;
 
+    @ManyToOne
+    @JoinColumn(name = "institution_id")
+    private Institution institution;
+
     @Column(name = "password", nullable = false)
 
     private String password;
@@ -44,5 +48,4 @@ public class EmailVerification {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-  
 }

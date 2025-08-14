@@ -25,7 +25,8 @@ public class InstitutionService {
 
 public void createInstitution(InstitutionCreateRequest request) {
     Institution institution = new Institution();
-    institution.setInstitutionName(request.getInstitutionName());
+    institution.setName(request.getInstitutionName());
+    institution.setInstitutionCode(request.getInstitutionCode());
     institution.setHaeQtd(request.getHaeQtd());
     institution.setAddress(request.getAddress());
     institution.setActive(true);

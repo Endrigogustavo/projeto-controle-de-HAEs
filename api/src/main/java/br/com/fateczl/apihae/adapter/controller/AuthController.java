@@ -28,15 +28,19 @@ public class AuthController {
 
     @PostMapping("/send-email-code")
     public ResponseEntity<Object> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
-        authService.sendVerificationCode(request.getName(), request.getEmail(),
-                request.getCourse(), request.getPassword());
+        authService.sendVerificationCode(
+            request.getName(), 
+            request.getEmail(),
+            request.getCourse(), 
+            request.getPassword(),
+            request.getInstitution());
 
         return ResponseEntity.ok(Collections.singletonMap("mensagem",
                 "E-mail de ativação enviado com sucesso."));
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<Employee> verifyEmailCode(@RequestParam("token") String token, @RequestParam String institutionId, HttpServletResponse response) {
+    public ResponseEntity<Employee> verifyEmailCode(@RequestParam("token") String token, @RequestParam("institutionId") String institutionId, HttpServletResponse response) {
         Employee verifiedEmployee = authService.verifyEmailCode(token, institutionId);
 
         String jwtToken = tokenService.generateToken(verifiedEmployee);

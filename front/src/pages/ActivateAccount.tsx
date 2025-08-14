@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { CircularProgress, Box, Typography, Alert } from "@mui/material";
 import { authService } from "@/services";
-import { CircularProgress, Box, Typography } from "@mui/material";
 
 export const ActivateAccount = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = new URLSearchParams(location.search).get("token");
+
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
+  const institutionId = queryParams.get("institutionId");
 
   const [status, setStatus] = useState<"activating" | "success" | "error">(
     "activating"
@@ -14,15 +17,15 @@ export const ActivateAccount = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (!token) {
+    if (!token || !institutionId) {
       setStatus("error");
-      setErrorMessage("Token de ativação não encontrado ou inválido.");
+      setErrorMessage("Link de ativação inválido ou incompleto.");
       return;
     }
 
     const activate = async () => {
       try {
-        const user = await authService.verifyCode(token);
+        const user = await authService.verifyCode(token, institutionId);
 
         localStorage.setItem("email", user.email);
         localStorage.setItem("token", "session_active");
@@ -48,16 +51,16 @@ export const ActivateAccount = () => {
           navigate(redirectPath, { replace: true });
         }, 3000);
       } catch (err: any) {
-        setStatus("success");
+        setStatus("error");
         setErrorMessage(
           err.response?.data?.message ||
-            "Falha ao ativar a conta. O link pode ter expirado ou já ter sido utilizado."
+            "Falha ao ativar a conta. O link pode ter expirado."
         );
       }
     };
 
     activate();
-  }, [token, navigate]);
+  }, [token, institutionId, navigate]);
 
   return (
     <Box

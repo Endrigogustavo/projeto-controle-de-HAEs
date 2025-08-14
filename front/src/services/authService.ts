@@ -2,14 +2,9 @@ import { LoggedUser } from "@/hooks/useAuth";
 import { api } from "./axios.config";
 
 export interface IAuthService {
-  register(data: {
-    name: string;
-    email: string;
-    password: string;
-    course?: string;
-  }): Promise<unknown>;
-  login(data: { email: string; password: string }): Promise<LoggedUser>;
-  verifyCode(token: string): Promise<LoggedUser>;
+  register(data: RegisterRequest): Promise<unknown>;
+  login(data: LoginRequest): Promise<LoggedUser>;
+  verifyCode(token: string, institutionId: string): Promise<LoggedUser>;
   logout(): Promise<unknown>;
   checkCookie(email: string): Promise<unknown>;
 }
@@ -18,6 +13,8 @@ interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  course: string;
+  institution: string;
 }
 
 interface LoginRequest {
@@ -35,9 +32,11 @@ const register = async (data: RegisterRequest) => {
   }
 };
 
-const verifyEmailCode = async (token: string) => {
+const verifyEmailCode = async (token: string, institutionId: string) => {
   try {
-    const response = await api.get(`/auth/verify-email?token=${token}`);
+    const response = await api.get(
+      `/auth/verify-email?token=${token}&institutionId=${institutionId}`
+    );
     return response.data;
   } catch (error) {
     console.log("Erro ao verificar token: " + error);
@@ -81,8 +80,8 @@ export const authService: IAuthService = {
   login: async (data) => {
     return await login(data);
   },
-  verifyCode: async (token: string) => {
-    return await verifyEmailCode(token);
+  verifyCode: async (token: string, institutionId: string) => {
+    return await verifyEmailCode(token, institutionId);
   },
   logout: async () => {
     return await logout();

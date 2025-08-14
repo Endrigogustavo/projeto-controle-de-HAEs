@@ -3,7 +3,6 @@ package br.com.fateczl.apihae.useCase.service;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
@@ -13,7 +12,6 @@ import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +47,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void sendVerificationCode(String name, String email, String course, String plainPassword) {
+    public void sendVerificationCode(String name, String email, String course, String plainPassword,
+            String institutionId) {
         String encryptedPassword = textEncryptor.encrypt(plainPassword);
 
         String verificationToken = UUID.randomUUID().toString();
@@ -67,9 +66,14 @@ public class AuthService {
         newVerification.setPassword(encryptedPassword);
         newVerification.setCode(verificationToken);
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+
+        Institution institution = institutionRepository.findByName(institutionId)
+                .orElseThrow(() -> new RuntimeException("Institution not found"));
+        newVerification.setInstitution(institution);
+
         emailVerificationRepository.save(newVerification);
 
-        emailService.sendAccountActivationEmail(email, verificationToken);
+        emailService.sendAccountActivationEmail(email, verificationToken, institution.getId().toString());
     }
 
     @Transactional

@@ -15,6 +15,7 @@ export const registerSchema = yup
 				"E-mail deve ser institucional (@fatec ou @cps)"
 			)
 			.required("E-mail é obrigatório"),
+		institution: yup.string().required("A unidade da Fatec é obrigatória"),
 		course: yup.string().required("Curso é obrigatório"),
 		password: yup
 			.string()

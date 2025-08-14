@@ -31,8 +31,11 @@ public class Institution {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(unique = true, nullable = false)
+    private Integer institutionCode;
+
     @Column(name = "name", nullable = false)
-    private String institutionName;
+    private String name;
 
     @Column(name = "hae_qtd", nullable = false)
     private int haeQtd;

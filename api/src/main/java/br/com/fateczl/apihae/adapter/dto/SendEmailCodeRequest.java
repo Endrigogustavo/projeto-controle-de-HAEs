@@ -15,6 +15,9 @@ public class SendEmailCodeRequest {
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
     private String name;
 
+    @NotBlank(message = "A instituição é obrigatória")
+    private String institution;
+
     @NotBlank(message = "E-mail não pode estar em branco")
     @Email(message = "E-mail deve ser válido")
     private String email;
