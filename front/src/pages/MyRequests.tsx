@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button,
   CircularProgress,
 } from "@mui/material";
 import { Hae } from "@/types/hae";

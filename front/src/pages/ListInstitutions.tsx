@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { MobileHeader } from "@/components/MobileHeader";
-import { Drawer, CircularProgress, LinearProgress } from "@mui/material";
+import { Drawer, LinearProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/components";
 import { api } from "@/services";
