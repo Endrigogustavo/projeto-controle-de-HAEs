@@ -7,16 +7,13 @@ import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-
 import java.util.Collections;
 import java.util.List;
-
 import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
+import br.com.fateczl.apihae.adapter.dto.EmployeeResponseDTO;
 
 @RestController
 @RequestMapping("/employee")
@@ -43,16 +40,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/get-professor/{id}")
-    public ResponseEntity<Object> getProfessorById(@PathVariable("id") String id) {
-        Employee employee = employeeService.getEmployeeById(id);
-        System.out.println(employee);
+    public ResponseEntity<EmployeeResponseDTO> getProfessorById(@PathVariable("id") String id) {
+        EmployeeResponseDTO employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
 
     @GetMapping("/get-professor")
-    public ResponseEntity<Object> getProfessorByEmail(@RequestParam("email") String email) {
-        Employee employee = employeeService.getEmployeeByEmail(email);
-        System.out.println(employee);
+    public ResponseEntity<EmployeeResponseDTO> getProfessorByEmail(@RequestParam("email") String email) {
+        EmployeeResponseDTO employee = employeeService.getEmployeeByEmail(email);
         return ResponseEntity.ok(employee);
     }
 
@@ -70,14 +65,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/get-my-user")
-    public ResponseEntity<?> getMyUser(@RequestParam("email") String email) {
-        Employee employee = employeeService.getEmployeeByEmail(email);
-        System.out.println(employee);
+    public ResponseEntity<EmployeeResponseDTO> getMyUser(@RequestParam("email") String email) {
+        EmployeeResponseDTO employee = employeeService.getEmployeeByEmail(email);
         return ResponseEntity.ok(employee);
     }
 
     @PostMapping("/createEmployeeByDiretorOrAdmin")
-    public ResponseEntity<?> createEmployeeByDiretorOrAdmin(@Valid @RequestBody EmployeeCreateByDiretorOrAdmRequest request) {
+    public ResponseEntity<?> createEmployeeByDiretorOrAdmin(
+            @Valid @RequestBody EmployeeCreateByDiretorOrAdmRequest request) {
         Employee newEmployee = employeeService.createEmployeeByDiretorOrAdmin(request);
         return ResponseEntity.ok(newEmployee);
     }

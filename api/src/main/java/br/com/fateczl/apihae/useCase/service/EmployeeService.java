@@ -1,6 +1,7 @@
 package br.com.fateczl.apihae.useCase.service;
 
 import br.com.fateczl.apihae.adapter.dto.EmployeeSummaryDTO;
+import br.com.fateczl.apihae.adapter.dto.InstitutionDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.Role;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
+import br.com.fateczl.apihae.adapter.dto.EmployeeResponseDTO;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 
 @RequiredArgsConstructor
@@ -50,15 +52,17 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public Employee getEmployeeByEmail(String email) {
-        return employeeRepository.findByEmail(email)
+    public EmployeeResponseDTO getEmployeeByEmail(String email) {
+        Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com email " + email));
+        return convertToDto(employee);
     }
 
     @Transactional(readOnly = true)
-    public Employee getEmployeeById(String id) {
-        return employeeRepository.findById(id)
+    public EmployeeResponseDTO getEmployeeById(String id) {
+        Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com ID: " + id));
+        return convertToDto(employee);
     }
 
     @Transactional
@@ -115,5 +119,23 @@ public class EmployeeService {
 
     public List<Employee> getEmployeesByInstitutionId(String institutionId) {
         return employeeRepository.findByInstitutionId(institutionId);
+    }
+
+    private EmployeeResponseDTO convertToDto(Employee employee) {
+        InstitutionDTO institutionDto = null;
+        if (employee.getInstitution() != null) {
+            institutionDto = new InstitutionDTO(
+                    employee.getInstitution().getId().toString(),
+                    employee.getInstitution().getName(),
+                    employee.getInstitution().getInstitutionCode());
+        }
+
+        return new EmployeeResponseDTO(
+                employee.getId(),
+                employee.getName(),
+                employee.getEmail(),
+                employee.getCourse(),
+                employee.getRole(),
+                institutionDto);
     }
 }
