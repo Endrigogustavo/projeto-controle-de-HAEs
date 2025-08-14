@@ -26,6 +26,7 @@ export const useAuth = () => {
   const [user, setUser] = useState<LoggedUser | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchUser = useCallback(async () => {
     const email = localStorage.getItem("email");
@@ -44,6 +45,12 @@ export const useAuth = () => {
       setUser(response.data);
     } catch (error) {
       console.error("Sessão inválida ou erro ao buscar usuário:", error);
+      setError(
+        error instanceof Error
+          ? error
+          : new Error("Falha ao carregar dados do usuário.")
+      );
+
       localStorage.removeItem("token");
       localStorage.removeItem("email");
       setUser(null);
@@ -63,5 +70,5 @@ export const useAuth = () => {
     navigate("/login");
   }, [navigate]);
 
-  return { user, loading, logout };
+  return { user, loading, error, logout, refetchUser: fetchUser };
 };
