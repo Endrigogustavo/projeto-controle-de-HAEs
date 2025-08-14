@@ -42,8 +42,6 @@ export const Register = () => {
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [isLoadingInstitutions, setIsLoadingInstitutions] = useState(true);
 
-  console.log(institutions)
-
   const {
     register,
     handleSubmit,
