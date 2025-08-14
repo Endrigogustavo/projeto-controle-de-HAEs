@@ -236,7 +236,7 @@ export const Sidebar = () => {
 
   return (
     <aside>
-      <div className="h-screen bg-gray-fatec flex flex-col items-center p-1  ">
+      <div className="h-full bg-gray-fatec flex flex-col items-center p-1  ">
         <img
           src="/fatec_zona_leste_icon_branco.png"
           alt="Logo da Fatec da Zona Leste"
