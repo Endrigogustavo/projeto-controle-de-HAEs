@@ -127,9 +127,12 @@ export const MyRequests = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={closeDeleteDialog}>
+          <button
+            className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
+            onClick={closeDeleteDialog}
+          >
             Cancelar
-          </Button>
+          </button>
           <Button
             variant="contained"
             onClick={handleDeleteConfirm}
