@@ -155,7 +155,7 @@ export const ViewHae = () => {
     }
   };
 
-  const isCoordinator = user?.role === "COORDENADOR";
+  const isCoordinator = user?.role === "COORDENADOR" || "DEV";
 
   if (isLoadingUser || !hae) {
     return (

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { AppLayout } from "@/layouts";
 
-const ROLES = ["PROFESSOR", "COORDENADOR", "ADMIN", "DIRETOR"];
+const ROLES = ["PROFESSOR", "COORDENADOR", "ADMIN", "DIRETOR", "DEV"];
 
 export const GerenciarUsuarios = () => {
   const [employees, setEmployees] = useState<LoggedUser[]>([]);
