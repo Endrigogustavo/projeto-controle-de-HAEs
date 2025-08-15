@@ -62,7 +62,7 @@ const DetailItem: React.FC<DetailItemProps> = ({
       {icon}
       <span>{label}</span>
     </div>
-    <p className="text-gray-800 text-base">{value}</p>
+    <div className="text-gray-800 text-base">{value}</div>
   </div>
 );
 
@@ -155,7 +155,7 @@ export const ViewHae = () => {
     }
   };
 
-  const isCoordinator = user?.role === "COORDENADOR" || "DEV";
+  const isCoordinator = user?.role === "COORDENADOR" || user?.role === "DEV";
 
   if (isLoadingUser || !hae) {
     return (
