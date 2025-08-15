@@ -240,6 +240,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
           Gestão de Recursos Humanos
         </MenuItem>
         <MenuItem value="Gestão Empresarial">Gestão Empresarial</MenuItem>
+        <MenuItem value="Gestão Empresarial EAD">Gestão Empresarial EAD</MenuItem>
         <MenuItem value="Logística">Logística</MenuItem>
         <MenuItem value="Polímeros">Polímeros</MenuItem>
       </TextField>
