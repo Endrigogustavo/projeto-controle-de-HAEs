@@ -1,14 +1,17 @@
 import * as yup from "yup";
 import { WeeklySchedule } from "@/components/StepperForm/types/haeFormTypes";
 
+const getToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
 const parseTime = (timeStr: string) => {
 	if (!timeStr) return 0;
 	const [hours, minutes] = timeStr.split(":").map(Number);
 	return hours * 60 + minutes;
 };
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
 
 export const haeFormSchema = yup.object().shape({
 	employeeId: yup.string().required("O ID do funcionário é obrigatório"),
@@ -32,12 +35,10 @@ export const haeFormSchema = yup.object().shape({
 			"Todos os dias selecionados devem ter horários válidos.",
 			(value, context) => {
 				const schedule = value as WeeklySchedule;
-
 				const dayOfWeek = context.parent.dayOfWeek as string[];
+
 				if (!schedule || dayOfWeek.length === 0) {
-					return context.createError({
-						message: "O cronograma semanal é obrigatório.",
-					});
+					return true;
 				}
 
 				for (const day of dayOfWeek) {
@@ -80,7 +81,13 @@ export const haeFormSchema = yup.object().shape({
 		.date()
 		.required("Data de início é obrigatória")
 		.typeError("Forneça uma data de início válida")
-		.min(today, "A data de início não pode ser anterior a hoje"),
+		.when('$isEditMode', {
+			is: false,
+			then: (schema) => 
+				schema.min(getToday(), 'A data de início não pode ser no passado.'),
+			otherwise: (schema) => schema,
+		}),
+
 	endDate: yup
 		.date()
 		.required("Data de fim é obrigatória")

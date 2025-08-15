@@ -132,7 +132,10 @@ const StepperForm: React.FC = () => {
   const handleFormSubmit = useCallback(async () => {
     try {
       setErrors({});
-      await haeFormSchema.validate(formData, { abortEarly: false });
+      await haeFormSchema.validate(formData, {
+        abortEarly: false,
+        context: { isEditMode },
+      });
 
       let success = false;
       if (isEditMode) {
@@ -172,6 +175,7 @@ const StepperForm: React.FC = () => {
       formData,
       setFormData: updateFormData,
       errors,
+      isEditMode,
     };
 
     switch (step) {
@@ -191,7 +195,6 @@ const StepperForm: React.FC = () => {
             {...commonStepProps}
             onBack={handleBackStep}
             onSubmit={handleFormSubmit}
-            isEditMode={isEditMode}
           />
         );
       default:
