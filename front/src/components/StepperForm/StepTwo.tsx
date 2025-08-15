@@ -35,12 +35,30 @@ const parseTime = (timeStr: string): number => {
   return hours * 60 + minutes;
 };
 
+const getToday = (): Date => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+const getTomorrow = (): Date => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow;
+};
+
+const toYYYYMMDD = (date: Date): string => {
+  return date.toISOString().split("T")[0];
+};
+
 const StepTwo: React.FC<StepTwoProps> = ({
   onNext,
   onBack,
   formData,
   setFormData,
   errors,
+  isEditMode,
 }) => {
   const [dailySchedules, setDailySchedules] = useState<DailySchedules>({});
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
@@ -114,6 +132,28 @@ const StepTwo: React.FC<StepTwoProps> = ({
     });
   };
 
+  const handleStartDateChange = (value: string) => {
+    setFormData("startDate", value);
+    if (localErrors.startDate) {
+      setLocalErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.startDate;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleEndDateChange = (value: string) => {
+    setFormData("endDate", value);
+    if (localErrors.endDate) {
+      setLocalErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.endDate;
+        return newErrors;
+      });
+    }
+  };
+
   const validateAndProceed = () => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
@@ -122,7 +162,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
       newErrors.dayOfWeek = "Selecione pelo menos um dia da semana";
       isValid = false;
     }
-
     formData.dayOfWeek.forEach((day) => {
       const schedule = dailySchedules[day];
       if (!schedule || !schedule.startTime || !schedule.endTime) {
@@ -151,6 +190,30 @@ const StepTwo: React.FC<StepTwoProps> = ({
     if (!formData.endDate) {
       newErrors.endDate = "Data final é obrigatória.";
       isValid = false;
+    }
+
+    if (formData.startDate && formData.endDate) {
+      const startDate = new Date(formData.startDate + "T00:00:00");
+      const endDate = new Date(formData.endDate + "T00:00:00");
+
+      if (endDate <= startDate) {
+        newErrors.endDate = "A data final deve ser posterior à data de início.";
+        isValid = false;
+      }
+
+      if (!isEditMode) {
+        const today = getToday();
+        const tomorrow = getTomorrow();
+
+        if (startDate < today) {
+          newErrors.startDate = "A data de início deve ser hoje ou no futuro.";
+          isValid = false;
+        }
+        if (endDate < tomorrow) {
+          newErrors.endDate = "A data final não pode ser hoje nem no passado.";
+          isValid = false;
+        }
+      }
     }
 
     setLocalErrors(newErrors);
@@ -244,9 +307,12 @@ const StepTwo: React.FC<StepTwoProps> = ({
           variant="outlined"
           InputLabelProps={{ shrink: true }}
           value={formData.startDate || ""}
-          onChange={(e) => setFormData("startDate", e.target.value)}
+          onChange={(e) => handleStartDateChange(e.target.value)}
           error={!!localErrors.startDate}
           helperText={localErrors.startDate || null}
+          InputProps={{
+            inputProps: { min: !isEditMode ? toYYYYMMDD(getToday()) : undefined },
+          }}
         />
         <TextField
           required
@@ -256,9 +322,12 @@ const StepTwo: React.FC<StepTwoProps> = ({
           variant="outlined"
           InputLabelProps={{ shrink: true }}
           value={formData.endDate || ""}
-          onChange={(e) => setFormData("endDate", e.target.value)}
+          onChange={(e) => handleEndDateChange(e.target.value)}
           error={!!localErrors.endDate}
           helperText={localErrors.endDate || null}
+          InputProps={{
+            inputProps: { min: !isEditMode ? toYYYYMMDD(getTomorrow()) : undefined },
+          }}
         />
       </div>
 
