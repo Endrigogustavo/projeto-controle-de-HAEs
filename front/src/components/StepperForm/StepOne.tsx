@@ -174,7 +174,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         select
         variant="outlined"
         value={formData.projectType}
-        onChange={(e) => handleProjectTypeChange(e.target.value)} // Usa o novo handler
+        onChange={(e) => handleProjectTypeChange(e.target.value)}
         error={!!errors.projectType}
         helperText={errors.projectType}
       >

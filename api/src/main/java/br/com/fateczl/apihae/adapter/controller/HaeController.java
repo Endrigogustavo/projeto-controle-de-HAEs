@@ -31,7 +31,7 @@ public class HaeController {
     private final HaeService haeService;
     private final HaeStatusService haeStatusService;
 
-      @PostMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request) {
         Hae createdHae = haeService.createHae(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHae);
@@ -102,7 +102,7 @@ public class HaeController {
     public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId,
             @PathVariable String haeId) {
         haeService.sendEmailToCoordinatorAboutHAECreated(coordinatorId, haeId);
-        
+
         return ResponseEntity.ok("Email enviado para o coordenador sobre a criação da HAE com ID: " + haeId);
     }
 
@@ -113,14 +113,14 @@ public class HaeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(hae);
     }
 
-    @Operation(summary = "Marcar como visualizada", description = "Marca uma HAE como visualizada")
-    @PutMapping("/viewed/{haeId}")
-    public ResponseEntity<String> markAsViewed(@PathVariable String haeId) {
+    @Operation(summary = "Alternar status de visualização", description = "Alterna o status 'viewed' de uma HAE (de true para false e vice-versa).")
+    @PutMapping("/viewed/toggle/{haeId}")
+    public ResponseEntity<Hae> toggleViewed(@PathVariable String haeId) {
         try {
-            haeStatusService.wasViewed(haeId);
-            return ResponseEntity.ok("HAE marcada como visualizada.");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Hae updatedHae = haeStatusService.toggleViewedStatus(haeId);
+            return ResponseEntity.ok(updatedHae);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 

@@ -55,7 +55,7 @@ export const CardHae = ({
             bgcolor: "#c10007",
             color: "white",
             "&:hover": {
-              bgcolor: "#a30006", // tom um pouco mais escuro
+              bgcolor: "#a30006",
             },
           }}
         >

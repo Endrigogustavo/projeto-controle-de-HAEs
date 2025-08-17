@@ -20,11 +20,23 @@ public class HaeStatusService {
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
 
+    @Transactional
     public void wasViewed(String haeId) {
         Hae hae = haeRepository.findById(haeId)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + haeId));
+        
         hae.setViewed(true);
         haeRepository.save(hae);
+    }
+
+    @Transactional
+    public Hae toggleViewedStatus(String haeId) {
+        Hae hae = haeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + haeId));
+        
+        hae.setViewed(!hae.getViewed());
+        
+        return haeRepository.save(hae);
     }
 
     public List<Hae> getHaeWasViewed() {

@@ -23,4 +23,5 @@ export interface Hae {
 	weeklySchedule: Record<string, string>;
 	createdAt: string;
 	updatedAt: string;
+	viewed: boolean;
 }
