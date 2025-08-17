@@ -1,14 +1,20 @@
 import React from "react";
-
 import {
   CheckCircleOutline,
   HighlightOffOutlined,
   HourglassEmpty,
   WorkspacePremiumOutlined,
+  Autorenew,
 } from "@mui/icons-material";
 
 interface StatusBadgeProps {
-  status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO" | string;
+  status:
+    | "PENDENTE"
+    | "APROVADO"
+    | "REPROVADO"
+    | "COMPLETO"
+    | "FECHAMENTO_SOLICITADO"
+    | string;
   isFullView: boolean;
 }
 
@@ -21,7 +27,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     { bg: string; text: string; icon: React.ReactElement }
   > = {
     PENDENTE: {
-      bg: "bg-yellow-100",
+      bg: "bg-gray-100",
       text: "text-gray-900",
       icon: (
         <HourglassEmpty sx={{ fontSize: isFullView ? "1.3rem" : "1.2rem" }} />
@@ -45,6 +51,13 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
         />
       ),
     },
+    FECHAMENTO_SOLICITADO: {
+      bg: "bg-amber-100", // Usando a cor âmbar
+      text: "text-gray-900",
+      icon: (
+        <Autorenew sx={{ fontSize: isFullView ? "1.3rem" : "1.2rem" }} />
+      ),
+    },
     COMPLETO: {
       bg: "bg-blue-100",
       text: "text-gray-900",
@@ -58,6 +71,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   const style = statusStyles[status] || statusStyles.PENDENTE;
 
+  const displayText =
+    status === "FECHAMENTO_SOLICITADO"
+      ? "EM ANÁLISE"
+      : status.replace("_", " ");
+
   return (
     <div
       className={`inline-flex items-center gap-1.5 ${
@@ -67,7 +85,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       } ${style.bg} ${style.text}`}
     >
       {style.icon}
-      <span>{status}</span>
+      <span>{displayText}</span>
     </div>
   );
 };

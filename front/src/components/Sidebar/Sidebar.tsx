@@ -87,6 +87,12 @@ export const Sidebar = () => {
               active={isActive("/myrequests")}
             />
             <SidebarItem
+              to="/closure-requests"
+              icon={<ArticleOutlined sx={{ fill: "white" }} />}
+              text="Solicitações de Fechamento"
+              active={isActive("/closure-requests")}
+            />
+            <SidebarItem
               to="/support"
               icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"

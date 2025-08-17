@@ -23,7 +23,9 @@ import {
   CreateInstitution,
   EditInstitution,
   ListInstitutions,
-  AllHaes
+  AllHaes,
+  RequestClosurePage,
+  ClosureRequestsPage,
 } from "../pages";
 import { PrivateRouteLayout } from "./layout/PrivateRouteLayout";
 
@@ -70,6 +72,8 @@ export const AppRoutes = () => {
           <Route path="/institution/edit/:id" element={<EditInstitution />} />
           <Route path="/institutions" element={<ListInstitutions />} />
           <Route path="/allHaes" element={<AllHaes />} />
+          <Route path="/request-closure/:id" element={<RequestClosurePage />} />
+          <Route path="/closure-requests" element={<ClosureRequestsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

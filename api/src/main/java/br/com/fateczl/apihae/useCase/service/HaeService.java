@@ -157,7 +157,7 @@ public class HaeService {
             throw new IllegalArgumentException("Professor com ID " + professorId + " não encontrado.");
         }
         List<Hae> haes = haeRepository.findByEmployeeId(professorId);
-        
+
         return haes.stream()
                 .map(HaeResponseDTO::new)
                 .collect(Collectors.toList());
@@ -301,5 +301,13 @@ public class HaeService {
         int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
         List<Hae> countSemesterHae = haeRepository.findBySemestre(year, monthStart, monthEnd);
         return countSemesterHae.size();
+    }
+
+    public List<HaeResponseDTO> getHaeByStatus(Status status) {
+        List<Hae> haes = haeRepository.findByStatus(status);
+
+        return haes.stream()
+                .map(HaeResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }

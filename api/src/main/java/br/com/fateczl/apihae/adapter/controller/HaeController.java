@@ -11,7 +11,7 @@ import br.com.fateczl.apihae.useCase.service.HaeStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import br.com.fateczl.apihae.domain.enums.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +20,8 @@ import jakarta.validation.Valid;
 
 import java.util.Collections;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/hae")
@@ -142,6 +142,13 @@ public class HaeController {
     @GetMapping("/institution/{institutionId}")
     public ResponseEntity<List<HaeResponseDTO>> getHaesByInstitution(@PathVariable String institutionId) {
         List<HaeResponseDTO> haes = haeService.getHaesByInstitutionId(institutionId);
+        return ResponseEntity.ok(haes);
+    }
+
+    @Operation(summary = "Lista todas as HAEs baseado nos status", description = "Retorna uma lista de HAEs baseado no status fornecido.")
+    @GetMapping("/getHaeByStatus/{status}")
+    public ResponseEntity<List<HaeResponseDTO>> getHaesByStatus(@PathVariable Status status) {
+        List<HaeResponseDTO> haes = haeService.getHaeByStatus(status);
         return ResponseEntity.ok(haes);
     }
 

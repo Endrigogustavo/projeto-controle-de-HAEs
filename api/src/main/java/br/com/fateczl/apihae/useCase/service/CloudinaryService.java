@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class CloudinaryService {
         List<String> comprovanteDocs = new ArrayList<>();
         comprovanteDocs.add(uploadResult.get("secure_url").toString());
         hae.setComprovanteDoc(comprovanteDocs);
+        hae.setStatus(Status.FECHAMENTO_SOLICITADO);
         haeRepository.save(hae);
 
         return uploadResult.get("secure_url").toString();

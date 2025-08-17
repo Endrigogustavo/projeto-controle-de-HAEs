@@ -4,5 +4,6 @@ public enum Status {
     PENDENTE,
     APROVADO,
     REPROVADO,
+    FECHAMENTO_SOLICITADO,
     COMPLETO
 }

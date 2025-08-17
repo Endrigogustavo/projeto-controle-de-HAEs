@@ -1,5 +1,8 @@
 package br.com.fateczl.apihae.adapter.dto;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Status;
 import lombok.AllArgsConstructor;
@@ -18,8 +21,11 @@ public class HaeResponseDTO {
     private String course;
     private String projectDescription;
     private Status status;
-    private String professorName; 
+    private String professorName;
     private Boolean viewed;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private List<String> comprovanteDoc;
 
     public HaeResponseDTO(Hae hae) {
         this.id = hae.getId();
@@ -29,5 +35,8 @@ public class HaeResponseDTO {
         this.status = hae.getStatus();
         this.professorName = hae.getEmployee().getName();
         this.viewed = hae.getViewed();
+        this.startDate = hae.getStartDate();
+        this.endDate = hae.getEndDate();
+        this.comprovanteDoc = hae.getComprovanteDoc();
     }
 }
