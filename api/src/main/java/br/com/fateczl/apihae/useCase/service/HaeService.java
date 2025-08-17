@@ -152,11 +152,15 @@ public class HaeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Hae> getHaesByProfessorId(String professorId) {
+    public List<HaeResponseDTO> getHaesByProfessorId(String professorId) {
         if (!employeeRepository.existsById(professorId)) {
             throw new IllegalArgumentException("Professor com ID " + professorId + " não encontrado.");
         }
-        return haeRepository.findByEmployeeId(professorId);
+        List<Hae> haes = haeRepository.findByEmployeeId(professorId);
+        
+        return haes.stream()
+                .map(HaeResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

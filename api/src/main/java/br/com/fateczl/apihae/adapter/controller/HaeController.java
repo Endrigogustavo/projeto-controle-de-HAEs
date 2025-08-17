@@ -77,8 +77,8 @@ public class HaeController {
     }
 
     @GetMapping("/getHaesByProfessor/{professorId}")
-    public ResponseEntity<?> getHaesByProfessor(@PathVariable String professorId) {
-        List<Hae> haes = haeService.getHaesByProfessorId(professorId);
+    public ResponseEntity<List<HaeResponseDTO>> getHaesByProfessor(@PathVariable String professorId) {
+        List<HaeResponseDTO> haes = haeService.getHaesByProfessorId(professorId);
         return ResponseEntity.ok(haes);
     }
 
