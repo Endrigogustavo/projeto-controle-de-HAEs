@@ -6,7 +6,6 @@ import { HaeResponseDTO } from "@/types/hae";
 import {
   CircularProgress,
   Typography,
-  Button,
   Paper,
   Link as MuiLink,
 } from "@mui/material";
@@ -23,13 +22,12 @@ export const ClosureRequestsPage = () => {
       const response = await api.get<HaeResponseDTO[]>(
         `/hae/getHaeByStatus/FECHAMENTO_SOLICITADO`
       );
-      
+
       const filteredRequests = response.data.filter(
         (hae) => hae.course === user.course
       );
-      
-      setRequests(filteredRequests);
 
+      setRequests(filteredRequests);
     } catch (error) {
       console.error("Erro ao buscar solicitações de fechamento:", error);
     } finally {
@@ -87,8 +85,10 @@ export const ClosureRequestsPage = () => {
                 elevation={2}
                 className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
               >
-                <div className="flex-1">
-                  <Typography variant="h6">{hae.projectTitle}</Typography>
+                <div className="flex-1 min-w-0">
+                  <Typography variant="h6" className="truncate">
+                    {hae.projectTitle}
+                  </Typography>
                   <Typography variant="body2" color="textSecondary">
                     Professor: {hae.professorName}
                   </Typography>
@@ -97,7 +97,7 @@ export const ClosureRequestsPage = () => {
                       href={hae.comprovanteDoc[0]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold"
+                      className="font-semibold break-all"
                     >
                       Visualizar Comprovante
                     </MuiLink>
@@ -107,24 +107,19 @@ export const ClosureRequestsPage = () => {
                     </Typography>
                   )}
                 </div>
-                <div className="flex gap-2 self-end md:self-center">
-                  <Button
-                    variant="outlined"
-                    color="error"
+                <div className="flex gap-2 self-end md:self-center flex-shrink-0">
+                  <button
+                    className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
                     onClick={() => handleUpdateStatus(hae.id, "APROVADO")}
                   >
                     Rejeitar
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      bgcolor: "#16a34a",
-                      "&:hover": { bgcolor: "#15803d" },
-                    }}
+                  </button>
+                  <button
+                    className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
                     onClick={() => handleUpdateStatus(hae.id, "COMPLETO")}
                   >
                     Aprovar Fechamento
-                  </Button>
+                  </button>
                 </div>
               </Paper>
             ))}
