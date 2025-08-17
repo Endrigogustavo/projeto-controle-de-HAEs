@@ -186,10 +186,10 @@ export const Sidebar = () => {
               active={isActive("/gerenciar-usuarios")}
             />
             <SidebarItem
-              to="/haes"
+              to="/allHaes"
               icon={<ListAltOutlined sx={{ fill: "white" }} />}
               text="Todas as HAEs"
-              active={isActive("/haes")}
+              active={isActive("/allHaes")}
             />
             <SidebarItem
               to="/requestHae"

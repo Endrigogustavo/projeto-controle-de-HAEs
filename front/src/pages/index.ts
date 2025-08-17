@@ -14,9 +14,10 @@ export * from "./Register";
 export * from "./RequestHae";
 export * from "./ResetPassword";
 export * from "./ContactUs";
-export * from "./TodasHaes";
+export * from "./AllHaesByInstitution";
 export * from "./ViewHae";
 export * from "./CreateInstitution"
 export * from "./DashboardDev"
 export * from "./ListInstitutions"
 export * from "./EditInstitution"
+export * from "./AllHaes"

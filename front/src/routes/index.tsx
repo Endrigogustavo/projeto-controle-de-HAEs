@@ -17,12 +17,13 @@ import {
   RequestHae,
   ResetPassword,
   ContactUs,
-  TodasHaes,
+  AllHaesByInstitution,
   ViewHae,
   DashboardDev,
   CreateInstitution,
   EditInstitution,
-  ListInstitutions
+  ListInstitutions,
+  AllHaes
 } from "../pages";
 import { PrivateRouteLayout } from "./layout/PrivateRouteLayout";
 
@@ -60,7 +61,7 @@ export const AppRoutes = () => {
           <Route path="/dashboard-diretor" element={<DashboardDiretor />} />
           <Route path="/professores" element={<Professores />} />
           <Route path="/coordenadores" element={<Coordenadores />} />
-          <Route path="/haes" element={<TodasHaes />} />
+          <Route path="/haes" element={<AllHaesByInstitution />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/hae/:id" element={<ViewHae />} />
           <Route path="/support" element={<ContactUs />} />
@@ -68,7 +69,7 @@ export const AppRoutes = () => {
           <Route path="/create-institution" element={<CreateInstitution />} />
           <Route path="/institution/edit/:id" element={<EditInstitution />} />
           <Route path="/institutions" element={<ListInstitutions />} />
-
+          <Route path="/allHaes" element={<AllHaes />} />
         </Route>
       </Routes>
     </BrowserRouter>
