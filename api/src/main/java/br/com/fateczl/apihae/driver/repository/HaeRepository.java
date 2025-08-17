@@ -28,4 +28,6 @@ public interface HaeRepository extends JpaRepository<Hae, String> {
     List<Hae> findBySemestre(@Param("year") int year,
             @Param("monthStart") int monthStart,
             @Param("monthEnd") int monthEnd);
+
+            
 }

@@ -25,3 +25,32 @@ export interface Hae {
 	updatedAt: string;
 	viewed: boolean;
 }
+
+export interface HaeResponseDTO {
+  id: string;
+  projectTitle: string;
+  course: string;
+  projectDescription: string;
+  status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO" | string;
+  professorName: string;
+  viewed: boolean;
+}
+
+export interface HaeDetailDTO {
+  id: string;
+  projectTitle: string;
+  professorName: string;
+  status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO" | string;
+  course: string;
+  projectType: string;
+  modality: string;
+  weeklyHours: number;
+  startDate: string;
+  endDate: string;
+  weeklySchedule: { [key: string]: string };
+  projectDescription: string;
+  observations: string;
+  students: string[];
+  viewed: boolean;
+  coordenatorName: string;
+}

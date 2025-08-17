@@ -1,6 +1,8 @@
 package br.com.fateczl.apihae.adapter.controller;
 
+import br.com.fateczl.apihae.adapter.dto.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.HaeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
@@ -38,8 +40,8 @@ public class HaeController {
     }
 
     @GetMapping("/getHaeById/{id}")
-    public ResponseEntity<Object> getHaeById(@PathVariable String id) {
-        Hae hae = haeService.getHaeById(id);
+    public ResponseEntity<HaeDetailDTO> getHaeById(@PathVariable String id) {
+        HaeDetailDTO hae = haeService.getHaeById(id);
         return ResponseEntity.ok(hae);
     }
 
@@ -62,8 +64,8 @@ public class HaeController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Hae>> getAllHaes() {
-        List<Hae> haes = haeService.getAllHaes();
+    public ResponseEntity<List<HaeResponseDTO>> getAllHaes() {
+        List<HaeResponseDTO> haes = haeService.getAllHaes();
         return ResponseEntity.ok(haes);
     }
 
@@ -134,6 +136,13 @@ public class HaeController {
     @GetMapping("/not-viewed")
     public ResponseEntity<List<Hae>> getNotViewed() {
         return ResponseEntity.ok(haeStatusService.getHaeWasNotViewed());
+    }
+
+    @Operation(summary = "Lista todas as HAEs de uma instituição", description = "Retorna uma lista de HAEs baseada no ID da instituição fornecido.")
+    @GetMapping("/institution/{institutionId}")
+    public ResponseEntity<List<HaeResponseDTO>> getHaesByInstitution(@PathVariable String institutionId) {
+        List<HaeResponseDTO> haes = haeService.getHaesByInstitutionId(institutionId);
+        return ResponseEntity.ok(haes);
     }
 
 }

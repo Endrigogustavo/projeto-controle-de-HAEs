@@ -24,8 +24,7 @@ import {
   ArrowBack,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
-import { Hae } from "@/types/hae";
-import { Employee } from "@/types/employee";
+import { HaeDetailDTO } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { StatusBadge } from "@/components";
 
@@ -66,7 +65,7 @@ const DetailItem: React.FC<DetailItemProps> = ({
   </div>
 );
 
-const STATUS_OPTIONS: Hae["status"][] = [
+const STATUS_OPTIONS: HaeDetailDTO["status"][] = [
   "PENDENTE",
   "APROVADO",
   "REPROVADO",
@@ -82,7 +81,7 @@ const projectTypeLabels: Record<string, string> = {
 export const ViewHae = () => {
   const { id } = useParams<{ id: string }>();
   const { user, loading: isLoadingUser } = useAuth();
-  const [hae, setHae] = useState<Hae | null>(null);
+  const [hae, setHae] = useState<HaeDetailDTO | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -90,29 +89,12 @@ export const ViewHae = () => {
     severity: "success" | "error";
   } | null>(null);
 
-  const [coordenatorName, setCoordenatorName] = useState<string | null>(null);
-
+  // A busca agora é mais simples e eficiente
   const fetchHae = useCallback(async () => {
     if (!id) return;
     try {
-      const response = await api.get<Hae>(`/hae/getHaeById/${id}`);
-      const fetchedHae = response.data;
-      setHae(fetchedHae);
-
-      if (
-        fetchedHae.coordenatorId &&
-        fetchedHae.coordenatorId !== "Sem coordenador definido"
-      ) {
-        try {
-          const coordinatorResponse = await api.get<Employee>(
-            `/employee/get-professor/${fetchedHae.coordenatorId}`
-          );
-          setCoordenatorName(coordinatorResponse.data.name);
-        } catch (coordError) {
-          console.error("Erro ao buscar dados do coordenador:", coordError);
-          setCoordenatorName("Informação indisponível");
-        }
-      }
+      const response = await api.get<HaeDetailDTO>(`/hae/getHaeById/${id}`);
+      setHae(response.data);
     } catch (err: any) {
       console.error("Erro ao buscar HAE:", err);
       setSnackbar({
@@ -127,7 +109,7 @@ export const ViewHae = () => {
     fetchHae();
   }, [fetchHae]);
 
-  const handleStatusChange = async (newStatus: Hae["status"]) => {
+  const handleStatusChange = async (newStatus: HaeDetailDTO["status"]) => {
     if (!user?.id) {
       setSnackbar({
         open: true,
@@ -185,20 +167,21 @@ export const ViewHae = () => {
                 {hae.projectTitle}
               </h1>
               <p className="text-gray-500">
-                Solicitado por: {hae.employee.name ?? "N/A"}
+                Solicitado por: {hae.professorName ?? "N/A"}
               </p>
             </div>
             <StatusBadge status={hae.status} isFullView />
           </div>
 
           <div className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
-            {coordenatorName && (
-              <DetailItem
-                icon={<VerifiedUserOutlined />}
-                label="Avaliado por"
-                value={coordenatorName}
-              />
-            )}
+            {hae.coordenatorName &&
+              hae.coordenatorName !== "Sem coordenador definido" && (
+                <DetailItem
+                  icon={<VerifiedUserOutlined />}
+                  label="Avaliado por"
+                  value={hae.coordenatorName}
+                />
+              )}
             <DetailItem
               icon={<SchoolOutlined />}
               label="Curso"
@@ -313,7 +296,7 @@ export const ViewHae = () => {
             {isCoordinator && (
               <>
                 <Divider />
-                <div className="bg-white mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4  rounded-lg ">
+                <div className="bg-white mt-6 flex flex-col md:flex-row md:items-center md:justify-end gap-4 rounded-lg">
                   <p className="font-semibold text-gray-700">
                     Ações do Coordenador:
                   </p>
@@ -326,7 +309,9 @@ export const ViewHae = () => {
                       label="Alterar Status"
                       value={hae.status}
                       onChange={(e) =>
-                        handleStatusChange(e.target.value as Hae["status"])
+                        handleStatusChange(
+                          e.target.value as HaeDetailDTO["status"]
+                        )
                       }
                       disabled={isSubmitting}
                     >
