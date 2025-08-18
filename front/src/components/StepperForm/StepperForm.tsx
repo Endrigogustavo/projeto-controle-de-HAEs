@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import { HaeDataType, StepProps, FormErrors } from "./types/haeFormTypes";
+import {
+  HaeDataType,
+  StepProps,
+  FormErrors,
+  WeeklySchedule,
+} from "./types/haeFormTypes";
 import { useAuth } from "@/hooks/useAuth";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,6 +17,7 @@ import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import * as yup from "yup";
 import { api, haeService } from "@/services";
 import { CircularProgress } from "@mui/material";
+import { HaeDetailDTO } from "@/types/hae";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -19,17 +25,6 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="standard" {...props} />;
 });
-
-interface HaeApiResponse
-  extends Omit<HaeDataType, "employeeId" | "studentRAs" | "institutionId"> {
-  employee: {
-    id: string;
-    institution?: {
-      id: string;
-    };
-  };
-  students: string[];
-}
 
 const StepperForm: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -74,20 +69,48 @@ const StepperForm: React.FC = () => {
   } = useHaeService(haeService);
 
   useEffect(() => {
-    if (isEditMode && haeIdToEdit) {
+    // Busca os dados da HAE para edição
+    if (isEditMode && haeIdToEdit && employee) {
       const fetchHaeForEdit = async () => {
         setIsLoadingHae(true);
         try {
-          const response = await api.get<HaeApiResponse>(
+          const response = await api.get<HaeDetailDTO>(
             `/hae/getHaeById/${haeIdToEdit}`
           );
           const haeData = response.data;
 
+          const formattedWeeklySchedule: WeeklySchedule = {};
+          if (haeData.weeklySchedule) {
+            for (const day in haeData.weeklySchedule) {
+              if (
+                Object.prototype.hasOwnProperty.call(
+                  haeData.weeklySchedule,
+                  day
+                )
+              ) {
+                formattedWeeklySchedule[day] = {
+                  timeRange: haeData.weeklySchedule[day],
+                };
+              }
+            }
+          }
+
           setFormData({
-            ...haeData,
-            employeeId: haeData.employee.id,
-            studentRAs: haeData.students,
-            institutionId: haeData.employee.institution?.id || "",
+            ...formData,
+            projectTitle: haeData.projectTitle || "",
+            course: haeData.course || "",
+            projectType: haeData.projectType || "",
+            modality: haeData.modality || "",
+            startDate: haeData.startDate || "",
+            endDate: haeData.endDate || "",
+            observations: haeData.observations || "",
+            dayOfWeek: haeData.dayOfWeek || [],
+            projectDescription: haeData.projectDescription || "",
+            weeklySchedule: formattedWeeklySchedule,
+            studentRAs: haeData.students || [],
+            weeklyHours: haeData.weeklyHours || 0,
+            employeeId: employee.id,
+            institutionId: employee.institution.id,
           });
         } catch (error) {
           console.error("Erro ao buscar HAE para edição:", error);
@@ -95,9 +118,10 @@ const StepperForm: React.FC = () => {
           setIsLoadingHae(false);
         }
       };
+
       fetchHaeForEdit();
     }
-  }, [isEditMode, haeIdToEdit]);
+  }, [isEditMode, haeIdToEdit, employee]);
 
   useEffect(() => {
     if (employee && !isLoadingEmployee && !isEditMode) {

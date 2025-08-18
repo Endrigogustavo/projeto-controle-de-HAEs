@@ -57,4 +57,5 @@ export interface HaeDetailDTO {
   students: string[];
   viewed: boolean;
   coordenatorName: string;
+  dayOfWeek: string[];
 }

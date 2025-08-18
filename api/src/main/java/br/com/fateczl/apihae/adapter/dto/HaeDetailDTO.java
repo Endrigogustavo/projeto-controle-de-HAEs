@@ -25,6 +25,7 @@ public class HaeDetailDTO {
     private HaeType projectType;
     private Modality modality;
     private Integer weeklyHours;
+    private List<String> dayOfWeek;
     private LocalDate startDate;
     private LocalDate endDate;
     private Map<String, String> weeklySchedule;
@@ -43,6 +44,7 @@ public class HaeDetailDTO {
         this.projectType = hae.getProjectType();
         this.modality = hae.getModality();
         this.weeklyHours = hae.getWeeklyHours();
+        this.dayOfWeek = hae.getDayOfWeek();
         this.startDate = hae.getStartDate();
         this.endDate = hae.getEndDate();
         this.weeklySchedule = hae.getWeeklySchedule();
