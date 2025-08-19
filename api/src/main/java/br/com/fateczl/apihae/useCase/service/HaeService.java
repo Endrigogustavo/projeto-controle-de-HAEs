@@ -11,12 +11,15 @@ import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import jakarta.persistence.criteria.Predicate;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -261,6 +264,37 @@ public class HaeService {
 
     public List<HaeResponseDTO> getHaeByStatus(Status status) {
         List<Hae> haes = haeRepository.findByStatus(status);
+
+        return haes.stream()
+                .map(HaeResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<HaeResponseDTO> searchHaes(String institutionId, String course, HaeType haeType, Status status, Boolean viewed) {
+        Specification<Hae> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(criteriaBuilder.equal(root.get("institution").get("id"), institutionId));
+
+            if (course != null && !course.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("course"), course));
+            }
+            if (haeType != null) {
+                predicates.add(criteriaBuilder.equal(root.get("projectType"), haeType));
+            }
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            if (viewed != null) {
+                predicates.add(criteriaBuilder.equal(root.get("viewed"), viewed));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        List<Hae> haes = haeRepository.findAll(spec);
 
         return haes.stream()
                 .map(HaeResponseDTO::new)
