@@ -1,12 +1,14 @@
 package br.com.fateczl.apihae.useCase.service;
 
+import br.com.fateczl.apihae.adapter.dto.gemini.GeminiRequest;
+import br.com.fateczl.apihae.adapter.dto.gemini.GeminiResponse;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import br.com.fateczl.apihae.adapter.dto.gemini.GeminiRequest;
-import br.com.fateczl.apihae.adapter.dto.gemini.GeminiResponse;
+import jakarta.annotation.PostConstruct;
 
 import java.util.List;
 
@@ -17,16 +19,22 @@ public class GeminiService {
 
     @Value("${gemini.api_key}")
     private String API_KEY;
-    @Value("${gemini.endpoint}")
-    private  String API_URL;
 
-    private final String ENDPOINT = API_URL + "?key=" + API_KEY;
-    
+    @Value("${gemini.api_url}")
+    private String API_URL;
+
+    private String ENDPOINT; // ✅ Agora não é final
+
     private final RestTemplate restTemplate = new RestTemplate();
+
+    @PostConstruct
+    public void init() {
+        this.ENDPOINT = API_URL + "?key=" + API_KEY;
+    }
 
     public String analyzeText(String prompt) {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(5000); // Evita erro 429
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
