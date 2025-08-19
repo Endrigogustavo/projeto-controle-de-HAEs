@@ -34,7 +34,7 @@ public class JWTUtils {
                 .withExpiresAt(generateExpirationDate())
                 .sign(algorithm);
         } catch (JWTCreationException exc) {
-            throw new RuntimeException("Error while authenticating: " + exc.getMessage(), exc);
+            throw new IllegalArgumentException("Error while authenticating: " + exc.getMessage(), exc);
         }
     }
 
