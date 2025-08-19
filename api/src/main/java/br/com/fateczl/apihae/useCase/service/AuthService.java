@@ -46,7 +46,7 @@ public class AuthService {
 
     @Transactional
     public void sendVerificationCode(String name, String email, String course, String plainPassword,
-            String institutionId) {
+            String institutionName) {
         String encryptedPassword = textEncryptor.encrypt(plainPassword);
 
         String verificationToken = UUID.randomUUID().toString();
@@ -66,7 +66,7 @@ public class AuthService {
         newVerification.setCode(verificationToken);
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 
-        Institution institution = institutionRepository.findById(institutionId)
+        Institution institution = institutionRepository.findByName(institutionName)
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         newVerification.setInstitution(institution);
 
