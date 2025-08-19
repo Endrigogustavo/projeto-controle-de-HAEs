@@ -9,6 +9,11 @@ import {
 import { StepOneProps, FormErrors } from "./types/haeFormTypes";
 import { stepOneSchema } from "@/validation/haeFormSchema";
 import { ValidationError } from "yup";
+import {
+  COURSE_OPTIONS,
+  HAE_TYPE_OPTIONS,
+  MODALITY_OPTIONS,
+} from "@/constants/options";
 
 const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
   const [errors, setErrors] = useState<FormErrors>({});
@@ -178,9 +183,11 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         error={!!errors.projectType}
         helperText={errors.projectType}
       >
-        <MenuItem value="ApoioDirecao">Apoio a Direção</MenuItem>
-        <MenuItem value="Estagio">Estágio</MenuItem>
-        <MenuItem value="TCC">Trabalho de Conclusão de Curso</MenuItem>
+        {HAE_TYPE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       <TextField
@@ -201,9 +208,11 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         error={!!errors.modality}
         helperText={errors.modality}
       >
-        <MenuItem value="PRESENCIAL">Presencial</MenuItem>
-        <MenuItem value="HIBRIDO">Híbrido</MenuItem>
-        <MenuItem value="ONLINE">Online</MenuItem>
+        {MODALITY_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       <TextField
@@ -223,26 +232,11 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         error={!!errors.course}
         helperText={errors.course}
       >
-        <MenuItem value="Análise e Desenvolvimento de Sistemas AMS">
-          Análise e Desenvolvimento de Sistemas AMS
-        </MenuItem>
-        <MenuItem value="Análise e Desenvolvimento de Sistemas">
-          Análise e Desenvolvimento de Sistemas
-        </MenuItem>
-        <MenuItem value="Comercio Exterior">Comércio Exterior</MenuItem>
-        <MenuItem value="Desenvolvimento de Produtos Plásticos">
-          Desenvolvimento de Produtos Plásticos
-        </MenuItem>
-        <MenuItem value="Desenvolvimento de Software Multiplataforma">
-          Desenvolvimento de Software Multiplataforma
-        </MenuItem>
-        <MenuItem value="Gestão de Recursos Humanos">
-          Gestão de Recursos Humanos
-        </MenuItem>
-        <MenuItem value="Gestão Empresarial">Gestão Empresarial</MenuItem>
-        <MenuItem value="Gestão Empresarial EAD">Gestão Empresarial EAD</MenuItem>
-        <MenuItem value="Logística">Logística</MenuItem>
-        <MenuItem value="Polímeros">Polímeros</MenuItem>
+        {COURSE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </TextField>
 
       <TextField

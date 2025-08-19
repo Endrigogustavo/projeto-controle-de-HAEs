@@ -13,11 +13,12 @@ import { api, authService } from "@/services";
 import { useAuthForms } from "@/hooks/useAuthForms";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { COURSE_OPTIONS } from "@/constants/options";
 
 interface Institution {
-    id: string;
-    institutionCode: number;
-    name: string;
+  id: string;
+  institutionCode: number;
+  name: string;
 }
 
 type FormData = {
@@ -52,20 +53,22 @@ export const Register = () => {
 
   useEffect(() => {
     const fetchInstitutions = async () => {
-        try {
-            const response = await api.get<Institution[]>("/institution/getAllInstitutions");
-            setInstitutions(response.data);
-        } catch (error) {
-            console.error("Erro ao buscar instituições:", error);
-        } finally {
-            setIsLoadingInstitutions(false);
-        }
+      try {
+        const response = await api.get<Institution[]>(
+          "/institution/getAllInstitutions"
+        );
+        setInstitutions(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar instituições:", error);
+      } finally {
+        setIsLoadingInstitutions(false);
+      }
     };
     fetchInstitutions();
   }, []);
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const success = await handleRegister(data); 
+    const success = await handleRegister(data);
     if (success) {
       setRegistrationSuccess(true);
     }
@@ -139,7 +142,7 @@ export const Register = () => {
               sx={{ margin: "1rem 0" }}
               required
             />
-            
+
             <TextField
               label="Instituição"
               select
@@ -155,13 +158,13 @@ export const Register = () => {
                 <MenuItem disabled>Carregando instituições...</MenuItem>
               ) : (
                 institutions.map((inst) => (
-                    <MenuItem key={inst.id} value={inst.name}>
-                        {inst.name}
-                    </MenuItem>
+                  <MenuItem key={inst.id} value={inst.name}>
+                    {inst.name}
+                  </MenuItem>
                 ))
               )}
             </TextField>
-            
+
             <TextField
               label="Curso"
               select
@@ -172,26 +175,11 @@ export const Register = () => {
               sx={{ margin: "1rem 0" }}
               required
             >
-              <MenuItem value="Análise e Desenvolvimento de Sistemas AMS">
-                Análise e Desenvolvimento de Sistemas AMS
-              </MenuItem>
-              <MenuItem value="Análise e Desenvolvimento de Sistemas">
-                Análise e Desenvolvimento de Sistemas
-              </MenuItem>
-              <MenuItem value="Comercio Exterior">Comércio Exterior</MenuItem>
-              <MenuItem value="Desenvolvimento de Produtos Plásticos">
-                Desenvolvimento de Produtos Plásticos
-              </MenuItem>
-              <MenuItem value="Desenvolvimento de Software Multiplataforma">
-                Desenvolvimento de Software Multiplataforma
-              </MenuItem>
-              <MenuItem value="Gestão de Recursos Humanos">
-                Gestão de Recursos Humanos
-              </MenuItem>
-              <MenuItem value="Gestão Empresarial">Gestão Empresarial</MenuItem>
-              <MenuItem value="Gestão Empresarial EAD">Gestão Empresarial EAD</MenuItem>
-              <MenuItem value="Logística">Logística</MenuItem>
-              <MenuItem value="Polímeros">Polímeros</MenuItem>
+              {COURSE_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
             </TextField>
 
             <PasswordField
