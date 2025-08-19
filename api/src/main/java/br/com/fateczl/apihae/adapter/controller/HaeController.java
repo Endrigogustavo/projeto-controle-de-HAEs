@@ -21,7 +21,6 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/hae")
@@ -83,8 +82,8 @@ public class HaeController {
     }
 
     @GetMapping("/getHaesByCourse/{course}")
-    public ResponseEntity<?> getHaesByCourse(@PathVariable String course) {
-        List<Hae> haes = haeService.getHaesByCourse(course);
+    public ResponseEntity<List<HaeResponseDTO>> getHaesByCourse(@PathVariable String course) {
+        List<HaeResponseDTO> haes = haeService.getHaesByCourse(course);
         return ResponseEntity.ok(haes);
     }
 

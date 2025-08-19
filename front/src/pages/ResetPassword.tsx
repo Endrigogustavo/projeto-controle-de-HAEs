@@ -6,6 +6,7 @@ import { useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { resetPasswordSchema } from "@/validation/resetPasswordSchema";
+import { AxiosError } from "axios";
 
 type FormData = yup.InferType<typeof resetPasswordSchema>;
 
@@ -37,11 +38,16 @@ export const ResetPassword = () => {
       });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 5000);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          "Ocorreu um erro. O token pode ser inválido ou ter expirado."
-      );
+    } catch (error) {
+      let errorMessage = "Ocorreu uma falha. Tente novamente.";
+
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

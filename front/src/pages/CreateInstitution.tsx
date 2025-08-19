@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { TextField, CircularProgress, Typography } from "@mui/material";
 import * as yup from "yup";
 import { AppLayout } from "@/layouts";
@@ -6,6 +6,7 @@ import { useSnackbar } from "@/hooks/useSnackbar";
 import { ToastNotification } from "@/components/ToastNotification";
 import { institutionService } from "@/services/institutionService";
 import { institutionSchema } from "@/validation/institutionSchema";
+import { AxiosError } from "axios";
 
 type FormData = {
   institutionCode: string;
@@ -49,7 +50,6 @@ export const CreateInstitution = () => {
       });
 
       setIsSubmitting(true);
-      console.log(payloadToValidate);
 
       await institutionService.createInstitution(payloadToValidate);
 
@@ -61,7 +61,7 @@ export const CreateInstitution = () => {
         haeQtd: "",
       });
       setErrors({});
-    } catch (err: any) {
+    } catch (err) {
       console.log(err);
       if (err instanceof yup.ValidationError) {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -72,11 +72,11 @@ export const CreateInstitution = () => {
         });
         setErrors(newErrors);
         showSnackbar("Por favor, corrija os erros no formulário.", "error");
+      } else if (err instanceof AxiosError) {
+        const errorMessage = err.response?.data?.message || "Erro ao criar instituição.";
+        showSnackbar(errorMessage, "error");
       } else {
-        showSnackbar(
-          err.response?.data?.message || "Erro ao criar instituição.",
-          "error"
-        );
+        showSnackbar("Ocorreu um erro inesperado.", "error");
       }
     } finally {
       setIsSubmitting(false);
@@ -142,7 +142,7 @@ export const CreateInstitution = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btnFatec  text-white uppercase hover:bg-red-900"
+              className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
             >
               {isSubmitting ? (
                 <CircularProgress

@@ -16,7 +16,7 @@ export interface Hae {
   coordenatorName?: string;
   startDate: string;
   endDate: string;
-  comprovanteDoc: any[];
+  comprovanteDoc: string[];
   modality: "ONLINE" | "HIBRIDO" | "PRESENCIAL";
   employee: EmployeeDetails;
   students: string[];
@@ -31,7 +31,7 @@ export interface HaeResponseDTO {
   projectTitle: string;
   course: string;
   projectDescription: string;
-  comprovanteDoc: any[];
+  comprovanteDoc: string[];
   status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO" | string;
   professorName: string;
   viewed: boolean;
@@ -43,7 +43,7 @@ export interface HaeDetailDTO {
   id: string;
   projectTitle: string;
   professorName: string;
-  comprovanteDoc: any[];
+  comprovanteDoc: string[];
   status: "PENDENTE" | "APROVADO" | "REPROVADO" | "COMPLETO" | string;
   course: string;
   projectType: string;

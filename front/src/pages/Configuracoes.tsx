@@ -10,6 +10,7 @@ import {
   Box,
 } from "@mui/material";
 import { AppLayout } from "@/layouts";
+import { AxiosError } from "axios";
 
 export const Configuracoes = () => {
   const [currentLimit, setCurrentLimit] = useState<number | null>(null);
@@ -98,10 +99,15 @@ export const Configuracoes = () => {
         message: "Limite de HAEs da instituição atualizado com sucesso!",
         severity: "success",
       });
-    } catch (error: any) {
-      console.error("Erro ao definir o limite de HAEs:", error);
-      const errorMessage =
-        error.response?.data?.message || "Falha ao salvar a configuração.";
+    } catch (error) {
+      let errorMessage = "Ocorreu uma falha. Tente novamente.";
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      console.error("...", error);
       setSnackbar({ open: true, message: errorMessage, severity: "error" });
     } finally {
       setIsSubmitting(false);

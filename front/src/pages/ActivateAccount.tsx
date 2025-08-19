@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import { authService } from "@/services";
+import { AxiosError } from "axios";
 
 export const ActivateAccount = () => {
   const navigate = useNavigate();
@@ -50,12 +51,16 @@ export const ActivateAccount = () => {
           }
           navigate(redirectPath, { replace: true });
         }, 3000);
-      } catch (err: any) {
-        setStatus("success");
-        setErrorMessage(
-          err.response?.data?.message ||
-            "Falha ao ativar a conta. O link pode ter expirado."
-        );
+      } catch (error) {
+        let errorMessage = "Ocorreu uma falha. Tente novamente.";
+
+        if (error instanceof AxiosError) {
+          errorMessage = error.response?.data?.message || error.message;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        console.log(errorMessage);
       }
     };
 

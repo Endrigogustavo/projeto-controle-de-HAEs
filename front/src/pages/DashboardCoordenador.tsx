@@ -1,43 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { api } from "@/services";
 import { CardHaeCoordenador } from "../components/CardHaeCoordenador";
 import { useAuth } from "@/hooks/useAuth";
 import { CircularProgress } from "@mui/material";
-import { Hae } from "@/types/hae";
+import { HaeResponseDTO } from "@/types/hae";
 import { AppLayout } from "@/layouts";
+import { AxiosError } from "axios";
 
 export const DashboardCoordenador = () => {
-  const [haes, setHaes] = useState<Hae[]>([]);
+  const [haes, setHaes] = useState<HaeResponseDTO[]>([]);
   const [isLoadingHaes, setIsLoadingHaes] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { user, loading: isLoadingUser } = useAuth();
+  
+  const fetchHaesByCourse = useCallback(async () => {
+    if (!user || !user.course) return;
 
-  useEffect(() => {
-    if (user && user.course) {
-      const fetchHaesByCourse = async () => {
-        setIsLoadingHaes(true);
-        setError(null);
-        try {
-          const courseName = encodeURIComponent(user.course);
-          const haeResponse = await api.get<Hae[]>(
-            `/hae/getHaesByCourse/${courseName}`
-          );
+    setIsLoadingHaes(true);
+    setError(null);
+    try {
+      const courseName = encodeURIComponent(user.course);
+      const haeResponse = await api.get<HaeResponseDTO[]>(
+        `/hae/getHaesByCourse/${courseName}`
+      );
 
-          setHaes(haeResponse.data);
-        } catch (err: any) {
-          console.error("Erro ao buscar HAEs por curso:", err);
-          setError("Não foi possível carregar as HAEs do seu curso.");
-        } finally {
-          setIsLoadingHaes(false);
-        }
-      };
-
-      fetchHaesByCourse();
-    } else if (!isLoadingUser) {
+      setHaes(haeResponse.data);
+    } catch (err) {
+      console.error("Erro ao buscar HAEs por curso:", err);
+      let errorMessage = "Não foi possível carregar as HAEs do seu curso.";
+      if (err instanceof AxiosError) {
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
+      setError(errorMessage);
+    } finally {
       setIsLoadingHaes(false);
     }
-  }, [user, isLoadingUser]);
+  }, [user]);
+
+  useEffect(() => {
+    if (!isLoadingUser) {
+      fetchHaesByCourse();
+    }
+  }, [isLoadingUser, fetchHaesByCourse]);
 
   if (isLoadingUser || isLoadingHaes) {
     return (
@@ -56,24 +61,23 @@ export const DashboardCoordenador = () => {
 
   return (
     <AppLayout>
-      <main className="col-start-2 row-start-2 p-4 overflow-auto pt-20 md:pt-4 h-full">
+      <main className="col-start-2 row-start-2 p-4 md:p-6 lg:p-8 overflow-auto pt-20 md:pt-4 h-full">
         <h2 className="subtitle font-semibold">
-          Visão Geral das HAEs (Coordenador)
+          Visão Geral das HAEs ({user?.course})
         </h2>
-        <p>
+        <p className="max-w-3xl mb-6">
           Abaixo estão listadas todas as HAEs submetidas pelos professores do
-          seu curso. Você pode acompanhá-las e realizar aprovações ou revisões
-          conforme necessário.
+          seu curso. Acompanhe o andamento e gerencie as aprovações.
         </p>
 
-        {error && <p className="mt-4 text-red-500">{error}</p>}
+        {error && <p className="mt-4 text-red-500 font-semibold">{error}</p>}
 
-        {haes.length === 0 ? (
-          <p className="mt-4 text-gray-500">
-            Nenhuma HAE encontrada para o seu curso.
+        {!error && haes.length === 0 ? (
+          <p className="mt-6 text-gray-500">
+            Nenhuma HAE encontrada para o seu curso no momento.
           </p>
         ) : (
-          <div className="grid gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
             {haes.map((hae) => (
               <CardHaeCoordenador
                 key={hae.id}
@@ -82,7 +86,7 @@ export const DashboardCoordenador = () => {
                 curso={hae.course}
                 descricao={hae.projectDescription}
                 status={hae.status}
-                professor={hae.employee.name}
+                professor={hae.professorName}
               />
             ))}
           </div>

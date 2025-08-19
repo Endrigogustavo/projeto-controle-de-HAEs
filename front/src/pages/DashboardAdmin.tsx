@@ -5,12 +5,14 @@ import { CardHaeAdmin } from "@/components/CardHaeAdmin";
 import { AppLayout } from "@/layouts";
 import { CircularProgress } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
+import { AxiosError } from "axios";
 
 export const DashboardAdmin = () => {
   const { user, loading: userLoading } = useAuth();
-  
+
   const [haes, setHaes] = useState<HaeResponseDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -22,14 +24,25 @@ export const DashboardAdmin = () => {
         setIsLoading(true);
         const institutionId = user.institution.id;
 
-        const haeResponse = await api.get<HaeResponseDTO[]>(`/hae/institution/${institutionId}`);
-        
+        const haeResponse = await api.get<HaeResponseDTO[]>(
+          `/hae/institution/${institutionId}`
+        );
+
         const sortedHaes = haeResponse.data.sort(
           (a, b) => Number(a.viewed) - Number(b.viewed)
         );
         setHaes(sortedHaes);
-      } catch (err: any) {
-        console.error("Erro ao buscar HAEs da instituição:", err);
+      } catch (error) {
+        let errorMessage = "Ocorreu uma falha. Tente novamente.";
+
+        if (error instanceof AxiosError) {
+          errorMessage = error.response?.data?.message || error.message;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        setError(errorMessage);
+        console.error("Erro ao buscar HAEs da instituição:", error);
       } finally {
         setIsLoading(false);
       }
@@ -51,7 +64,14 @@ export const DashboardAdmin = () => {
     } catch (error) {
       console.error("Falha ao atualizar o status de visualização:", error);
       setHaes(originalHaes);
-      alert("Não foi possível atualizar o status da HAE. Tente novamente.");
+
+      let errorMessage =
+        "Não foi possível atualizar o status da HAE. Tente novamente.";
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data?.message || errorMessage;
+      }
+
+      setError(errorMessage);
     }
   };
 
@@ -75,12 +95,19 @@ export const DashboardAdmin = () => {
       <main className="col-start-2 row-start-2 p-4 md:p-6 lg:p-8 overflow-auto pt-20 md:pt-4 h-full">
         <h2 className="subtitle font-semibold">Visão Geral das HAEs (Admin)</h2>
         <p>
-          Abaixo estão listadas todas as HAEs da sua instituição: {user?.institution.name}.
+          Abaixo estão listadas todas as HAEs da sua instituição:{" "}
+          {user?.institution.name}.
         </p>
 
-        {haes.length === 0 ? (
-          <p className="mt-6 text-gray-500">Nenhuma HAE encontrada para esta instituição.</p>
-        ) : (
+        {error && <p className="mt-4 text-red-500 font-semibold">{error}</p>}
+
+        {!error && haes.length === 0 && (
+          <p className="mt-6 text-gray-500">
+            Nenhuma HAE encontrada para esta instituição.
+          </p>
+        )}
+
+        {!error && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
             {haes.map((hae) => (
               <CardHaeAdmin

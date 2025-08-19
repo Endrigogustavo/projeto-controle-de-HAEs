@@ -139,9 +139,12 @@ public class HaeService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public List<Hae> getHaesByCourse(String course) {
-        return haeRepository.findByCourse(course);
+    @Transactional(readOnly = true)
+    public List<HaeResponseDTO> getHaesByCourse(String course) {
+        List<Hae> haes = haeRepository.findByCourse(course);
+        return haes.stream()
+                .map(HaeResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

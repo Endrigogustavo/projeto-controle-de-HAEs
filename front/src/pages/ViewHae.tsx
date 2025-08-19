@@ -27,6 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { HaeDetailDTO } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { StatusBadge } from "@/components";
+import { AxiosError } from "axios";
 
 /**
  * Formata uma string de data (YYYY-MM-DD) para o formato local do usuário.
@@ -89,19 +90,19 @@ export const ViewHae = () => {
     severity: "success" | "error";
   } | null>(null);
 
-  // A busca agora é mais simples e eficiente
   const fetchHae = useCallback(async () => {
     if (!id) return;
     try {
       const response = await api.get<HaeDetailDTO>(`/hae/getHaeById/${id}`);
       setHae(response.data);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erro ao buscar HAE:", err);
-      setSnackbar({
-        open: true,
-        message: "Falha ao carregar os dados da HAE.",
-        severity: "error",
-      });
+      if (err instanceof AxiosError) {
+        const message = err.response?.data?.message || "Falha ao carregar os dados da HAE.";
+        setSnackbar({ open: true, message, severity: "error" });
+      } else {
+        setSnackbar({ open: true, message: "Falha ao carregar os dados da HAE.", severity: "error" });
+      }
     }
   }, [id]);
 
@@ -128,9 +129,11 @@ export const ViewHae = () => {
         severity: "success",
       });
       fetchHae();
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message || "Ocorreu um erro na operação.";
+    } catch (err) {
+      let errorMessage = "Ocorreu um erro na operação.";
+      if (err instanceof AxiosError) {
+        errorMessage = err.response?.data?.message || "Ocorreu um erro na operação.";
+      }
       setSnackbar({ open: true, message: errorMessage, severity: "error" });
     } finally {
       setIsSubmitting(false);

@@ -8,6 +8,7 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import { AxiosError } from "axios";
 
 export const RequestClosurePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,11 +50,15 @@ export const RequestClosurePage = () => {
       });
       alert("Solicitação de fechamento enviada com sucesso!");
       navigate("/myrequests");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erro ao solicitar fechamento:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Falha ao enviar a solicitação. Tente novamente.";
+      let errorMessage = "Falha ao enviar a solicitação. Tente novamente.";
+      
+      if (err instanceof AxiosError) {
+        errorMessage =
+          err.response?.data?.message ||
+          "Falha ao enviar a solicitação. Tente novamente.";
+      }
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);

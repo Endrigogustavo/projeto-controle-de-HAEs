@@ -6,6 +6,7 @@ import { AppLayout } from "@/layouts";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { ToastNotification } from "@/components/ToastNotification";
 import { api } from "@/services";
+import { AxiosError } from "axios";
 
 interface InstitutionApiResponse {
   id: string;
@@ -106,7 +107,7 @@ export const EditInstitution = () => {
 
       showSnackbar("Instituição atualizada com sucesso!", "success");
       setTimeout(() => navigate("/institutions"), 1500);
-    } catch (err: any) {
+    } catch (err) {
       if (err instanceof yup.ValidationError) {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
         err.inner.forEach((error) => {
@@ -116,12 +117,14 @@ export const EditInstitution = () => {
         });
         setErrors(newErrors);
         showSnackbar("Por favor, corrija os erros no formulário.", "error");
-      } else {
+      } else if (err instanceof AxiosError) {
         console.error("Erro ao atualizar instituição:", err);
-        showSnackbar(
-          err.response?.data?.message || "Erro ao atualizar instituição.",
-          "error"
-        );
+        const errorMessage =
+          err.response?.data?.message || "Erro ao atualizar instituição.";
+        showSnackbar(errorMessage, "error");
+      } else {
+        console.error("Erro inesperado:", err);
+        showSnackbar("Ocorreu um erro inesperado.", "error");
       }
     } finally {
       setIsSubmitting(false);
@@ -202,7 +205,8 @@ export const EditInstitution = () => {
               }}
             >
               <button
-                className="btnFatec bg-gray-600  text-white uppercase hover:bg-gray-900"
+                type="button"
+                className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-900"
                 onClick={() => navigate("/institutions")}
               >
                 Cancelar
