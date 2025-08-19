@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.adapter.dto;
+package br.com.fateczl.apihae.adapter.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,10 @@ import jakarta.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentUpdateRequest {
+public class StudentRequest {
+
+    @NotBlank(message = "O RA é obrigatório")
+    private String ra;
 
     @NotBlank(message = "O nome é obrigatório")
     private String name;

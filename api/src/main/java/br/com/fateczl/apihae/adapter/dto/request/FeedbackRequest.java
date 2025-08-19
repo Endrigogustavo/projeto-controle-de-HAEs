@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.adapter.dto;
+package br.com.fateczl.apihae.adapter.dto.request;
 
 import br.com.fateczl.apihae.domain.enums.FeedbackCategory;
 import lombok.Getter;

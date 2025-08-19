@@ -1,5 +1,6 @@
-package br.com.fateczl.apihae.adapter.dto;
+package br.com.fateczl.apihae.adapter.dto.response;
 
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionDTO;
 import br.com.fateczl.apihae.domain.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;

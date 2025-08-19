@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.adapter.dto;
+package br.com.fateczl.apihae.adapter.dto.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

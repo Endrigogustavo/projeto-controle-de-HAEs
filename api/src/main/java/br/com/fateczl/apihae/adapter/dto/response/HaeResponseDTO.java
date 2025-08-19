@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.adapter.dto;
+package br.com.fateczl.apihae.adapter.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
