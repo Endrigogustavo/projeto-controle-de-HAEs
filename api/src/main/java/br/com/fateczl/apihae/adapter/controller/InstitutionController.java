@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import br.com.fateczl.apihae.adapter.dto.InstitutionCreateRequest;
-import br.com.fateczl.apihae.adapter.dto.InstitutionUpdateRequest;
+
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.useCase.service.InstitutionService;
 import jakarta.validation.Valid;

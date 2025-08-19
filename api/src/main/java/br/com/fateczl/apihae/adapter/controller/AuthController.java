@@ -1,8 +1,8 @@
 package br.com.fateczl.apihae.adapter.controller;
 
-import br.com.fateczl.apihae.adapter.dto.LoginRequest;
-import br.com.fateczl.apihae.adapter.dto.ResetPasswordRequest;
-import br.com.fateczl.apihae.adapter.dto.SendEmailCodeRequest;
+import br.com.fateczl.apihae.adapter.dto.request.LoginRequest;
+import br.com.fateczl.apihae.adapter.dto.request.ResetPasswordRequest;
+import br.com.fateczl.apihae.adapter.dto.request.SendEmailCodeRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.AuthService;
 import br.com.fateczl.apihae.useCase.util.CookieUtils;

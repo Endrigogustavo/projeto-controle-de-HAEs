@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.fateczl.apihae.adapter.dto.FeedbackRequest;
+import br.com.fateczl.apihae.adapter.dto.request.FeedbackRequest;
 import br.com.fateczl.apihae.useCase.service.EmailService;
 import jakarta.mail.MessagingException;
 

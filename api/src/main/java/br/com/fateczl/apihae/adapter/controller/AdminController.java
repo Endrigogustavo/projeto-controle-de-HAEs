@@ -1,6 +1,6 @@
 package br.com.fateczl.apihae.adapter.controller;
 
-import br.com.fateczl.apihae.adapter.dto.ChangeRoleRequest;
+import br.com.fateczl.apihae.adapter.dto.request.ChangeRoleRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

@@ -3,8 +3,9 @@ package br.com.fateczl.apihae.useCase.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import br.com.fateczl.apihae.adapter.dto.StudentRequest;
-import br.com.fateczl.apihae.adapter.dto.StudentUpdateRequest;
+
+import br.com.fateczl.apihae.adapter.dto.request.StudentRequest;
+import br.com.fateczl.apihae.adapter.dto.request.StudentUpdateRequest;
 import br.com.fateczl.apihae.domain.entity.Student;
 import br.com.fateczl.apihae.driver.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
