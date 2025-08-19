@@ -1,10 +1,13 @@
 package br.com.fateczl.apihae.useCase.service;
 
-import br.com.fateczl.apihae.adapter.dto.EmployeeSummaryDTO;
-import br.com.fateczl.apihae.adapter.dto.InstitutionDTO;
+import br.com.fateczl.apihae.adapter.dto.request.EmployeeCreateByDiretorOrAdmRequest;
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionDTO;
+import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
+import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.Role;
+import br.com.fateczl.apihae.domain.factory.EmployeeFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
@@ -17,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import br.com.fateczl.apihae.adapter.dto.EmployeeCreateByDiretorOrAdmRequest;
-import br.com.fateczl.apihae.adapter.dto.EmployeeResponseDTO;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 
 @RequiredArgsConstructor
@@ -104,15 +105,10 @@ public class EmployeeService {
 
     @Transactional
     public Employee createEmployeeByDiretorOrAdmin(EmployeeCreateByDiretorOrAdmRequest request) {
-        Employee employee = new Employee();
-        employee.setName(request.getName());
-        employee.setEmail(request.getEmail());
-        employee.setCourse(request.getCourse());
-        employee.setPassword(request.getProvisoryPassword());
-        employee.setRole(Role.PROFESSOR);
-
+        Employee employee = EmployeeFactory.createEmployee(request);
+        
         Institution institution = institutionRepository.findById(request.getInstitutionId())
-                .orElseThrow(() -> new RuntimeException("Institution not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         employee.setInstitution(institution);
         return employeeRepository.save(employee);
     }

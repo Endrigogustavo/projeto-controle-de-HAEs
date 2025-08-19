@@ -24,7 +24,7 @@ public class HaeStatusService {
     public void wasViewed(String haeId) {
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + haeId));
-        
+
         hae.setViewed(true);
         haeRepository.save(hae);
     }
@@ -33,9 +33,8 @@ public class HaeStatusService {
     public Hae toggleViewedStatus(String haeId) {
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + haeId));
-        
+
         hae.setViewed(!hae.getViewed());
-        
         return haeRepository.save(hae);
     }
 
@@ -47,19 +46,15 @@ public class HaeStatusService {
         return haeRepository.findByViewed(false);
     }
 
-        @Transactional
+    @Transactional
     public Hae changeHaeStatus(String id, Status newStatus, String coordenadorId) {
         Hae hae = haeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + id));
 
-        Employee coordenador = employeeRepository.findById(coordenadorId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Coordenador com id " + coordenadorId + " não encontrado."));
-
-        if (coordenador.getRole() != Role.COORDENADOR && coordenador.getRole() != Role.DEV) {
-            throw new IllegalArgumentException("Empregado com ID " + coordenadorId
-                    + " não é um coordenador. Apenas coordenadores podem mudar o status da HAE.");
-        }
+        employeeRepository.findById(coordenadorId)
+                .filter(emp -> emp.getRole() == Role.COORDENADOR || emp.getRole() == Role.DEV)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Coordenador com id " + coordenadorId + " não encontrado ou não é coordenador/dev."));
 
         hae.setStatus(newStatus);
         hae.setCoordenatorId(coordenadorId);

@@ -1,8 +1,8 @@
 package br.com.fateczl.apihae.useCase.service;
 
-import br.com.fateczl.apihae.adapter.dto.HaeDetailDTO;
-import br.com.fateczl.apihae.adapter.dto.HaeRequest;
-import br.com.fateczl.apihae.adapter.dto.HaeResponseDTO;
+import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
+import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
+import br.com.fateczl.apihae.domain.factory.HaeFactory;
 import static br.com.fateczl.apihae.useCase.util.DataUtils.getSemestre;
 import lombok.RequiredArgsConstructor;
 
@@ -69,9 +68,6 @@ public class HaeService {
                     "Você possui HAEs de semestres anteriores que não foram concluídas. Finalize-as para poder criar novas.");
         }
 
-        LocalDate inicio = request.getStartDate();
-        LocalDate fim = request.getEndDate();
-
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
                 .stream()
@@ -79,32 +75,7 @@ public class HaeService {
                         Map.Entry::getKey,
                         e -> e.getValue().getTimeRange()));
 
-        Hae newHae = new Hae();
-        newHae.setEmployee(employee);
-        newHae.setNameEmployee(employee.getName());
-        newHae.setProjectTitle(request.getProjectTitle());
-        newHae.setWeeklyHours(request.getWeeklyHours());
-        newHae.setStartDate(request.getStartDate());
-        newHae.setEndDate(request.getEndDate());
-        newHae.setObservations(request.getObservations());
-        newHae.setStatus(Status.PENDENTE);
-        newHae.setCourse(request.getCourse());
-        newHae.setProjectType(request.getProjectType());
-        newHae.setModality(request.getModality());
-        newHae.setCoordenatorId("Sem coordenador definido");
-        newHae.setDayOfWeek(request.getDayOfWeek());
-        newHae.setTimeRange(request.getTimeRange());
-        newHae.setProjectDescription(request.getProjectDescription());
-        newHae.setWeeklySchedule(weeklyScheduleFlattened);
-
-        newHae.setInstitution(institution);
-
-        if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
-            newHae.setStudents(request.getStudentRAs());
-        } else {
-            newHae.setStudents(List.of());
-        }
-
+        Hae newHae = HaeFactory.createHae(request, employee, institution, weeklyScheduleFlattened);
         return haeRepository.save(newHae);
     }
 
@@ -116,12 +87,9 @@ public class HaeService {
         String coordenatorName = "Sem coordenador definido"; // Valor padrão
 
         if (hae.getCoordenatorId() != null && !hae.getCoordenatorId().equals("Sem coordenador definido")) {
-            Optional<Employee> coordinator = employeeRepository.findById(hae.getCoordenatorId());
-            if (coordinator.isPresent()) {
-                coordenatorName = coordinator.get().getName();
-            } else {
-                coordenatorName = "Coordenador não encontrado";
-            }
+            coordenatorName = employeeRepository.findById(hae.getCoordenatorId())
+                    .map(Employee::getName)
+                    .orElse("Coordenador não encontrado");
         }
 
         return new HaeDetailDTO(hae, coordenatorName);
@@ -240,40 +208,25 @@ public class HaeService {
     @Transactional
     public Hae createHaeAsCoordinator(String coordinatorId, String employeeId, HaeRequest request) {
         Employee coordinator = employeeRepository.findById(coordinatorId)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
-        if (coordinator.getRole() != Role.COORDENADOR) {
-            throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
-        }
-
-        LocalDate inicio = request.getStartDate();
-        LocalDate fim = request.getEndDate();
+                .filter(emp -> emp.getRole() == Role.COORDENADOR)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "O empregado com ID " + coordinatorId + " não é um coordenador."));
 
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado com ID: " + employeeId));
 
-        Hae hae = new Hae();
-        hae.setEmployee(employee);
-        hae.setNameEmployee(employee.getName());
-        hae.setStatus(Status.APROVADO);
-        hae.setCoordenatorId(coordinatorId);
-        hae.setProjectTitle(request.getProjectTitle());
-        hae.setWeeklyHours(request.getWeeklyHours());
-        hae.setStartDate(request.getStartDate());
-        hae.setEndDate(request.getEndDate());
-        hae.setObservations(request.getObservations());
-        hae.setCourse(request.getCourse());
-        hae.setProjectType(request.getProjectType());
-        hae.setModality(request.getModality());
-        hae.setDayOfWeek(request.getDayOfWeek());
-        hae.setTimeRange(request.getTimeRange());
-        hae.setProjectDescription(request.getProjectDescription());
+        Institution institution = institutionRepository.findById(request.getInstitutionId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Instituição não encontrada com ID: " + request.getInstitutionId()));
 
-        if (request.getProjectType() == HaeType.Estagio || request.getProjectType() == HaeType.TCC) {
-            List<String> studentRas = request.getStudentRAs();
-            hae.setStudents(studentRas);
-        } else {
-            hae.setStudents(List.of());
-        }
+        Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().getTimeRange()));
+
+        Hae hae = HaeFactory.createByCoordinator(employee, request, institution, coordinator, weeklyScheduleFlattened);
 
         return haeRepository.save(hae);
     }

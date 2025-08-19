@@ -3,6 +3,7 @@ package br.com.fateczl.apihae.useCase.service;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import br.com.fateczl.apihae.domain.entity.EmailVerification;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
@@ -12,16 +13,18 @@ import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import br.com.fateczl.apihae.domain.factory.EmployeeFactory;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
+    
     private final EmployeeRepository employeeRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -34,15 +37,10 @@ public class AuthService {
         Employee employee = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Credenciais inválidas."));
 
-        try {
-            String decryptedStoredPassword = textEncryptor.decrypt(employee.getPassword());
-            if (!plainPassword.equals(decryptedStoredPassword)) {
-                throw new IllegalArgumentException("Credenciais inválidas.");
-            }
-        } catch (Exception e) {
+        String decryptedStoredPassword = textEncryptor.decrypt(employee.getPassword());
+        if (!plainPassword.equals(decryptedStoredPassword)) {
             throw new IllegalArgumentException("Credenciais inválidas.");
         }
-
         return employee;
     }
 
@@ -54,10 +52,11 @@ public class AuthService {
         String verificationToken = UUID.randomUUID().toString();
 
         Optional<EmailVerification> existing = emailVerificationRepository.findByEmail(email);
-        if (existing.isPresent()) {
-            emailVerificationRepository.delete(existing.get());
+        existing.ifPresent(verification -> {
+            emailVerificationRepository.delete(verification);
             emailVerificationRepository.flush();
-        }
+        });
+      
 
         EmailVerification newVerification = new EmailVerification();
         newVerification.setEmail(email);
@@ -67,8 +66,8 @@ public class AuthService {
         newVerification.setCode(verificationToken);
         newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
 
-        Institution institution = institutionRepository.findByName(institutionId)
-                .orElseThrow(() -> new RuntimeException("Institution not found"));
+        Institution institution = institutionRepository.findById(institutionId)
+                .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         newVerification.setInstitution(institution);
 
         emailVerificationRepository.save(newVerification);
@@ -84,19 +83,15 @@ public class AuthService {
 
         String email = verification.getEmail();
 
-        if (employeeRepository.findByEmail(email).isPresent()) {
+        employeeRepository.findByEmail(email).ifPresent(existingEmployee -> {
             emailVerificationRepository.delete(verification);
             throw new IllegalArgumentException("Email já associado com uma conta registrada.");
-        }
+        });
 
-        Employee newEmployee = new Employee();
-        newEmployee.setName(verification.getName());
-        newEmployee.setEmail(email);
-        newEmployee.setCourse(verification.getCourse());
-        newEmployee.setPassword(verification.getPassword());
+        Employee newEmployee = EmployeeFactory.fromEmailVerification(verification, email);
 
         Institution institution = institutionRepository.findById(institutionId)
-                .orElseThrow(() -> new RuntimeException("Institution not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         newEmployee.setInstitution(institution);
 
         if (email.toLowerCase().endsWith("@cps.sp.gov.br")) {

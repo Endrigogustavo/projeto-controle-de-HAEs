@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
-import br.com.fateczl.apihae.adapter.dto.EmployeeResponseDTO;
-import br.com.fateczl.apihae.adapter.dto.InstitutionCreateRequest;
-import br.com.fateczl.apihae.adapter.dto.InstitutionUpdateRequest;
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
+import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Role;
+import br.com.fateczl.apihae.domain.factory.InstitutionFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
@@ -27,21 +28,16 @@ public class InstitutionService {
     private final HaeRepository haeRepository;
     private final EmployeeService employeeService;
 
-      public void createInstitution(InstitutionCreateRequest request) {
-        if (institutionRepository.findByName(request.getName()).isPresent()){
+    public void createInstitution(InstitutionCreateRequest request) {
+        institutionRepository.findByName(request.getName()).ifPresent(inst -> {
             throw new IllegalArgumentException("Nome de instituição já em uso.");
-        }
-        
-        if (institutionRepository.findByInstitutionCode(request.getInstitutionCode()).isPresent()) {
-            throw new IllegalArgumentException("Código de instituição já em uso.");
-        }
+        });
 
-        Institution institution = new Institution();
-        institution.setName(request.getName());
-        institution.setInstitutionCode(request.getInstitutionCode());
-        institution.setHaeQtd(request.getHaeQtd());
-        institution.setAddress(request.getAddress());
-        institution.setActive(true);
+        institutionRepository.findByInstitutionCode(request.getInstitutionCode()).ifPresent(inst -> {
+            throw new IllegalArgumentException("Código de instituição já em uso.");
+        });
+
+        Institution institution = InstitutionFactory.create(request);
 
         institutionRepository.save(institution);
     }
@@ -55,9 +51,8 @@ public class InstitutionService {
 
     @Transactional()
     public void setHaeQtd(int quantidade, String userId, String institutionId) {
-        if (quantidade < 0) {
-            throw new IllegalArgumentException("Quantidade não pode ser negativa.");
-        }
+        Optional.of(quantidade).filter(q -> q >= 0)
+                .orElseThrow(() -> new IllegalArgumentException("Quantidade não pode ser negativa."));
 
         EmployeeResponseDTO employee = employeeService.getEmployeeById(userId);
         if (employee == null) {
@@ -102,16 +97,20 @@ public class InstitutionService {
         Institution institution = institutionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com ID: " + id));
 
-        Optional<Institution> existingByName = institutionRepository.findByName(request.getName());
-        if (existingByName.isPresent() && !existingByName.get().getId().equals(institution.getId())) {
-            throw new IllegalArgumentException(
-                    "O nome '" + request.getName() + "' já está em uso por outra instituição.");
-        }
+        institutionRepository.findByName(request.getName())
+                .filter(existing -> !existing.getId().equals(institution.getId()))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException(
+                            "O nome '" + request.getName() + "' já está em uso por outra instituição.");
+                });
 
-        Optional<Institution> existingByCode = institutionRepository.findByInstitutionCode(request.getInstitutionCode());
-        if (existingByCode.isPresent() && !existingByCode.get().getId().equals(institution.getId())) {
+        Optional<Institution> existingByCode = institutionRepository
+                .findByInstitutionCode(request.getInstitutionCode())
+                .filter(existing -> !existing.getId().equals(institution.getId()));
+
+        existingByCode.ifPresent(existing -> {
             throw new IllegalArgumentException("O código '" + request.getInstitutionCode() + "' já está em uso.");
-        }
+        });
 
         institution.setName(request.getName());
         institution.setAddress(request.getAddress());
