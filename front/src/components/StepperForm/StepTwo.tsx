@@ -228,7 +228,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       <div>
         <h2 className="font-semibold subtitle">Cronograma Semanal</h2>
         <p className="text-gray-600">
-          Defina os dias da semana e os horários para cada dia.
+          Defina todos os dias da semana e os horários para cada dia selecionando-os abaixo.
         </p>
       </div>
 
