@@ -217,7 +217,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
 
       <TextField
         fullWidth
-        label="Curso"
+        label="Curso relativo a HAE"
         select
         value={formData.course}
         onChange={(e) => {
