@@ -55,7 +55,7 @@ export const Register = () => {
     const fetchInstitutions = async () => {
       try {
         const response = await api.get<Institution[]>(
-          "/institution/getAllInstitutions"
+          "/institution/getAll"
         );
         setInstitutions(response.data);
       } catch (error) {

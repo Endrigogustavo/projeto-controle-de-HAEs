@@ -26,7 +26,7 @@ export const ListInstitutions = () => {
       setError(null);
       try {
         const response = await api.get<Institution[]>(
-          "/institution/getAllInstitutions"
+          "/institution/getAll"
         );
         setInstitutions(response.data);
       } catch (err) {

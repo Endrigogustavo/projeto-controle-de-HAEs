@@ -20,7 +20,7 @@ const createInstitution = async (data: InstitutionPayload): Promise<Institution>
 
 const getAllInstitutions = async (): Promise<Institution[]> => {
     try {
-        const response = await api.get<Institution[]>("/institution/getAllInstitutions");
+        const response = await api.get<Institution[]>("/institution/getAll");
         return response.data;
     } catch (error) {
         console.error("Erro no serviço ao buscar instituições:", error);
