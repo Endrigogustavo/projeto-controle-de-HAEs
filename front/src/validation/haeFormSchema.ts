@@ -98,6 +98,7 @@ export const haeFormSchema = yup.object().shape({
 		),
 
 	modality: yup.string().required("Modalidade é obrigatória"),
+	dimension: yup.string().required("A dimensão da HAE é obrigatória"),
 	studentRAs: yup.array().when("projectType", {
 		is: (type: string) => type === "TCC" || type === "Estagio",
 		then: (schema) =>
@@ -130,6 +131,7 @@ export const stepOneSchema = yup.object().shape({
 		.string()
 		.required("Descrição do projeto é obrigatória"),
 	modality: yup.string().required("Modalidade é obrigatória"),
+	dimension: yup.string().required("A dimensão da HAE é obrigatória"),
 	studentRAs: yup.array().when("projectType", {
 		is: (type: string) => type === "TCC" || type === "Estagio",
 		then: (schema) =>

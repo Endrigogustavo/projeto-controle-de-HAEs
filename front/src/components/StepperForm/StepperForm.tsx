@@ -2,12 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import {
-  HaeDataType,
-  StepProps,
-  FormErrors,
-  WeeklySchedule,
-} from "./types/haeFormTypes";
+import { HaeDataType, StepProps, FormErrors, WeeklySchedule } from "./types/haeFormTypes";
 import { useAuth } from "@/hooks/useAuth";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -15,7 +10,6 @@ import { useHaeService } from "@/hooks/useHaeService";
 import {
   Snackbar,
   Alert as MuiAlert,
-  AlertProps,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -26,13 +20,6 @@ import {
 import * as yup from "yup";
 import { api, haeService } from "@/services";
 import { HaeDetailDTO } from "@/types/hae";
-
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="standard" {...props} />;
-});
 
 const StepperForm: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -55,6 +42,7 @@ const StepperForm: React.FC = () => {
     weeklyHours: 0,
     course: "",
     projectType: "",
+    dimension: "",
     modality: "",
     startDate: "",
     endDate: "",
@@ -87,8 +75,7 @@ const StepperForm: React.FC = () => {
             `/hae/getHaeById/${haeIdToEdit}`
           );
           const haeData = response.data;
-          setOriginalStatus(haeData.status); // Armazena o status original
-
+          setOriginalStatus(haeData.status);          
           const formattedWeeklySchedule: WeeklySchedule = {};
           if (haeData.weeklySchedule) {
             for (const day in haeData.weeklySchedule) {
@@ -98,11 +85,12 @@ const StepperForm: React.FC = () => {
             }
           }
 
-          setFormData({
-            ...formData,
+          setFormData(prevData => ({
+            ...prevData,
             projectTitle: haeData.projectTitle || "",
             course: haeData.course || "",
             projectType: haeData.projectType || "",
+            dimension: haeData.dimension || "",
             modality: haeData.modality || "",
             startDate: haeData.startDate || "",
             endDate: haeData.endDate || "",
@@ -114,7 +102,7 @@ const StepperForm: React.FC = () => {
             weeklyHours: haeData.weeklyHours || 0,
             employeeId: employee.id,
             institutionId: employee.institution.id,
-          });
+          }));
         } catch (error) {
           console.error("Erro ao buscar HAE para edição:", error);
         } finally {
@@ -144,7 +132,7 @@ const StepperForm: React.FC = () => {
         ...prevData,
         [field]: value,
       }));
-      if (errors[field]) {
+      if (errors[field as keyof FormErrors]) {
         setErrors((prevErrors) => ({ ...prevErrors, [field]: undefined }));
       }
     },
@@ -176,7 +164,10 @@ const StepperForm: React.FC = () => {
         const newErrors: FormErrors = {};
         error.inner.forEach((err) => {
           if (err.path) {
-            newErrors[err.path] = err.message;
+            const key = err.path as keyof HaeDataType;
+            if (key in formData) {
+              newErrors[key] = err.message;
+            }
           }
         });
         setErrors(newErrors);
@@ -184,7 +175,7 @@ const StepperForm: React.FC = () => {
         console.error("Erro inesperado no formulário:", error);
       }
     }
-  }, [formData, isEditMode, handleCreateHae, navigate]);
+  }, [formData, isEditMode, handleCreateHae, handleUpdateHae, navigate, haeIdToEdit]);
 
   const handleConfirmUpdate = async () => {
     setIsConfirmDialogOpen(false);
@@ -195,7 +186,7 @@ const StepperForm: React.FC = () => {
   };
 
   const renderCurrentStep = () => {
-    const isCompleted = originalStatus === "COMPLETO";
+    const isCompleted = originalStatus === 'COMPLETO';
     const commonStepProps: StepProps = {
       formData,
       setFormData: updateFormData,
@@ -208,13 +199,7 @@ const StepperForm: React.FC = () => {
       case 1:
         return <StepOne {...commonStepProps} onNext={handleNextStep} />;
       case 2:
-        return (
-          <StepTwo
-            {...commonStepProps}
-            onNext={handleNextStep}
-            onBack={handleBackStep}
-          />
-        );
+        return <StepTwo {...commonStepProps} onNext={handleNextStep} onBack={handleBackStep} />;
       case 3:
         return (
           <StepThree
@@ -229,19 +214,12 @@ const StepperForm: React.FC = () => {
     }
   };
 
-  const isCompleted = originalStatus === "COMPLETO";
+  const isCompleted = originalStatus === 'COMPLETO';
 
   if (isLoadingEmployee || isLoadingHae) {
     return (
       <div className="h-screen flex justify-center items-center">
-        <CircularProgress
-          size={70}
-          sx={{
-            "& .MuiCircularProgress-circle": {
-              stroke: "#c10007",
-            },
-          }}
-        />
+        <CircularProgress size={70} sx={{ "& .MuiCircularProgress-circle": { stroke: "#c10007" } }} />
       </div>
     );
   }
@@ -249,13 +227,9 @@ const StepperForm: React.FC = () => {
   if (employeeError) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-red-600">
-        <p className="text-xl">
-          Ocorreu um erro inesperado ao carregar seus dados.
-        </p>
+        <p className="text-xl">Ocorreu um erro inesperado ao carregar seus dados.</p>
         <p className="text-md">{employeeError.message}</p>
-        <p className="text-sm text-gray-500 mt-2">
-          Por favor, tente recarregar a página.
-        </p>
+        <p className="text-sm text-gray-500 mt-2">Por favor, tente recarregar a página.</p>
       </div>
     );
   }
@@ -263,9 +237,7 @@ const StepperForm: React.FC = () => {
   if (!employee) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-xl">
-          Você precisa estar logado para acessar este formulário.
-        </p>
+        <p className="text-xl">Você precisa estar logado para acessar este formulário.</p>
         <p className="text-md mt-2">Por favor, faça login para continuar.</p>
       </div>
     );
@@ -289,13 +261,9 @@ const StepperForm: React.FC = () => {
           onClose={hideSnackbar}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
-          <Alert
-            onClose={hideSnackbar}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
-          >
-            <p className="text-green-800 font-semibold">{snackbarMessage}</p>
-          </Alert>
+          <MuiAlert onClose={hideSnackbar} severity={snackbarSeverity} sx={{ width: "100%" }}>
+            <p className="font-semibold">{snackbarMessage}</p>
+          </MuiAlert>
         </Snackbar>
 
         <Dialog
@@ -308,14 +276,12 @@ const StepperForm: React.FC = () => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Ao salvar as alterações, esta HAE retornará ao status "PENDENTE" e
-              precisará ser reavaliada pelo coordenador.
-              <br />
-              <br />
+              Ao salvar as alterações, esta HAE retornará ao status "PENDENTE" e precisará ser reavaliada pelo coordenador.
+              <br /><br />
               Você tem certeza que deseja continuar?
             </DialogContentText>
           </DialogContent>
-          <DialogActions sx={{ padding: "16px 24px" }}>
+          <DialogActions sx={{ padding: '16px 24px' }}>
             <button
               onClick={() => setIsConfirmDialogOpen(false)}
               className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"

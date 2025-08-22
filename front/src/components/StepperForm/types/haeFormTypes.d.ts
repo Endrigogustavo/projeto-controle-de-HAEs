@@ -11,6 +11,7 @@ export interface HaeDataType {
   course: string;
   projectTitle: string;
   modality: string;
+  dimension: string;
   weeklyHours: number;
   projectType: string;
   dayOfWeek: string[];
@@ -24,25 +25,7 @@ export interface HaeDataType {
   institutionId: string;
 }
 
-export interface FormErrors {
-  [key: string]: string | { [index: number]: string } | undefined;
-  nameEmployee?: string;
-  course?: string;
-  projectTitle?: string;
-  modality?: string;
-  weeklyHours?: string;
-  projectType?: string;
-  dayOfWeek?: string;
-  timeRange?: string;
-  startTime?: string;
-  endTime?: string;
-  projectDescription?: string;
-  observations?: string;
-  startDate?: string;
-  endDate?: string;
-  employeeId?: string;
-  studentRAs?: { [index: number]: string } | string;
-}
+export type FormErrors = Partial<Record<keyof HaeDataType, string>>;
 
 export interface StepProps {
   formData: HaeDataType;

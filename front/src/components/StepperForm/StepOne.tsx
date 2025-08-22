@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   MenuItem,
@@ -13,9 +12,15 @@ import {
   COURSE_OPTIONS,
   HAE_TYPE_OPTIONS,
   MODALITY_OPTIONS,
+  DIMENSION_OPTIONS,
 } from "@/constants/options";
 
-const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
+const StepOne: React.FC<StepOneProps> = ({
+  onNext,
+  formData,
+  setFormData,
+  isCompleted,
+}) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [studentRAs, setStudentRAs] = useState<string[]>([""]);
 
@@ -36,6 +41,7 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         {
           projectTitle: formData.projectTitle,
           projectType: formData.projectType,
+          dimension: formData.dimension,
           course: formData.course,
           projectDescription: formData.projectDescription,
           studentRAs: nonEmptyRAs,
@@ -50,23 +56,22 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
       const newErrors: FormErrors = {};
       if (validationErrors instanceof ValidationError) {
         validationErrors.inner.forEach((error: ValidationError) => {
+          // ===================================================================
+          //                      LÓGICA DE ERRO CORRIGIDA
+          // ===================================================================
+          // Garante que 'error.path' existe antes de continuar
           if (error.path) {
-            if (error.path.startsWith("studentRAs[")) {
-              const match = error.path.match(/studentRAs\[(\d+)\]/);
-              if (match) {
-                const index = Number(match[1]);
-                if (
-                  typeof newErrors.studentRAs !== "object" ||
-                  newErrors.studentRAs === null
-                ) {
-                  newErrors.studentRAs = {};
-                }
-                newErrors.studentRAs[index] = error.message;
+            // Converte o path para string para podermos usar métodos de string
+            const pathAsString = String(error.path);
+
+            if (pathAsString.startsWith("studentRAs")) {
+              // Pega a primeira mensagem de erro do array e a atribui como a mensagem principal
+              if (!newErrors.studentRAs) {
+                newErrors.studentRAs = error.message;
               }
-            } else if (error.path === "studentRAs") {
-              newErrors.studentRAs = error.message;
             } else {
-              newErrors[error.path] = error.message;
+              // Garante que o path seja uma chave válida de FormErrors
+              newErrors[pathAsString as keyof FormErrors] = error.message;
             }
           }
         });
@@ -82,31 +87,16 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
     setStudentRAs(updatedRAs);
     setFormData("studentRAs", updatedRAs);
 
-    const currentRaErrors = errors.studentRAs;
-    if (typeof errors.studentRAs === "string") {
+    if (errors.studentRAs) {
       setErrors((prev) => ({ ...prev, studentRAs: undefined }));
-    } else if (
-      typeof currentRaErrors === "object" &&
-      currentRaErrors !== null &&
-      currentRaErrors[index]
-    ) {
-      const updatedErrors = { ...currentRaErrors };
-      delete updatedErrors[index];
-      setErrors((prev) => ({
-        ...prev,
-        studentRAs:
-          Object.keys(updatedErrors).length > 0 ? updatedErrors : undefined,
-      }));
     }
   };
 
   const handleProjectTypeChange = (newValue: string) => {
     setFormData("projectType", newValue);
-
     if (errors.projectType) {
       setErrors((prevErrors) => ({ ...prevErrors, projectType: undefined }));
     }
-
     if (newValue !== "Estagio" && newValue !== "TCC") {
       setStudentRAs([""]);
       setFormData("studentRAs", []);
@@ -116,31 +106,20 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
     }
   };
 
-  const addRMField = () => {
+  const addRAField = () => {
     setStudentRAs([...studentRAs, ""]);
   };
 
-  const removeRMField = (index: number) => {
-    const updatedRMs = studentRAs.filter((_, i) => i !== index);
-    setStudentRAs(updatedRMs);
-    setFormData("studentRAs", updatedRMs);
+  const removeRAField = (index: number) => {
+    const updatedRAs = studentRAs.filter((_, i) => i !== index);
+    setStudentRAs(updatedRAs);
+    setFormData("studentRAs", updatedRAs);
+  };
 
-    const currentRaErrors = errors.studentRAs;
-    if (typeof currentRaErrors === "object" && currentRaErrors !== null) {
-      const updatedErrors = { ...currentRaErrors };
-      delete updatedErrors[index];
-      const reorderedErrors: { [key: number]: string } = {};
-      Object.entries(updatedErrors).forEach(([i, msg]) => {
-        const errorIndex = Number(i);
-        if (typeof msg === "string") {
-          const newIndex = errorIndex > index ? errorIndex - 1 : errorIndex;
-          reorderedErrors[newIndex] = msg;
-        }
-      });
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        studentRAs: reorderedErrors,
-      }));
+  const handleChange = (field: keyof FormErrors, value: string) => {
+    setFormData(field as keyof typeof formData, value); // Type assertion para segurança
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -160,17 +139,10 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         variant="outlined"
         placeholder="Ex.: Aulas de Legislação para Concurso Público"
         value={formData.projectTitle}
-        onChange={(e) => {
-          setFormData("projectTitle", e.target.value);
-          if (errors.projectTitle) {
-            setErrors((prevErrors) => ({
-              ...prevErrors,
-              projectTitle: undefined,
-            }));
-          }
-        }}
+        onChange={(e) => handleChange("projectTitle", e.target.value)}
         error={!!errors.projectTitle}
-        helperText={errors.projectTitle}
+        helperText={errors.projectTitle || " "}
+        disabled={isCompleted}
       />
 
       <TextField
@@ -181,9 +153,28 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         value={formData.projectType}
         onChange={(e) => handleProjectTypeChange(e.target.value)}
         error={!!errors.projectType}
-        helperText={errors.projectType}
+        helperText={errors.projectType || " "}
+        disabled={isCompleted}
       >
         {HAE_TYPE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <TextField
+        fullWidth
+        label="Dimensão da HAE"
+        select
+        variant="outlined"
+        value={formData.dimension}
+        onChange={(e) => handleChange("dimension", e.target.value)}
+        error={!!errors.dimension}
+        helperText={errors.dimension || " "}
+        disabled={isCompleted}
+      >
+        {DIMENSION_OPTIONS.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
@@ -196,17 +187,10 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         select
         variant="outlined"
         value={formData.modality}
-        onChange={(e) => {
-          setFormData("modality", e.target.value);
-          if (errors.modality) {
-            setErrors((prevErrors) => ({
-              ...prevErrors,
-              modality: undefined,
-            }));
-          }
-        }}
+        onChange={(e) => handleChange("modality", e.target.value)}
         error={!!errors.modality}
-        helperText={errors.modality}
+        helperText={errors.modality || " "}
+        disabled={isCompleted}
       >
         {MODALITY_OPTIONS.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -220,17 +204,10 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         label="Curso relativo a HAE"
         select
         value={formData.course}
-        onChange={(e) => {
-          setFormData("course", e.target.value);
-          if (errors.course) {
-            setErrors((prevErrors) => ({
-              ...prevErrors,
-              course: undefined,
-            }));
-          }
-        }}
+        onChange={(e) => handleChange("course", e.target.value)}
         error={!!errors.course}
-        helperText={errors.course}
+        helperText={errors.course || " "}
+        disabled={isCompleted}
       >
         {COURSE_OPTIONS.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -247,63 +224,53 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         maxRows={10}
         placeholder="Ex.: O projeto consiste em ministrar aulas preparatórias..."
         value={formData.projectDescription}
-        onChange={(e) => {
-          setFormData("projectDescription", e.target.value);
-          if (errors.projectDescription) {
-            setErrors((prevErrors) => ({
-              ...prevErrors,
-              projectDescription: undefined,
-            }));
-          }
-        }}
+        onChange={(e) => handleChange("projectDescription", e.target.value)}
         error={!!errors.projectDescription}
-        helperText={errors.projectDescription}
+        helperText={errors.projectDescription || " "}
+        disabled={isCompleted}
       />
 
       {(formData.projectType === "TCC" ||
         formData.projectType === "Estagio") && (
-        <FormControl fullWidth error={typeof errors.studentRAs === "string"}>
+        <FormControl
+          fullWidth
+          error={!!errors.studentRAs}
+          disabled={isCompleted}
+        >
           <div className="flex flex-col gap-4">
             <h3 className="font-medium text-gray-700">RAs dos Alunos</h3>
-            {studentRAs.map((ra, index) => {
-              const raError =
-                errors.studentRAs &&
-                typeof errors.studentRAs === "object" &&
-                errors.studentRAs[index];
-
-              return (
-                <div key={index} className="flex items-center gap-2">
-                  <TextField
-                    required
-                    fullWidth
-                    label={`RA do Aluno ${index + 1}`}
-                    variant="outlined"
-                    value={ra}
-                    onChange={(e) => handleRAChange(index, e.target.value)}
-                    error={!!raError}
-                    helperText={raError || ""}
-                  />
-                  {index > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => removeRMField(index)}
-                      className="text-red-500 font-bold"
-                    >
-                      Remover
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+            {studentRAs.map((ra, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <TextField
+                  required
+                  fullWidth
+                  label={`RA do Aluno ${index + 1}`}
+                  variant="outlined"
+                  value={ra}
+                  onChange={(e) => handleRAChange(index, e.target.value)}
+                />
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeRAField(index)}
+                    className="text-red-500 font-bold"
+                    disabled={isCompleted}
+                  >
+                    Remover
+                  </button>
+                )}
+              </div>
+            ))}
             <button
               type="button"
-              onClick={addRMField}
+              onClick={addRAField}
               className="text-blue-500 font-semibold text-sm text-left w-fit"
+              disabled={isCompleted}
             >
               + Adicionar outro RA
             </button>
           </div>
-          {typeof errors.studentRAs === "string" && (
+          {errors.studentRAs && typeof errors.studentRAs === "string" && (
             <FormHelperText>{errors.studentRAs}</FormHelperText>
           )}
         </FormControl>
@@ -313,7 +280,8 @@ const StepOne: React.FC<StepOneProps> = ({ onNext, formData, setFormData }) => {
         <button
           type="button"
           onClick={handleNext}
-          className=" py-2 btnFatec uppercase hover:bg-red-900"
+          className="py-2 btnFatec uppercase hover:bg-red-900"
+          disabled={isCompleted}
         >
           <p>CONTINUAR</p>
         </button>
