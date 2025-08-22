@@ -80,7 +80,7 @@ public class InstitutionService {
         return institutions.stream()
                 .map(InstitutionResponseDTO::new)
                 .collect(Collectors.toList());
-    }
+    }  
 
     @Transactional(readOnly = true)
     public List<Employee> getEmployeesByInstitutionId(String institutionId) {

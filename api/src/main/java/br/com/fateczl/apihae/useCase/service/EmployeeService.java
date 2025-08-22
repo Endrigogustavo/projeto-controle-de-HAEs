@@ -1,7 +1,7 @@
 package br.com.fateczl.apihae.useCase.service;
 
 import br.com.fateczl.apihae.adapter.dto.request.EmployeeCreateByDiretorOrAdmRequest;
-import br.com.fateczl.apihae.adapter.dto.request.InstitutionDTO;
+import br.com.fateczl.apihae.adapter.dto.request.InstitutionRequestDTO;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
@@ -32,8 +32,12 @@ public class EmployeeService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Transactional(readOnly = true)
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<EmployeeResponseDTO> getAllEmployees() {
+        List<Employee> employees = employeeRepository.findAll();
+        
+        return employees.stream()
+            .map(EmployeeResponseDTO::new)
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -118,9 +122,9 @@ public class EmployeeService {
     }
 
     private EmployeeResponseDTO convertToDto(Employee employee) {
-        InstitutionDTO institutionDto = null;
+        InstitutionRequestDTO institutionDto = null;
         if (employee.getInstitution() != null) {
-            institutionDto = new InstitutionDTO(
+            institutionDto = new InstitutionRequestDTO(
                     employee.getInstitution().getId().toString(),
                     employee.getInstitution().getName(),
                     employee.getInstitution().getInstitutionCode());
