@@ -26,6 +26,9 @@ public class EmailService {
   @Value("${frontend.activation.url}")
   private String frontendActivationUrl;
 
+  @Value("${app.allowed.origin}")
+  private String frontendBaseUrl;
+
   /**
    * 
    * @param toEmail O e-mail do destinatário.
@@ -110,6 +113,24 @@ public class EmailService {
     helper.setSubject(subject);
     helper.setText(htmlContent, true);
     javaMailSender.send(message);
+  }
+
+  /**
+   * Envia um e-mail de notificação para o coordenador quando uma HAE é
+   * atualizada.
+   * 
+   * @param toEmail O e-mail do coordenador.
+   * @param hae     A HAE que foi modificada.
+   */
+  public void sendHaeUpdatedNotificationEmail(String toEmail, Hae hae) {
+    String subject = "Atualização de HAE - " + hae.getProjectTitle();
+    String emailContent = buildHaeUpdatedEmailTemplate(hae);
+    try {
+      sendEmail(toEmail, subject, emailContent);
+      System.out.println("E-mail de notificação de atualização de HAE enviado para: " + toEmail);
+    } catch (MessagingException e) {
+      System.err.println("Erro ao enviar e-mail de notificação de atualização para " + toEmail + ": " + e.getMessage());
+    }
   }
 
   private String buildActivationEmailTemplate(String activationLink) {
@@ -250,6 +271,35 @@ public class EmailService {
             hae.getEndDate(),
             hae.getWeeklyHours(),
             formatWeeklySchedule(hae.getWeeklySchedule()));
+  }
+
+  private String buildHaeUpdatedEmailTemplate(Hae hae) {
+    return """
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://fatweb.s3.amazonaws.com/vestibularfatec/assets/img/layout/logotipo-fatec.png" alt="Logo FATEC" style="max-width: 200px;" />
+          </div>
+          <h2 style="color: #a6192e; text-align: center;">HAE Atualizada - Ação Necessária</h2>
+          <p>Olá Coordenador(a),</p>
+          <p>
+            A HAE "<strong>%s</strong>" do professor(a) <strong>%s</strong> foi recentemente atualizada e agora está com o status <strong>PENDENTE</strong>, aguardando uma nova avaliação.
+          </p>
+          <p>Por favor, acesse o sistema para revisar as alterações e aprovar ou reprovar a solicitação.</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="%s" target="_blank" style="font-size: 16px; background-color: #a6192e; color: white; padding: 12px 24px; text-decoration: none; display: inline-block; border-radius: 6px;">
+              Acessar Sistema
+            </a>
+          </div>
+          <p style="text-align: center; font-size: 12px; color: #888;">
+            Este é um e-mail automático do Sistema de Gerenciamento de HAEs.
+          </p>
+        </div>
+        """
+        .formatted(
+            hae.getProjectTitle(),
+            hae.getNameEmployee(),
+            frontendBaseUrl
+        );
   }
 
   private String formatWeeklySchedule(Map<String, String> schedule) {

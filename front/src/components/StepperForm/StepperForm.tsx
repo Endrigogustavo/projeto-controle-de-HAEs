@@ -12,11 +12,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useHaeService } from "@/hooks/useHaeService";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import {
+  Snackbar,
+  Alert as MuiAlert,
+  AlertProps,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import * as yup from "yup";
 import { api, haeService } from "@/services";
-import { CircularProgress } from "@mui/material";
 import { HaeDetailDTO } from "@/types/hae";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -38,6 +46,8 @@ const StepperForm: React.FC = () => {
   const haeIdToEdit = location.state?.haeId;
   const isEditMode = !!haeIdToEdit;
   const [isLoadingHae, setIsLoadingHae] = useState(isEditMode);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [originalStatus, setOriginalStatus] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<HaeDataType>({
     employeeId: "",
@@ -69,7 +79,6 @@ const StepperForm: React.FC = () => {
   } = useHaeService(haeService);
 
   useEffect(() => {
-    // Busca os dados da HAE para edição
     if (isEditMode && haeIdToEdit && employee) {
       const fetchHaeForEdit = async () => {
         setIsLoadingHae(true);
@@ -78,20 +87,14 @@ const StepperForm: React.FC = () => {
             `/hae/getHaeById/${haeIdToEdit}`
           );
           const haeData = response.data;
+          setOriginalStatus(haeData.status); // Armazena o status original
 
           const formattedWeeklySchedule: WeeklySchedule = {};
           if (haeData.weeklySchedule) {
             for (const day in haeData.weeklySchedule) {
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  haeData.weeklySchedule,
-                  day
-                )
-              ) {
-                formattedWeeklySchedule[day] = {
-                  timeRange: haeData.weeklySchedule[day],
-                };
-              }
+              formattedWeeklySchedule[day] = {
+                timeRange: haeData.weeklySchedule[day],
+              };
             }
           }
 
@@ -118,7 +121,6 @@ const StepperForm: React.FC = () => {
           setIsLoadingHae(false);
         }
       };
-
       fetchHaeForEdit();
     }
   }, [isEditMode, haeIdToEdit, employee]);
@@ -161,16 +163,13 @@ const StepperForm: React.FC = () => {
         context: { isEditMode },
       });
 
-      let success = false;
       if (isEditMode) {
-        success = await handleUpdateHae(haeIdToEdit, formData);
+        setIsConfirmDialogOpen(true);
       } else {
-        success = await handleCreateHae(formData);
-      }
-
-      if (success) {
-        const redirectPath = "/myrequests";
-        setTimeout(() => navigate(redirectPath), 2000);
+        const success = await handleCreateHae(formData);
+        if (success) {
+          setTimeout(() => navigate("/myrequests"), 2000);
+        }
       }
     } catch (error: unknown) {
       if (error instanceof yup.ValidationError) {
@@ -185,21 +184,24 @@ const StepperForm: React.FC = () => {
         console.error("Erro inesperado no formulário:", error);
       }
     }
-  }, [
-    formData,
-    handleCreateHae,
-    handleUpdateHae,
-    navigate,
-    isEditMode,
-    haeIdToEdit,
-  ]);
+  }, [formData, isEditMode, handleCreateHae, navigate]);
+
+  const handleConfirmUpdate = async () => {
+    setIsConfirmDialogOpen(false);
+    const success = await handleUpdateHae(haeIdToEdit, formData);
+    if (success) {
+      setTimeout(() => navigate("/myrequests"), 2000);
+    }
+  };
 
   const renderCurrentStep = () => {
+    const isCompleted = originalStatus === "COMPLETO";
     const commonStepProps: StepProps = {
       formData,
       setFormData: updateFormData,
       errors,
       isEditMode,
+      isCompleted,
     };
 
     switch (step) {
@@ -218,13 +220,16 @@ const StepperForm: React.FC = () => {
           <StepThree
             {...commonStepProps}
             onBack={handleBackStep}
-            onSubmit={handleFormSubmit}
+            onSubmit={handleConfirmUpdate}
+            onOpenConfirmDialog={handleFormSubmit}
           />
         );
       default:
         return null;
     }
   };
+
+  const isCompleted = originalStatus === "COMPLETO";
 
   if (isLoadingEmployee || isLoadingHae) {
     return (
@@ -272,6 +277,11 @@ const StepperForm: React.FC = () => {
         <h2 className="text-3xl font-bold text-center mb-6">
           {isEditMode ? "Editar Solicitação de HAE" : "Criar Nova HAE"}
         </h2>
+        {isCompleted && (
+          <MuiAlert severity="info" className="my-4">
+            Esta HAE já foi concluída e não pode mais ser editada.
+          </MuiAlert>
+        )}
         {renderCurrentStep()}
         <Snackbar
           open={openSnackbar}
@@ -287,6 +297,40 @@ const StepperForm: React.FC = () => {
             <p className="text-green-800 font-semibold">{snackbarMessage}</p>
           </Alert>
         </Snackbar>
+
+        <Dialog
+          open={isConfirmDialogOpen}
+          onClose={() => setIsConfirmDialogOpen(false)}
+          aria-labelledby="confirm-dialog-title"
+        >
+          <DialogTitle id="confirm-dialog-title" className="font-semibold">
+            Confirmar Alterações
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Ao salvar as alterações, esta HAE retornará ao status "PENDENTE" e
+              precisará ser reavaliada pelo coordenador.
+              <br />
+              <br />
+              Você tem certeza que deseja continuar?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ padding: "16px 24px" }}>
+            <button
+              onClick={() => setIsConfirmDialogOpen(false)}
+              className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirmUpdate}
+              className="btnFatec bg-red-800 text-white uppercase hover:bg-red-900"
+              autoFocus
+            >
+              Confirmar e Enviar
+            </button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );

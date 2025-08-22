@@ -5,29 +5,28 @@ import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
+import br.com.fateczl.apihae.domain.factory.HaeFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 import jakarta.persistence.criteria.Predicate;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import br.com.fateczl.apihae.domain.entity.Institution;
-import br.com.fateczl.apihae.domain.factory.HaeFactory;
 import static br.com.fateczl.apihae.useCase.util.DataUtils.getSemestre;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -78,7 +77,17 @@ public class HaeService {
                         e -> e.getValue().getTimeRange()));
 
         Hae newHae = HaeFactory.createHae(request, employee, institution, weeklyScheduleFlattened);
-        return haeRepository.save(newHae);
+        Hae savedHae = haeRepository.save(newHae);
+
+        emailService.sendAlertProfessorHaeStatusEmail(employee.getEmail(), savedHae);
+
+        employeeRepository.findCoordinatorByCourse(savedHae.getCourse())
+                .ifPresentOrElse(
+                        coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), savedHae),
+                        () -> System.err.println("Aviso: Nenhum coordenador encontrado para o curso '"
+                                + savedHae.getCourse() + "'. E-mail de notificação não enviado."));
+
+        return savedHae;
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +95,7 @@ public class HaeService {
         Hae hae = haeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + id));
 
-        String coordenatorName = "Sem coordenador definido"; // Valor padrão
+        String coordenatorName = "Sem coordenador definido";
 
         if (hae.getCoordenatorId() != null && !hae.getCoordenatorId().equals("Sem coordenador definido")) {
             coordenatorName = employeeRepository.findById(hae.getCoordenatorId())
@@ -159,55 +168,58 @@ public class HaeService {
         Hae hae = haeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + id));
 
+        if (hae.getStatus() == Status.COMPLETO) {
+            throw new IllegalStateException("Não é possível editar uma HAE com status COMPLETO.");
+        }
+
+        hae.setProjectTitle(request.getProjectTitle());
+        hae.setCourse(request.getCourse());
+        hae.setProjectType(request.getProjectType());
+        hae.setModality(request.getModality());
+        hae.setProjectDescription(request.getProjectDescription());
+        hae.setStartDate(request.getStartDate());
+        hae.setEndDate(request.getEndDate());
+        hae.setDayOfWeek(request.getDayOfWeek());
+        hae.setObservations(request.getObservations());
+        hae.setStudents(request.getStudentRAs());
+
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().getTimeRange()));
-
-        hae.setCourse(request.getCourse());
-        hae.setProjectTitle(request.getProjectTitle());
-        hae.setWeeklyHours(request.getWeeklyHours());
-        hae.setProjectType(request.getProjectType());
-        hae.setDayOfWeek(request.getDayOfWeek());
-        hae.setTimeRange(request.getTimeRange());
-        hae.setProjectDescription(request.getProjectDescription());
-        hae.setObservations(request.getObservations());
-        hae.setStatus(Status.PENDENTE);
-        hae.setStartDate(request.getStartDate());
-        hae.setEndDate(request.getEndDate());
-        hae.setModality(request.getModality());
-        hae.setStudents(request.getStudentRAs());
         hae.setWeeklySchedule(weeklyScheduleFlattened);
+
+        double totalMinutes = 0;
+        for (String timeRange : weeklyScheduleFlattened.values()) {
+            try {
+                String[] times = timeRange.split(" - ");
+                if (times.length == 2) {
+                    LocalTime startTime = LocalTime.parse(times[0]);
+                    LocalTime endTime = LocalTime.parse(times[1]);
+                    if (endTime.isAfter(startTime)) {
+                        totalMinutes += ChronoUnit.MINUTES.between(startTime, endTime);
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Formato de hora inválido no cronograma durante a atualização: " + timeRange);
+            }
+        }
+        hae.setWeeklyHours((int) Math.round(totalMinutes / 60.0));
+
+        hae.setStatus(Status.PENDENTE);
+        hae.setCoordenatorId("Sem coordenador definido");
+        hae.setViewed(false);
         hae.setUpdatedAt(LocalDateTime.now());
 
-        return haeRepository.save(hae);
-    }
+        Hae updatedHae = haeRepository.save(hae);
 
-    @Transactional
-    public void sendEmailToCoordinatorAboutHAECreated(String coordinatorId, String haeId) {
-        Hae hae = haeRepository.findById(haeId)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
-        Employee coordinator = employeeRepository.findById(coordinatorId)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado com ID: " + coordinatorId));
-        if (coordinator.getRole() != Role.COORDENADOR) {
-            throw new IllegalArgumentException("O empregado com ID " + coordinatorId + " não é um coordenador.");
-        }
-        emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae);
-    }
+        employeeRepository.findCoordinatorByCourse(hae.getCourse())
+                .ifPresent(coordinator -> emailService.sendHaeUpdatedNotificationEmail(coordinator.getEmail(),
+                        updatedHae));
 
-    @Transactional
-    public void sendEmailToProfessorAboutHaeStatus(String professorId, String haeId) {
-        Hae hae = haeRepository.findById(haeId)
-                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
-        Employee professor = employeeRepository.findById(professorId)
-                .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado com ID: " + professorId));
-        if (professor.getRole() != Role.PROFESSOR) {
-            throw new IllegalArgumentException("O empregado com ID " + professorId + " não é um professor.");
-        }
-
-        emailService.sendAlertProfessorHaeStatusEmail(professor.getEmail(), hae);
+        return updatedHae;
     }
 
     @Transactional
@@ -261,6 +273,7 @@ public class HaeService {
         return countSemesterHae.size();
     }
 
+    @Transactional(readOnly = true)
     public List<HaeResponseDTO> getHaeByStatus(Status status) {
         List<Hae> haes = haeRepository.findByStatus(status);
 

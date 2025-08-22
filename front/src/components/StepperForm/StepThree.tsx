@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { TextField } from "@mui/material";
-import { StepThreeProps, FormErrors } from "./types/haeFormTypes";
+import { StepThreeProps } from "./types/haeFormTypes";
 
 const StepThree: React.FC<StepThreeProps> = ({
   onBack,
@@ -8,15 +8,14 @@ const StepThree: React.FC<StepThreeProps> = ({
   setFormData,
   onSubmit,
   isEditMode,
+  isCompleted,
+  onOpenConfirmDialog,
 }) => {
-  const [errors, setErrors] = useState<FormErrors>({});
-
   const handleSendClick = async () => {
-    try {
-      setErrors({});
+    if (isEditMode) {
+      await onOpenConfirmDialog();
+    } else {
       await onSubmit();
-    } catch (err: unknown) {
-      console.log(err);
     }
   };
 
@@ -36,17 +35,8 @@ const StepThree: React.FC<StepThreeProps> = ({
           maxRows={10}
           placeholder="Ex.: Necessidade de acesso a laboratórios específicos..."
           value={formData.observations}
-          onChange={(e) => {
-            setFormData("observations", e.target.value);
-            if (errors.observations) {
-              setErrors((prevErrors) => ({
-                ...prevErrors,
-                observations: undefined,
-              }));
-            }
-          }}
-          error={!!errors.observations}
-          helperText={errors.observations}
+          onChange={(e) => setFormData("observations", e.target.value)}
+          disabled={isCompleted}
         />
       </div>
 
@@ -55,13 +45,15 @@ const StepThree: React.FC<StepThreeProps> = ({
           type="button"
           onClick={onBack}
           className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-900"
+          disabled={isCompleted}
         >
           Voltar
         </button>
         <button
           type="button"
           onClick={handleSendClick}
-          className="btnFatec text-white uppercase hover:bg-red-900"
+          className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
+          disabled={isCompleted}
         >
           {isEditMode ? "Atualizar" : "Enviar"}
         </button>

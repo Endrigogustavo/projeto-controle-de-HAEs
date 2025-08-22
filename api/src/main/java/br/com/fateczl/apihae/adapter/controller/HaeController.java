@@ -99,14 +99,6 @@ public class HaeController {
         return ResponseEntity.status(HttpStatus.OK).body(createdHae);
     }
 
-    @PostMapping("/sendEmailToCoordinatorAboutHAECreated/{coordinatorId}/{haeId}")
-    public ResponseEntity<?> sendEmailToCoordinatorAboutHAECreated(@PathVariable String coordinatorId,
-            @PathVariable String haeId) {
-        haeService.sendEmailToCoordinatorAboutHAECreated(coordinatorId, haeId);
-
-        return ResponseEntity.ok("Email enviado para o coordenador sobre a criação da HAE com ID: " + haeId);
-    }
-
     @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
     public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId,
             @Valid @RequestBody HaeRequest request) {

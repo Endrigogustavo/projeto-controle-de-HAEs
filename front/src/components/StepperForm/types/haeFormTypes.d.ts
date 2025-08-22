@@ -52,6 +52,7 @@ export interface StepProps {
   ) => void;
   errors: FormErrors;
   isEditMode: boolean;
+  isCompleted: boolean;
 }
 
 export interface StepOneProps extends StepProps {
@@ -66,4 +67,5 @@ export interface StepTwoProps extends StepProps {
 export interface StepThreeProps extends StepProps {
   onBack: () => void;
   onSubmit: () => Promise<void>;
+  onOpenConfirmDialog: () => void;
 }
