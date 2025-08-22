@@ -12,6 +12,7 @@ public class EmployeeFactory {
         employee.setEmail(email);
         employee.setCourse(verification.getCourse());
         employee.setPassword(verification.getPassword());
+        employee.setInstitution(verification.getInstitution());
         return employee;
     }
 

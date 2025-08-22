@@ -16,5 +16,6 @@ public class InstitutionRequestDTO {
     public InstitutionRequestDTO(Institution institution) {
         this.id = institution.getId();
         this.name = institution.getName();
+        this.institutionCode = institution.getInstitutionCode();
     }
 }

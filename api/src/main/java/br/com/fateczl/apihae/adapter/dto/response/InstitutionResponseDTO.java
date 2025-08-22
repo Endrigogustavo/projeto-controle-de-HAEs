@@ -11,9 +11,11 @@ import lombok.Setter;
 public class InstitutionResponseDTO {
     private String id;
     private String name;
+    private Integer institutionCode;
 
     public InstitutionResponseDTO(Institution institution) {
         this.id = institution.getId();
         this.name = institution.getName();
+        this.institutionCode = institution.getInstitutionCode();
     }
 }
