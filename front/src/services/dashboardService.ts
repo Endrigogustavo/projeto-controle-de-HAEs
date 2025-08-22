@@ -18,7 +18,7 @@ const getDevDashboardStats = async (): Promise<DashboardStats> => {
 		const [haesRes, usersRes, institutionsRes] = await Promise.all([
 			api.get<Hae[]>("/hae/getAll"),
 			api.get<LoggedUser[]>("/employee/getAllEmployee"),
-			api.get<Institution[]>("/institution/getAllInstitutions"),
+			api.get<Institution[]>("/institution/getAll"),
 		]);
 
 		return {

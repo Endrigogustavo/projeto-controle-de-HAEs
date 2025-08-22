@@ -1,5 +1,7 @@
 package br.com.fateczl.apihae.adapter.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
+import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.useCase.service.InstitutionService;
 import jakarta.validation.Valid;
@@ -32,7 +34,8 @@ public class InstitutionController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Institution> updateInstitution(@PathVariable String id, @Valid @RequestBody InstitutionUpdateRequest request) {
+    public ResponseEntity<Institution> updateInstitution(@PathVariable String id,
+            @Valid @RequestBody InstitutionUpdateRequest request) {
         Institution updatedInstitution = institutionService.updateInstitution(id, request);
         return ResponseEntity.ok(updatedInstitution);
     }
@@ -50,8 +53,8 @@ public class InstitutionController {
         return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
     }
 
-    @GetMapping("/getAllInstitutions")
-    public ResponseEntity<?> getAllInstitutions() {
+    @GetMapping("/getAll")
+    public ResponseEntity<List<InstitutionResponseDTO>> getAllInstitutions() {
         return ResponseEntity.ok(institutionService.listAllInstitutions());
     }
 

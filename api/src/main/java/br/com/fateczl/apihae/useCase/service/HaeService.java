@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import br.com.fateczl.apihae.domain.entity.Institution;
@@ -271,7 +270,8 @@ public class HaeService {
     }
 
     @Transactional(readOnly = true)
-    public List<HaeResponseDTO> searchHaes(String institutionId, String course, HaeType haeType, Status status, Boolean viewed) {
+    public List<HaeResponseDTO> searchHaes(String institutionId, String course, HaeType haeType, Status status,
+            Boolean viewed) {
         Specification<Hae> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -289,6 +289,9 @@ public class HaeService {
 
             if (viewed != null) {
                 predicates.add(criteriaBuilder.equal(root.get("viewed"), viewed));
+            }
+            if (institutionId != null && !institutionId.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("institution").get("id"), institutionId));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

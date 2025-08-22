@@ -151,17 +151,16 @@ public class HaeController {
         return ResponseEntity.ok(haes);
     }
 
-    @Operation(summary = "Busca avançada de HAEs", description = "Filtra HAEs por instituição, curso, tipo, status e se foi visualizado.")
+    @Operation(summary = "Busca avançada de HAEs", description = "Filtra HAEs por instituição, curso, tipo, status e visualização. Todos os filtros são opcionais.")
     @GetMapping("/search")
     public ResponseEntity<List<HaeResponseDTO>> searchHaes(
-            @RequestParam String institutionId,
+            @RequestParam(required = false) String institutionId,
             @RequestParam(required = false) String course,
             @RequestParam(required = false) HaeType haeType,
             @RequestParam(required = false) Status status,
             @RequestParam(required = false) Boolean viewed) {
 
         List<HaeResponseDTO> haes = haeService.searchHaes(institutionId, course, haeType, status, viewed);
-
         return ResponseEntity.ok(haes);
     }
 

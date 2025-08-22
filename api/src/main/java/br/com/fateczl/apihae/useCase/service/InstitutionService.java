@@ -2,6 +2,7 @@ package br.com.fateczl.apihae.useCase.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
+import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Role;
@@ -72,8 +74,12 @@ public class InstitutionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Institution> listAllInstitutions() {
-        return institutionRepository.findAll();
+    public List<InstitutionResponseDTO> listAllInstitutions() {
+        List<Institution> institutions = institutionRepository.findAll();
+
+        return institutions.stream()
+                .map(InstitutionResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
