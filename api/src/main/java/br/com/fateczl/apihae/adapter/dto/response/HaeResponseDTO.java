@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import br.com.fateczl.apihae.domain.entity.Hae;
+import br.com.fateczl.apihae.domain.enums.DimensaoHae;
 import br.com.fateczl.apihae.domain.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class HaeResponseDTO {
     private Status status;
     private String professorName;
     private Boolean viewed;
+    private DimensaoHae dimensao;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<String> comprovanteDoc;
@@ -35,6 +37,7 @@ public class HaeResponseDTO {
         this.status = hae.getStatus();
         this.professorName = hae.getEmployee().getName();
         this.viewed = hae.getViewed();
+        this.dimensao = hae.getDimensao();
         this.startDate = hae.getStartDate();
         this.endDate = hae.getEndDate();
         this.comprovanteDoc = hae.getComprovanteDoc();

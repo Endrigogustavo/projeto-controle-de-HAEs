@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import br.com.fateczl.apihae.domain.enums.DimensaoHae;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,6 +35,7 @@ public class HaeDetailDTO {
     private String observations;
     private List<String> students;
     private Boolean viewed;
+    private DimensaoHae dimensao;
     private String coordenatorName;
 
     public HaeDetailDTO(Hae hae, String coordenatorName) {
@@ -52,6 +55,7 @@ public class HaeDetailDTO {
         this.observations = hae.getObservations();
         this.students = hae.getStudents();
         this.viewed = hae.getViewed();
+        this.dimensao = hae.getDimensao();
         this.coordenatorName = coordenatorName;
     }
 }

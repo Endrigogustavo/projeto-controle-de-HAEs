@@ -180,6 +180,7 @@ public class HaeService {
         hae.setStartDate(request.getStartDate());
         hae.setEndDate(request.getEndDate());
         hae.setDayOfWeek(request.getDayOfWeek());
+        hae.setDimensao(request.getDimensao());
         hae.setObservations(request.getObservations());
         hae.setStudents(request.getStudentRAs());
 

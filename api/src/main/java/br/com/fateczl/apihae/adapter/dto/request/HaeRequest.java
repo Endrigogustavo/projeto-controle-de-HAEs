@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import br.com.fateczl.apihae.domain.enums.DimensaoHae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Modality;
 import jakarta.validation.constraints.Future;
@@ -46,6 +47,9 @@ public class HaeRequest {
     @FutureOrPresent(message = "A data de início não pode ser no passado.")
     private LocalDate startDate;
 
+    @NotNull(message = "A dimensão não pode ser nula.")
+    private DimensaoHae dimensao;
+    
     @NotNull(message = "A data de término não pode ser nula.")
     @Future(message = "A data de término deve ser no futuro.")
     private LocalDate endDate;

@@ -4,11 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import br.com.fateczl.apihae.domain.enums.DimensaoHae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Modality;
 import br.com.fateczl.apihae.domain.enums.Status;
@@ -92,6 +95,10 @@ public class Hae {
     @CollectionTable(name = "hae_docs", joinColumns = @JoinColumn(name = "hae_id"))
     @Column(name = "comprovanteDoc")
     private List<String> comprovanteDoc;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dimensao", nullable = false)
+    private DimensaoHae dimensao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "modality", nullable = false)

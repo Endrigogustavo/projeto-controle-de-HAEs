@@ -26,6 +26,7 @@ public class HaeFactory {
         hae.setObservations(request.getObservations());
         hae.setStatus(Status.PENDENTE);
         hae.setCourse(request.getCourse());
+        hae.setDimensao(request.getDimensao());
         hae.setProjectType(request.getProjectType());
         hae.setModality(request.getModality());
         hae.setCoordenatorId("Sem coordenador definido");
@@ -56,6 +57,7 @@ public class HaeFactory {
         hae.setObservations(request.getObservations());
         hae.setStatus(Status.PENDENTE);
         hae.setCourse(request.getCourse());
+        hae.setDimensao(request.getDimensao()); 
         hae.setProjectType(request.getProjectType());
         hae.setModality(request.getModality());
         hae.setCoordenatorId(coordinator.getId());
