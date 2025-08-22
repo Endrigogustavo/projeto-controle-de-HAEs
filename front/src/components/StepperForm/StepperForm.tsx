@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import StepThree from "./StepThree";
-import { HaeDataType, StepProps, FormErrors, WeeklySchedule } from "./types/haeFormTypes";
+import {
+  HaeDataType,
+  StepProps,
+  FormErrors,
+  WeeklySchedule,
+} from "./types/haeFormTypes";
 import { useAuth } from "@/hooks/useAuth";
 import { haeFormSchema } from "@/validation/haeFormSchema";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -31,7 +36,9 @@ const StepperForm: React.FC = () => {
 
   const location = useLocation();
   const haeIdToEdit = location.state?.haeId;
-  const isEditMode = !!haeIdToEdit;
+
+  const [isEditMode] = useState(!!haeIdToEdit);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingHae, setIsLoadingHae] = useState(isEditMode);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [originalStatus, setOriginalStatus] = useState<string | null>(null);
@@ -42,7 +49,7 @@ const StepperForm: React.FC = () => {
     weeklyHours: 0,
     course: "",
     projectType: "",
-    dimension: "",
+    dimensao: "",
     modality: "",
     startDate: "",
     endDate: "",
@@ -75,7 +82,8 @@ const StepperForm: React.FC = () => {
             `/hae/getHaeById/${haeIdToEdit}`
           );
           const haeData = response.data;
-          setOriginalStatus(haeData.status);          
+          setOriginalStatus(haeData.status);
+
           const formattedWeeklySchedule: WeeklySchedule = {};
           if (haeData.weeklySchedule) {
             for (const day in haeData.weeklySchedule) {
@@ -85,12 +93,12 @@ const StepperForm: React.FC = () => {
             }
           }
 
-          setFormData(prevData => ({
+          setFormData((prevData) => ({
             ...prevData,
             projectTitle: haeData.projectTitle || "",
             course: haeData.course || "",
             projectType: haeData.projectType || "",
-            dimension: haeData.dimension || "",
+            dimensao: haeData.dimensao || "",
             modality: haeData.modality || "",
             startDate: haeData.startDate || "",
             endDate: haeData.endDate || "",
@@ -128,10 +136,7 @@ const StepperForm: React.FC = () => {
 
   const updateFormData = useCallback(
     <K extends keyof HaeDataType>(field: K, value: HaeDataType[K]) => {
-      setFormData((prevData) => ({
-        ...prevData,
-        [field]: value,
-      }));
+      setFormData((prevData) => ({ ...prevData, [field]: value }));
       if (errors[field as keyof FormErrors]) {
         setErrors((prevErrors) => ({ ...prevErrors, [field]: undefined }));
       }
@@ -143,7 +148,9 @@ const StepperForm: React.FC = () => {
   const handleBackStep = () => setStep((prev) => prev - 1);
   const navigate = useNavigate();
 
-  const handleFormSubmit = useCallback(async () => {
+  const handleSubmitTrigger = useCallback(async () => {
+    if (isSubmitting) return;
+
     try {
       setErrors({});
       await haeFormSchema.validate(formData, {
@@ -154,6 +161,7 @@ const StepperForm: React.FC = () => {
       if (isEditMode) {
         setIsConfirmDialogOpen(true);
       } else {
+        setIsSubmitting(true);
         const success = await handleCreateHae(formData);
         if (success) {
           setTimeout(() => navigate("/myrequests"), 2000);
@@ -175,18 +183,30 @@ const StepperForm: React.FC = () => {
         console.error("Erro inesperado no formulário:", error);
       }
     }
-  }, [formData, isEditMode, handleCreateHae, handleUpdateHae, navigate, haeIdToEdit]);
+  }, [formData, isEditMode, handleCreateHae, navigate]);
 
-  const handleConfirmUpdate = async () => {
+  const handleConfirmUpdate = useCallback(async () => {
+    if (isSubmitting) return;
+
     setIsConfirmDialogOpen(false);
+    setIsSubmitting(true);
+
+    if (!haeIdToEdit) {
+      console.error("ID da HAE não encontrado para atualização.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const success = await handleUpdateHae(haeIdToEdit, formData);
     if (success) {
       setTimeout(() => navigate("/myrequests"), 2000);
     }
-  };
+
+    setIsSubmitting(false);
+  }, [haeIdToEdit, formData, handleUpdateHae, navigate, isSubmitting]);
 
   const renderCurrentStep = () => {
-    const isCompleted = originalStatus === 'COMPLETO';
+    const isCompleted = originalStatus === "COMPLETO";
     const commonStepProps: StepProps = {
       formData,
       setFormData: updateFormData,
@@ -199,14 +219,21 @@ const StepperForm: React.FC = () => {
       case 1:
         return <StepOne {...commonStepProps} onNext={handleNextStep} />;
       case 2:
-        return <StepTwo {...commonStepProps} onNext={handleNextStep} onBack={handleBackStep} />;
+        return (
+          <StepTwo
+            {...commonStepProps}
+            onNext={handleNextStep}
+            onBack={handleBackStep}
+          />
+        );
       case 3:
         return (
           <StepThree
             {...commonStepProps}
             onBack={handleBackStep}
-            onSubmit={handleConfirmUpdate}
-            onOpenConfirmDialog={handleFormSubmit}
+            onSubmit={handleSubmitTrigger}
+            onOpenConfirmDialog={handleSubmitTrigger}
+            isSubmitting={isSubmitting}
           />
         );
       default:
@@ -214,7 +241,7 @@ const StepperForm: React.FC = () => {
     }
   };
 
-  const isCompleted = originalStatus === 'COMPLETO';
+  const isCompleted = originalStatus === "COMPLETO";
 
   if (isLoadingEmployee || isLoadingHae) {
     return (
@@ -281,7 +308,7 @@ const StepperForm: React.FC = () => {
               Você tem certeza que deseja continuar?
             </DialogContentText>
           </DialogContent>
-          <DialogActions sx={{ padding: '16px 24px' }}>
+          <DialogActions sx={{ padding: "16px 24px" }}>
             <button
               onClick={() => setIsConfirmDialogOpen(false)}
               className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"

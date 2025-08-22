@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, CircularProgress } from "@mui/material";
 import { StepThreeProps } from "./types/haeFormTypes";
 
 const StepThree: React.FC<StepThreeProps> = ({
@@ -10,6 +10,7 @@ const StepThree: React.FC<StepThreeProps> = ({
   isEditMode,
   isCompleted,
   onOpenConfirmDialog,
+  isSubmitting,
 }) => {
   const handleSendClick = async () => {
     if (isEditMode) {
@@ -36,7 +37,7 @@ const StepThree: React.FC<StepThreeProps> = ({
           placeholder="Ex.: Necessidade de acesso a laboratórios específicos..."
           value={formData.observations}
           onChange={(e) => setFormData("observations", e.target.value)}
-          disabled={isCompleted}
+          disabled={isCompleted || isSubmitting} 
         />
       </div>
 
@@ -45,17 +46,26 @@ const StepThree: React.FC<StepThreeProps> = ({
           type="button"
           onClick={onBack}
           className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-900"
-          disabled={isCompleted}
+          disabled={isCompleted || isSubmitting}
         >
           Voltar
         </button>
         <button
           type="button"
           onClick={handleSendClick}
-          className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
-          disabled={isCompleted}
+          className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={isCompleted || isSubmitting}
         >
-          {isEditMode ? "Atualizar" : "Enviar"}
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <CircularProgress size={20} color="inherit" />
+              <span>{isEditMode ? "Atualizando..." : "Enviando..."}</span>
+            </div>
+          ) : isEditMode ? (
+            "Atualizar"
+          ) : (
+            "Enviar"
+          )}
         </button>
       </div>
     </div>
