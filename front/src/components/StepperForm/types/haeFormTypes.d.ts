@@ -11,7 +11,7 @@ export interface HaeDataType {
   course: string;
   projectTitle: string;
   modality: string;
-  dimension: string;
+  dimensao: string;
   weeklyHours: number;
   projectType: string;
   dayOfWeek: string[];
@@ -51,4 +51,5 @@ export interface StepThreeProps extends StepProps {
   onBack: () => void;
   onSubmit: () => Promise<void>;
   onOpenConfirmDialog: () => void;
+  isSubmitting: boolean; 
 }

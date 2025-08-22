@@ -36,14 +36,14 @@ export const VIEWED_OPTIONS = [
     { value: 'false', label: 'Não Visualizadas' },
 ];
 
-export const DIMENSION_OPTIONS = [
+export const DIMENSAO_OPTIONS = [
     { value: "DIMENSAO_1_DIDATICO_PEDAGOGICO", label: "Dimensão 1: Didático-Pedagógico" },
-    { value: "DIMENSAO_2_LABORATORIOS_ENSINO_E_EQUIPAMENTOS", label: "Dimensão 2: Laboratórios de Ensino" },
-    { value: "DIMENSAO_3_PESQUISA_E_EXTENSAO_EQUIPAMENTOS_E_LABORATORIOS", label: "Dimensão 3: Pesquisa e Extensão" },
-    { value: "DIMENSAO_4_ATIVIDADES_FORMATIVAS", label: "Dimensão 4: Atividades Formativas" },
-    { value: "DIMENSAO_5_INFRAESTRUTURA", label: "Dimensão 5: Infraestrutura" },
-    { value: "DIMENSAO_6_DESENVOLVIMENTO_DE_PESSOAS", label: "Dimensão 6: Desenvolvimento de Pessoas" },
-    { value: "DIMENSAO_7_CONVENIOS_E_PARCEIRAS_INSTITUCIONAIS", label: "Dimensão 7: Convênios e Parcerias" },
-    { value: "DIMENSAO_8_IMPLANTACAO_DE_CURSOS", label: "Dimensão 8: Implantação de Cursos" },
-    { value: "DIMENSAO_9_GESTAO_DA_ROTINA", label: "Dimensão 9: Gestão da Rotina" },
+    { value: "DIMENSAO_2_LABORATORIOS_ENSINO_E_EQUIPAMENTOS", label: "Dimensão 2: Laboratórios - Ensino e Equipamentos" },
+    { value: "DIMENSAO_3_PESQUISA_E_EXTENSAO_EQUIPAMENTOS_E_LABORATORIOS", label: "Dimensão 3: Pesquisa e Extensão - Equipamentos e Laboratórios" },
+    { value: "DIMENSAO_4_ATIVIDADES_FORMATIVAS", label: "Dimensão 4: Atividades Formativas (IC, PCIs, Projetos de alunos, etc)" },
+    { value: "DIMENSAO_5_INFRAESTRUTURA", label: "Dimensão 5: Infraestrutura (Água, pisos, ventilação, refrigeração)" },
+    { value: "DIMENSAO_6_DESENVOLVIMENTO_DE_PESSOAS", label: "Dimensão 6: Desenvolvimento de Pessoas (Capacitação, engetec, cursos livres)" },
+    { value: "DIMENSAO_7_CONVENIOS_E_PARCEIRAS_INSTITUCIONAIS", label: "Dimensão 7: Convênios e Parcerias (IBM, JA, Parcerias com empresários)" },
+    { value: "DIMENSAO_8_IMPLANTACAO_DE_CURSOS", label: "Dimensão 8: Implantação de Cursos (Novos cursos superiores, AMS Design, outros)" },
+    { value: "DIMENSAO_9_GESTAO_DA_ROTINA", label: "Dimensão 9: Gestão da Rotina (NDE, CEPE, CPA, ENADE, WebSai, inclusão, acessibilidade, atendimento ao aluno)" },
 ];

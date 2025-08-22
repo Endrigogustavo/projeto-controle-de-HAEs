@@ -48,7 +48,7 @@ export interface HaeDetailDTO {
   course: string;
   projectType: string;
   modality: string;
-  dimension: string;
+  dimensao: string;
   weeklyHours: number;
   startDate: string;
   endDate: string;

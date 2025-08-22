@@ -12,7 +12,7 @@ import {
   COURSE_OPTIONS,
   HAE_TYPE_OPTIONS,
   MODALITY_OPTIONS,
-  DIMENSION_OPTIONS,
+  DIMENSAO_OPTIONS,
 } from "@/constants/options";
 
 const StepOne: React.FC<StepOneProps> = ({
@@ -41,7 +41,7 @@ const StepOne: React.FC<StepOneProps> = ({
         {
           projectTitle: formData.projectTitle,
           projectType: formData.projectType,
-          dimension: formData.dimension,
+          dimensao: formData.dimensao,
           course: formData.course,
           projectDescription: formData.projectDescription,
           studentRAs: nonEmptyRAs,
@@ -56,21 +56,14 @@ const StepOne: React.FC<StepOneProps> = ({
       const newErrors: FormErrors = {};
       if (validationErrors instanceof ValidationError) {
         validationErrors.inner.forEach((error: ValidationError) => {
-          // ===================================================================
-          //                      LÓGICA DE ERRO CORRIGIDA
-          // ===================================================================
-          // Garante que 'error.path' existe antes de continuar
           if (error.path) {
-            // Converte o path para string para podermos usar métodos de string
             const pathAsString = String(error.path);
 
             if (pathAsString.startsWith("studentRAs")) {
-              // Pega a primeira mensagem de erro do array e a atribui como a mensagem principal
               if (!newErrors.studentRAs) {
                 newErrors.studentRAs = error.message;
               }
             } else {
-              // Garante que o path seja uma chave válida de FormErrors
               newErrors[pathAsString as keyof FormErrors] = error.message;
             }
           }
@@ -124,7 +117,7 @@ const StepOne: React.FC<StepOneProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-7 ">
+    <div className="flex flex-col gap-4">
       <div>
         <h2 className="font-semibold subtitle">Definição de Atividade</h2>
         <p className="text-gray-600">
@@ -168,13 +161,13 @@ const StepOne: React.FC<StepOneProps> = ({
         label="Dimensão da HAE"
         select
         variant="outlined"
-        value={formData.dimension}
-        onChange={(e) => handleChange("dimension", e.target.value)}
-        error={!!errors.dimension}
-        helperText={errors.dimension || " "}
+        value={formData.dimensao}
+        onChange={(e) => handleChange("dimensao", e.target.value)}
+        error={!!errors.dimensao}
+        helperText={errors.dimensao || " "}
         disabled={isCompleted}
       >
-        {DIMENSION_OPTIONS.map((option) => (
+        {DIMENSAO_OPTIONS.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
