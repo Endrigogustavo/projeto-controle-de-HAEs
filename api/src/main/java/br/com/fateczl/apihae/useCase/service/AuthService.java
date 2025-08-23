@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import br.com.fateczl.apihae.domain.factory.EmailVerificationFactory;
 import br.com.fateczl.apihae.domain.factory.EmployeeFactory;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 
@@ -57,14 +58,8 @@ public class AuthService {
             emailVerificationRepository.flush();
         });
       
-
-        EmailVerification newVerification = new EmailVerification();
-        newVerification.setEmail(email);
-        newVerification.setName(name);
-        newVerification.setCourse(course);
-        newVerification.setPassword(encryptedPassword);
-        newVerification.setCode(verificationToken);
-        newVerification.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        EmailVerification newVerification = EmailVerificationFactory.create(name, email, course, encryptedPassword,
+                institutionName, verificationToken);
 
         Institution institution = institutionRepository.findByName(institutionName)
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
@@ -78,7 +73,7 @@ public class AuthService {
     @Transactional
     public Employee verifyEmailCode(String token, String institutionId) {
         EmailVerification verification = emailVerificationRepository.findByCode(token)
-                .filter(v -> v.getExpiresAt().isAfter(LocalDateTime.now()))
+                .filter(verificationFilter -> verificationFilter.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Token de ativação inválido ou expirado."));
 
         String email = verification.getEmail();

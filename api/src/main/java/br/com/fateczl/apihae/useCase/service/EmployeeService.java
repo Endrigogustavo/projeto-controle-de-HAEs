@@ -89,9 +89,11 @@ public class EmployeeService {
 
         if (newEmail != null && !newEmail.trim().isEmpty()) {
             Optional<Employee> existingEmployeeWithEmail = employeeRepository.findByEmail(newEmail.trim());
-            if (existingEmployeeWithEmail.isPresent() && !existingEmployeeWithEmail.get().getId().equals(id)) {
-                throw new IllegalArgumentException("Email em uso por outra conta.");
-            }
+            existingEmployeeWithEmail.ifPresent(accountValidation -> {
+                if (!accountValidation.getId().equals(id)) {
+                    throw new IllegalArgumentException("Email em uso por outra conta.");
+                }
+            });
             employee.setEmail(newEmail.trim());
         }
 
