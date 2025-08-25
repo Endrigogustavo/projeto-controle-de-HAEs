@@ -12,10 +12,12 @@ public class InstitutionResponseDTO {
     private String id;
     private String name;
     private Integer institutionCode;
+    private String address;
 
     public InstitutionResponseDTO(Institution institution) {
         this.id = institution.getId();
         this.name = institution.getName();
         this.institutionCode = institution.getInstitutionCode();
+        this.address = institution.getAddress();
     }
 }
