@@ -22,12 +22,14 @@ import {
   GroupOutlined,
   VerifiedUserOutlined,
   ArrowBack,
+  WidgetsOutlined,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { HaeDetailDTO } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { StatusBadge } from "@/components";
 import { AxiosError } from "axios";
+import { DIMENSAO_LABELS, HAE_TYPE_LABELS, STATUS_OPTIONS } from "@/constants/options";
 
 /**
  * Formata uma string de data (YYYY-MM-DD) para o formato local do usuário.
@@ -65,19 +67,6 @@ const DetailItem: React.FC<DetailItemProps> = ({
     <div className="text-gray-800 text-base">{value}</div>
   </div>
 );
-
-const STATUS_OPTIONS: HaeDetailDTO["status"][] = [
-  "PENDENTE",
-  "APROVADO",
-  "REPROVADO",
-  "COMPLETO",
-];
-
-const projectTypeLabels: Record<string, string> = {
-  ApoioDirecao: "Apoio à Direção",
-  Estagio: "Estágio",
-  TCC: "Trabalho de Conclusão de Curso",
-};
 
 export const ViewHae = () => {
   const { id } = useParams<{ id: string }>();
@@ -193,7 +182,12 @@ export const ViewHae = () => {
             <DetailItem
               icon={<CategoryOutlined />}
               label="Tipo de Projeto"
-              value={projectTypeLabels[hae.projectType] || hae.projectType}
+              value={HAE_TYPE_LABELS[hae.projectType] || hae.projectType}
+            />
+            <DetailItem
+              icon={<WidgetsOutlined />}
+              label="Dimensão"
+              value={DIMENSAO_LABELS[hae.dimensao] || hae.dimensao}
             />
             <DetailItem
               icon={<AccessTimeIcon />}
@@ -318,9 +312,9 @@ export const ViewHae = () => {
                       }
                       disabled={isSubmitting}
                     >
-                      {STATUS_OPTIONS.map((statusOption) => (
-                        <MenuItem key={statusOption} value={statusOption}>
-                          {statusOption}
+                      {STATUS_OPTIONS.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
                         </MenuItem>
                       ))}
                     </Select>
