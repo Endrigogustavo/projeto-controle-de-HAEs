@@ -20,70 +20,70 @@ import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
-import br.com.fateczl.apihae.useCase.service.EmployeeService;
+import br.com.fateczl.apihae.useCase.service.Employee.ManageEmployee;
+import br.com.fateczl.apihae.useCase.service.Employee.ShowEmployee;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/employee")
 @SecurityRequirement(name = "cookieAuth")
 @Tag(name = "Employee", description = "Endpoints para manipular os funcionários do sistema")
 public class EmployeeController {
 
-    private final EmployeeService employeeService;
-
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
+    private final ShowEmployee showEmployee;
+    private final ManageEmployee manageEmployee;
 
     @GetMapping("/getAllEmployee")
     public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
-        List<EmployeeResponseDTO> employees = employeeService.getAllEmployees();
+        List<EmployeeResponseDTO> employees = showEmployee.getAllEmployees();
         return ResponseEntity.ok(employees);
     }
 
     @GetMapping("/getAllByRole/{role}")
     public ResponseEntity<List<EmployeeSummaryDTO>> getAllProfessoresByRole(@PathVariable("role") Role role) {
-        List<EmployeeSummaryDTO> summaries = employeeService.getEmployeeSummaries(role);
+        List<EmployeeSummaryDTO> summaries = showEmployee.getEmployeeSummaries(role);
         return ResponseEntity.ok(summaries);
     }
 
     @GetMapping("/get-professor/{id}")
     public ResponseEntity<EmployeeResponseDTO> getProfessorById(@PathVariable("id") String id) {
-        EmployeeResponseDTO employee = employeeService.getEmployeeById(id);
+        EmployeeResponseDTO employee = showEmployee.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
 
     @GetMapping("/get-professor")
     public ResponseEntity<EmployeeResponseDTO> getProfessorByEmail(@RequestParam("email") String email) {
-        EmployeeResponseDTO employee = employeeService.getEmployeeByEmail(email);
+        EmployeeResponseDTO employee = showEmployee.getEmployeeByEmail(email);
         return ResponseEntity.ok(employee);
     }
 
     @DeleteMapping("/delete-account/{id}")
     public ResponseEntity<Object> deleteAccount(@PathVariable String id) {
-        employeeService.deleteEmployeeAccount(id);
+        manageEmployee.deleteEmployeeAccount(id);
         return ResponseEntity.ok(Collections.singletonMap("mensagem", "Conta deletada com sucesso."));
     }
 
     @PutMapping("/update-account/{id}")
     public ResponseEntity<Object> updateAccount(@PathVariable String id,
             @Valid @RequestBody EmployeeUpdateRequest request) {
-        Employee updatedEmployee = employeeService.updateEmployeeAccount(id, request.getName(), request.getEmail());
+        Employee updatedEmployee = manageEmployee.updateEmployeeAccount(id, request.getName(), request.getEmail());
         return ResponseEntity.ok(updatedEmployee);
     }
 
     @GetMapping("/get-my-user")
     public ResponseEntity<EmployeeResponseDTO> getMyUser(@RequestParam("email") String email) {
-        EmployeeResponseDTO employee = employeeService.getEmployeeByEmail(email);
+        EmployeeResponseDTO employee = showEmployee.getEmployeeByEmail(email);
         return ResponseEntity.ok(employee);
     }
 
     @PostMapping("/createEmployeeByDiretorOrAdmin")
     public ResponseEntity<?> createEmployeeByDiretorOrAdmin(
             @Valid @RequestBody EmployeeCreateByDiretorOrAdmRequest request) {
-        Employee newEmployee = employeeService.createEmployeeByDiretorOrAdmin(request);
+        Employee newEmployee = manageEmployee.createEmployeeByDiretorOrAdmin(request);
         return ResponseEntity.ok(newEmployee);
     }
 }

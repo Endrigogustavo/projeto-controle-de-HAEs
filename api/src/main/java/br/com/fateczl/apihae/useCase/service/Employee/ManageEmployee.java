@@ -1,74 +1,31 @@
-package br.com.fateczl.apihae.useCase.service;
+package br.com.fateczl.apihae.useCase.service.Employee;
 
 import br.com.fateczl.apihae.adapter.dto.request.EmployeeCreateByDiretorOrAdmRequest;
-import br.com.fateczl.apihae.adapter.dto.request.InstitutionRequestDTO;
-import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
-import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.factory.EmployeeFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import org.jasypt.util.text.TextEncryptor;
 
 import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
 
 @RequiredArgsConstructor
 @Service
-public class EmployeeService {
+public class ManageEmployee {
 
     private final EmployeeRepository employeeRepository;
-    private final HaeRepository haeRepository;
     private final InstitutionRepository institutionRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-
-    @Transactional(readOnly = true)
-    public List<EmployeeResponseDTO> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        
-        return employees.stream()
-            .map(EmployeeResponseDTO::new)
-            .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<EmployeeSummaryDTO> getEmployeeSummaries(Role role) {
-        List<Employee> professors = employeeRepository.findAllByRole(role);
-
-        return professors.stream().map(professor -> {
-            int haeCount = haeRepository.countByEmployeeId(professor.getId());
-
-            return new EmployeeSummaryDTO(
-                    professor.getId(),
-                    professor.getName(),
-                    professor.getEmail(),
-                    professor.getCourse(),
-                    haeCount);
-        }).collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public EmployeeResponseDTO getEmployeeByEmail(String email) {
-        Employee employee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com email " + email));
-        return convertToDto(employee);
-    }
-
-    @Transactional(readOnly = true)
-    public EmployeeResponseDTO getEmployeeById(String id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com ID: " + id));
-        return convertToDto(employee);
-    }
+    private final TextEncryptor textEncryptor;
 
     @Transactional
     public void deleteEmployeeAccount(String id) {
@@ -112,32 +69,13 @@ public class EmployeeService {
     @Transactional
     public Employee createEmployeeByDiretorOrAdmin(EmployeeCreateByDiretorOrAdmRequest request) {
         Employee employee = EmployeeFactory.createEmployee(request);
-        
+        String plainPassword = request.getProvisoryPassword();
+        String encryptedPassword = textEncryptor.encrypt(plainPassword);
+        employee.setPassword(encryptedPassword);
+
         Institution institution = institutionRepository.findById(request.getInstitutionId())
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         employee.setInstitution(institution);
         return employeeRepository.save(employee);
-    }
-
-    public List<Employee> getEmployeesByInstitutionId(String institutionId) {
-        return employeeRepository.findByInstitutionId(institutionId);
-    }
-
-    private EmployeeResponseDTO convertToDto(Employee employee) {
-        InstitutionRequestDTO institutionDto = null;
-        if (employee.getInstitution() != null) {
-            institutionDto = new InstitutionRequestDTO(
-                    employee.getInstitution().getId().toString(),
-                    employee.getInstitution().getName(),
-                    employee.getInstitution().getInstitutionCode());
-        }
-
-        return new EmployeeResponseDTO(
-                employee.getId(),
-                employee.getName(),
-                employee.getEmail(),
-                employee.getCourse(),
-                employee.getRole(),
-                institutionDto);
     }
 }
