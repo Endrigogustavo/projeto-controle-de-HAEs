@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.useCase.service;
+package br.com.fateczl.apihae.useCase.service.Hae;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class HaeStatusService {
+public class StatusHae {
     private final HaeRepository haeRepository;
     private final EmployeeRepository employeeRepository;
 
