@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.useCase.service;
+package br.com.fateczl.apihae.useCase.service.Institution;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,16 +19,17 @@ import br.com.fateczl.apihae.domain.factory.InstitutionFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import br.com.fateczl.apihae.useCase.service.Employee.ShowEmployee;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class InstitutionService {
+public class ShowInstitution {
 
     private final InstitutionRepository institutionRepository;
     private final EmployeeRepository employeeRepository;
     private final HaeRepository haeRepository;
-    private final EmployeeService employeeService;
+    private final ShowEmployee showEmployee;
 
     public void createInstitution(InstitutionCreateRequest request) {
         institutionRepository.findByName(request.getName()).ifPresent(inst -> {
@@ -56,7 +57,7 @@ public class InstitutionService {
         Optional.of(quantidade).filter(q -> q >= 0)
                 .orElseThrow(() -> new IllegalArgumentException("Quantidade não pode ser negativa."));
 
-        EmployeeResponseDTO employee = employeeService.getEmployeeById(userId);
+        EmployeeResponseDTO employee = showEmployee.getEmployeeById(userId);
         if (employee == null) {
             throw new IllegalArgumentException("Usuário não encontrado.");
         }

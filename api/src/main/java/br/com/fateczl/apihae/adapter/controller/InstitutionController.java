@@ -11,65 +11,66 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Institution;
-import br.com.fateczl.apihae.useCase.service.InstitutionService;
+import br.com.fateczl.apihae.useCase.service.Institution.ManageInstitution;
+import br.com.fateczl.apihae.useCase.service.Institution.ShowInstitution;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/institution")
 public class InstitutionController {
-    private final InstitutionService institutionService;
-
-    public InstitutionController(InstitutionService institutionService) {
-        this.institutionService = institutionService;
-    }
+    private final ManageInstitution manageInstitution;
+    private final ShowInstitution showInstitution;
 
     @PostMapping("/create")
     public ResponseEntity<?> createInstitution(@RequestBody InstitutionCreateRequest request) {
-        institutionService.createInstitution(request);
+        manageInstitution.createInstitution(request);
         return ResponseEntity.ok("Instituição criada com sucesso!");
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Institution> updateInstitution(@PathVariable String id,
             @Valid @RequestBody InstitutionUpdateRequest request) {
-        Institution updatedInstitution = institutionService.updateInstitution(id, request);
+        Institution updatedInstitution = manageInstitution.updateInstitution(id, request);
         return ResponseEntity.ok(updatedInstitution);
     }
 
     @GetMapping("/getAvailableHaesCount")
     public ResponseEntity<Integer> getAvailableHaesCount(@RequestParam String institutionId) {
-        int count = institutionService.getHaeQtd(institutionId);
+        int count = showInstitution.getHaeQtd(institutionId);
         return ResponseEntity.ok(count);
     }
 
     @PostMapping("/setAvailableHaesCount")
     public ResponseEntity<?> setAvailableHaesCount(@RequestParam int count, @RequestParam String userId,
             @RequestParam String institutionId) {
-        institutionService.setHaeQtd(count, userId, institutionId);
+        manageInstitution.setHaeQtd(count, userId, institutionId);
         return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<List<InstitutionResponseDTO>> getAllInstitutions() {
-        return ResponseEntity.ok(institutionService.listAllInstitutions());
+        return ResponseEntity.ok(showInstitution.listAllInstitutions());
     }
 
     @GetMapping("/getInstitutionById")
     public ResponseEntity<?> getInstitutionById(@RequestParam String institutionId) {
-        return ResponseEntity.ok(institutionService.getInstitutionById(institutionId));
+        return ResponseEntity.ok(showInstitution.getInstitutionById(institutionId));
     }
 
     @GetMapping("/getEmployeesByInstitutionId")
     public ResponseEntity<?> getEmployeesByInstitutionId(@RequestParam String institutionId) {
-        return ResponseEntity.ok(institutionService.getEmployeesByInstitutionId(institutionId));
+        return ResponseEntity.ok(showInstitution.getEmployeesByInstitutionId(institutionId));
     }
 
     @GetMapping("/getHaesByInstitutionId")
     public ResponseEntity<?> getHaesByInstitutionId(@RequestParam String institutionId) {
-        return ResponseEntity.ok(institutionService.getHaesByInstitutionId(institutionId));
+        return ResponseEntity.ok(showInstitution.getHaesByInstitutionId(institutionId));
     }
 }
