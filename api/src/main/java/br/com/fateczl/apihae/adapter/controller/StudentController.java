@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fateczl.apihae.adapter.dto.request.StudentRequest;
 import br.com.fateczl.apihae.adapter.dto.request.StudentUpdateRequest;
-import br.com.fateczl.apihae.useCase.service.StudentService;
+import br.com.fateczl.apihae.useCase.service.Student.StudentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

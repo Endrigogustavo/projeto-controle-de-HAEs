@@ -1,5 +1,7 @@
 package br.com.fateczl.apihae.adapter.controller;
 
+import java.io.IOException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -29,7 +31,7 @@ public class FileController {
         try {
             String url = cloudinaryService.uploadFile(file, haeId);
             return ResponseEntity.ok(url);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(500).body("Erro ao enviar arquivo: " + e.getMessage());
         }
     }
@@ -41,7 +43,7 @@ public class FileController {
         try {
             List<String> urls = cloudinaryService.uploadMultipleFiles(files, haeId);
             return ResponseEntity.ok(urls);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return ResponseEntity.status(500)
                     .body(Collections.singletonList("Erro ao enviar arquivos: " + e.getMessage()));
         }

@@ -2,25 +2,27 @@ package br.com.fateczl.apihae.adapter.controller;
 
 import br.com.fateczl.apihae.adapter.dto.request.ChangeRoleRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
-import br.com.fateczl.apihae.useCase.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
+import br.com.fateczl.apihae.useCase.service.Employee.ManageEmployee;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin")
 @SecurityRequirement(name = "cookieAuth") 
 @Tag(name = "Admin", description = "Endpoints para administração do sistema")
 public class AdminController {
 
-    private final EmployeeService employeeService;
+    private final ManageEmployee manageEmployee;
 
-    public AdminController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
+
 
     /**
      * PUT /admin/change-role/{id}
@@ -36,7 +38,7 @@ public class AdminController {
     @PutMapping("/change-role/{id}")
     public ResponseEntity<Object> changeEmployeeRole(@PathVariable String id,
             @Valid @RequestBody ChangeRoleRequest request) {
-        Employee updatedEmployee = employeeService.changeEmployeeRole(id, request.getNewRole());
+        Employee updatedEmployee = manageEmployee.changeEmployeeRole(id, request.getNewRole());
         return ResponseEntity.ok(updatedEmployee);
     }
 

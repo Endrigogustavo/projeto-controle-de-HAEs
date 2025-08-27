@@ -1,4 +1,4 @@
-package br.com.fateczl.apihae.useCase.service;
+package br.com.fateczl.apihae.useCase.service.Student;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
