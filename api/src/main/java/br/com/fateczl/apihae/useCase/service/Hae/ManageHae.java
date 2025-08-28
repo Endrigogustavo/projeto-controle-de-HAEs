@@ -148,9 +148,11 @@ public class ManageHae {
 
         Hae updatedHae = haeRepository.save(hae);
 
-        employeeRepository.findCoordinatorByCourse(hae.getCourse())
-                .ifPresent(coordinator -> emailService.sendHaeUpdatedNotificationEmail(coordinator.getEmail(),
-                        updatedHae));
+        employeeRepository.findByCourseAndRole(hae.getCourse(), Role.COORDENADOR)
+                .ifPresentOrElse(
+                        coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae),
+                        () -> System.err.println("Aviso: Nenhum coordenador encontrado para o curso '"
+                                + hae.getCourse() + "'. E-mail de notificação não enviado."));
 
         return updatedHae;
     }
