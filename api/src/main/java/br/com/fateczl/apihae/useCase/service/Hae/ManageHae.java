@@ -78,7 +78,7 @@ public class ManageHae {
 
         emailService.sendAlertProfessorHaeStatusEmail(employee.getEmail(), savedHae);
 
-        employeeRepository.findCoordinatorByCourse(savedHae.getCourse())
+        employeeRepository.findByCourseAndRole(savedHae.getCourse(), Role.COORDENADOR)
                 .ifPresentOrElse(
                         coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), savedHae),
                         () -> System.err.println("Aviso: Nenhum coordenador encontrado para o curso '"
