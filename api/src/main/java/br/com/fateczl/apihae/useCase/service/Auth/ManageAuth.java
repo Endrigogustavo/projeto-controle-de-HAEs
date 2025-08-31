@@ -43,7 +43,7 @@ public class ManageAuth {
     }
 
     @Transactional
-    public Employee verifyEmailCode(String token, String institutionId) {
+    public Employee verifyEmailCode(String token, Integer institutionCode) {
         EmailVerification verification = emailVerificationRepository.findByCode(token)
                 .filter(verificationFilter -> verificationFilter.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Token de ativação inválido ou expirado."));
@@ -57,7 +57,7 @@ public class ManageAuth {
 
         Employee newEmployee = EmployeeFactory.fromEmailVerification(verification, email);
 
-        Institution institution = institutionRepository.findById(institutionId)
+        Institution institution = institutionRepository.findByInstitutionCode(institutionCode)
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         newEmployee.setInstitution(institution);
 

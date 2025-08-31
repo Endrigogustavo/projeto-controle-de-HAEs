@@ -37,15 +37,15 @@ public class ManageHae {
 
     @Transactional
     public Hae createHae(HaeRequest request) {
-        int qtdHaeFatec = showInstitution.getHaeQtd(request.getInstitutionId());
+        Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
+                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o código fornecido."));
+
+        int qtdHaeFatec = showInstitution.getHaeQtd(institution.getId());
         List<Hae> haesDoSemestre = showHae.findByCurrentSemester();
 
         if (haesDoSemestre.size() >= qtdHaeFatec) {
             throw new IllegalArgumentException("Limite de HAEs atingido no semestre. Não é possível criar mais HAEs.");
         }
-
-        Institution institution = institutionRepository.findById(request.getInstitutionId())
-                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o ID fornecido."));
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -167,9 +167,9 @@ public class ManageHae {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado com ID: " + employeeId));
 
-        Institution institution = institutionRepository.findById(request.getInstitutionId())
+        Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Instituição não encontrada com ID: " + request.getInstitutionId()));
+                        "Instituição não encontrada com código: " + request.getInstitutionCode()));
 
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()

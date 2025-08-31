@@ -100,9 +100,9 @@ public class ShowInstitution {
     }
 
     @Transactional()
-    public Institution updateInstitution(String id, InstitutionUpdateRequest request) {
-        Institution institution = institutionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com ID: " + id));
+    public Institution updateInstitution(Integer id, InstitutionUpdateRequest request) {
+        Institution institution = institutionRepository.findByInstitutionCode(id)
+                .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com código: " + id));
 
         institutionRepository.findByName(request.getName())
                 .filter(existing -> !existing.getId().equals(institution.getId()))

@@ -73,7 +73,7 @@ public class ManageEmployee {
         String encryptedPassword = textEncryptor.encrypt(plainPassword);
         employee.setPassword(encryptedPassword);
 
-        Institution institution = institutionRepository.findById(request.getInstitutionId())
+        Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         employee.setInstitution(institution);
         return employeeRepository.save(employee);
