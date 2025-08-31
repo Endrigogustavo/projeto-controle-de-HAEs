@@ -45,8 +45,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<Employee> verifyEmailCode(@RequestParam("token") String token, @RequestParam("institutionId") String institutionId, HttpServletResponse response) {
-        Employee verifiedEmployee = manageAuth.verifyEmailCode(token, institutionId);
+    public ResponseEntity<Employee> verifyEmailCode(@RequestParam("token") String token, @RequestParam("institutionCode") Integer institutionCode, HttpServletResponse response) {
+        Employee verifiedEmployee = manageAuth.verifyEmailCode(token, institutionCode);
 
         String jwtToken = tokenService.generateToken(verifiedEmployee);
         setTokenCookie(response, jwtToken);

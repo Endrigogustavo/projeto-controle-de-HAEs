@@ -35,7 +35,7 @@ public class InstitutionController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Institution> updateInstitution(@PathVariable String id,
+    public ResponseEntity<Institution> updateInstitution(@PathVariable Integer id,
             @Valid @RequestBody InstitutionUpdateRequest request) {
         Institution updatedInstitution = manageInstitution.updateInstitution(id, request);
         return ResponseEntity.ok(updatedInstitution);
