@@ -24,6 +24,10 @@ services:
       - .env
     networks:
       - backend
+    deploy:
+      resources:
+        limits:
+          memory: 300M
 
 volumes:
   pgdata:
