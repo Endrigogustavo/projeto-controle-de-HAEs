@@ -59,7 +59,7 @@ const StepperForm: React.FC = () => {
     projectDescription: "",
     weeklySchedule: {},
     studentRAs: [],
-    institutionId: "",
+    institutionCode: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -109,8 +109,9 @@ const StepperForm: React.FC = () => {
             studentRAs: haeData.students || [],
             weeklyHours: haeData.weeklyHours || 0,
             employeeId: employee.id,
-            institutionId: employee.institution.id,
+            institutionCode: employee.institution.institutionCode || "",
           }));
+
         } catch (error) {
           console.error("Erro ao buscar HAE para edição:", error);
         } finally {
@@ -126,7 +127,7 @@ const StepperForm: React.FC = () => {
       setFormData((prevData) => ({
         ...prevData,
         employeeId: employee.id || "",
-        institutionId: employee?.institution.id || "",
+        institutionCode: employee.institution.institutionCode || "",
       }));
     }
     if (employeeError) {
@@ -162,6 +163,7 @@ const StepperForm: React.FC = () => {
         setIsConfirmDialogOpen(true);
       } else {
         setIsSubmitting(true);
+        console.log("Submitting form data:", formData);
         const success = await handleCreateHae(formData);
         if (success) {
           setTimeout(() => navigate("/myrequests"), 2000);

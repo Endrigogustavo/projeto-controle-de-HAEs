@@ -23,6 +23,7 @@ export interface HaeDataType {
   endDate: string;
   studentRAs: string[];
   institutionId: string;
+  institutionCode: number | string;
 }
 
 export type FormErrors = Partial<Record<keyof HaeDataType, string>>;
@@ -51,5 +52,5 @@ export interface StepThreeProps extends StepProps {
   onBack: () => void;
   onSubmit: () => Promise<void>;
   onOpenConfirmDialog: () => void;
-  isSubmitting: boolean; 
+  isSubmitting: boolean;
 }
