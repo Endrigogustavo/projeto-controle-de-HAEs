@@ -112,7 +112,7 @@ export const CardRequestHae = ({
         {canRequestClosure() && (
           <button
             onClick={handleRequestClosure}
-            className="btnFatec bg-green-600 text-white uppercase hover:bg-green-800"
+            className="btnFatec text-white uppercase hover:bg-red-900"
           >
             Solicitar Fechamento
           </button>
