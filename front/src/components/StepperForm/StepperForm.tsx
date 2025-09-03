@@ -59,6 +59,7 @@ const StepperForm: React.FC = () => {
     projectDescription: "",
     weeklySchedule: {},
     studentRAs: [],
+    institutionId: "",
     institutionCode: "",
   });
 
