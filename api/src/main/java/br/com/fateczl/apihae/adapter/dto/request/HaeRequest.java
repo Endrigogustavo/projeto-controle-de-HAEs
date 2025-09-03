@@ -70,7 +70,7 @@ public class HaeRequest {
     @Size(min = 1, message = "Pelo menos um dia do cronograma deve ser informado.")
     private Map<String, WeeklyScheduleEntry> weeklySchedule;
 
-    @NotBlank(message = "O código da instituição é obrigatório")
+    @NotNull(message = "O código da instituição é obrigatório")
     private Integer institutionCode;
 
     private List<String> studentRAs;
