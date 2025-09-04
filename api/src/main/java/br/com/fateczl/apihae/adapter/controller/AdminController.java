@@ -1,14 +1,13 @@
 package br.com.fateczl.apihae.adapter.controller;
 
 import br.com.fateczl.apihae.adapter.dto.request.ChangeRoleRequest;
+import br.com.fateczl.apihae.adapter.facade.AdminFacade;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import br.com.fateczl.apihae.useCase.service.Employee.ManageEmployee;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,7 @@ import lombok.RequiredArgsConstructor;
 @SecurityRequirement(name = "cookieAuth") 
 @Tag(name = "Admin", description = "Endpoints para administração do sistema")
 public class AdminController {
-
-    private final ManageEmployee manageEmployee;
-
-
+    private final AdminFacade adminFacade;
 
     /**
      * PUT /admin/change-role/{id}
@@ -38,9 +34,7 @@ public class AdminController {
     @PutMapping("/change-role/{id}")
     public ResponseEntity<Object> changeEmployeeRole(@PathVariable String id,
             @Valid @RequestBody ChangeRoleRequest request) {
-        Employee updatedEmployee = manageEmployee.changeEmployeeRole(id, request.getNewRole());
+        Employee updatedEmployee = adminFacade.changeEmployeeRole(id, request.getNewRole());
         return ResponseEntity.ok(updatedEmployee);
     }
-
-    
 }

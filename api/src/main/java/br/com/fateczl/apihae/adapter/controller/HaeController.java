@@ -4,6 +4,7 @@ import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
+import br.com.fateczl.apihae.adapter.facade.HaeFacade;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +21,6 @@ import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
-import br.com.fateczl.apihae.useCase.service.Hae.ManageHae;
-import br.com.fateczl.apihae.useCase.service.Hae.ShowHae;
-import br.com.fateczl.apihae.useCase.service.Hae.StatusHae;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,91 +29,77 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Hae", description = "Endpoints para manipular HAEs (Horas de Atividades Específicas)")
 public class HaeController {
-
-    private final ShowHae showHae;
-    private final ManageHae manageHae;
-    private final StatusHae statusHae;
+    private final HaeFacade haeFacade;
 
     @PostMapping("/create")
     public ResponseEntity<Object> createHae(@Valid @RequestBody HaeRequest request) {
-        Hae createdHae = manageHae.createHae(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdHae);
+        return ResponseEntity.status(HttpStatus.CREATED).body(haeFacade.createHae(request));
     }
 
     @GetMapping("/getHaeById/{id}")
     public ResponseEntity<HaeDetailDTO> getHaeById(@PathVariable String id) {
-        HaeDetailDTO hae = showHae.getHaeById(id);
-        return ResponseEntity.ok(hae);
+        return ResponseEntity.ok(haeFacade.getHaeById(id));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteHae(@PathVariable String id) {
-        manageHae.deleteHae(id);
+        haeFacade.deleteHae(id);
         return ResponseEntity.ok(Collections.singletonMap("mensagem", "HAE deletado com sucesso."));
     }
 
     @GetMapping("/employee/{id}")
     public ResponseEntity<List<Hae>> getHaesByEmployeeId(@PathVariable String id) {
-        List<Hae> haes = showHae.getHaesByEmployeeId(id);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByEmployeeId(id));
     }
 
     @GetMapping("/getHaesByEmployeeIdWithLimit/{employeeId}")
     public ResponseEntity<List<Hae>> getHaesByEmployeeIdWithLimit(@PathVariable String employeeId) {
-        List<Hae> haes = showHae.getHaesByEmployeeIdWithLimit(employeeId);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByEmployeeIdWithLimit(employeeId));
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<List<HaeResponseDTO>> getAllHaes() {
-        List<HaeResponseDTO> haes = showHae.getAllHaes();
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getAllHaes());
     }
 
     @PutMapping("/change-status/{id}")
     public ResponseEntity<Object> changeHaeStatus(@PathVariable String id,
             @Valid @RequestBody HaeStatusUpdateRequest request) {
-        Hae updatedHae = statusHae.changeHaeStatus(id, request.getNewStatus(), request.getCoordenadorId());
-        return ResponseEntity.ok(updatedHae);
+        return ResponseEntity.ok(haeFacade.updateHaeStatus(id, request.getNewStatus(), request.getCoordenadorId()));
     }
 
     @GetMapping("/getHaesByProfessor/{professorId}")
     public ResponseEntity<List<HaeResponseDTO>> getHaesByProfessor(@PathVariable String professorId) {
-        List<HaeResponseDTO> haes = showHae.getHaesByProfessorId(professorId);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByProfessorId(professorId));
     }
 
     @GetMapping("/getHaesByCourse/{course}")
     public ResponseEntity<List<HaeResponseDTO>> getHaesByCourse(@PathVariable String course) {
-        List<HaeResponseDTO> haes = showHae.getHaesByCourse(course);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByCourse(course));
     }
 
     @GetMapping("/getHaesByType/{haeType}")
     public ResponseEntity<?> getHaesByType(@PathVariable HaeType haeType) {
-        List<Hae> haes = showHae.getHaesByType(haeType);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByType(haeType));
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Hae> updateHae(@PathVariable String id, @RequestBody HaeRequest request) {
-        Hae createdHae = manageHae.updateHae(id, request);
-        return ResponseEntity.status(HttpStatus.OK).body(createdHae);
+        return ResponseEntity.status(HttpStatus.OK).body(haeFacade.updateHae(id, request));
     }
 
     @PostMapping("/createHaeAsCoordinator/{coordinatorId}/{employeeId}")
     public ResponseEntity<?> createHaeAsCoordinator(@PathVariable String coordinatorId, @PathVariable String employeeId,
             @Valid @RequestBody HaeRequest request) {
-        Hae hae = manageHae.createHaeAsCoordinator(coordinatorId, employeeId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(hae);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(haeFacade.createHaeAsCoordinator(coordinatorId, employeeId, request));
     }
 
     @Operation(summary = "Alternar status de visualização", description = "Alterna o status 'viewed' de uma HAE (de true para false e vice-versa).")
     @PutMapping("/viewed/toggle/{haeId}")
     public ResponseEntity<Hae> toggleViewed(@PathVariable String haeId) {
         try {
-            Hae updatedHae = statusHae.toggleViewedStatus(haeId);
-            return ResponseEntity.ok(updatedHae);
+            return ResponseEntity.ok(haeFacade.toggleViewedStatus(haeId));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -124,27 +108,25 @@ public class HaeController {
     @Operation(summary = "Listar HAEs visualizadas", description = "Retorna todas as HAEs que já foram visualizadas")
     @GetMapping("/viewed")
     public ResponseEntity<List<Hae>> getViewed() {
-        return ResponseEntity.ok(statusHae.getHaeWasViewed());
+        return ResponseEntity.ok(haeFacade.getViewed());
     }
 
     @Operation(summary = "Listar HAEs não visualizadas", description = "Retorna todas as HAEs que ainda não foram visualizadas")
     @GetMapping("/not-viewed")
     public ResponseEntity<List<Hae>> getNotViewed() {
-        return ResponseEntity.ok(statusHae.getHaeWasNotViewed());
+        return ResponseEntity.ok(haeFacade.getNotViewed());
     }
 
     @Operation(summary = "Lista todas as HAEs de uma instituição", description = "Retorna uma lista de HAEs baseada no ID da instituição fornecido.")
     @GetMapping("/institution/{institutionId}")
     public ResponseEntity<List<HaeResponseDTO>> getHaesByInstitution(@PathVariable String institutionId) {
-        List<HaeResponseDTO> haes = showHae.getHaesByInstitutionId(institutionId);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaesByInstitutionId(institutionId));
     }
 
     @Operation(summary = "Lista todas as HAEs baseado nos status", description = "Retorna uma lista de HAEs baseado no status fornecido.")
     @GetMapping("/getHaeByStatus/{status}")
     public ResponseEntity<List<HaeResponseDTO>> getHaesByStatus(@PathVariable Status status) {
-        List<HaeResponseDTO> haes = showHae.getHaeByStatus(status);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.getHaeByStatus(status));
     }
 
     @Operation(summary = "Busca avançada de HAEs", description = "Filtra HAEs por instituição, curso, tipo, status e visualização. Todos os filtros são opcionais.")
@@ -156,8 +138,7 @@ public class HaeController {
             @RequestParam(required = false) Status status,
             @RequestParam(required = false) Boolean viewed) {
 
-        List<HaeResponseDTO> haes = showHae.searchHaes(institutionId, course, haeType, status, viewed);
-        return ResponseEntity.ok(haes);
+        return ResponseEntity.ok(haeFacade.advancedHaeSearch(institutionId, course, haeType, status, viewed));
     }
 
 }

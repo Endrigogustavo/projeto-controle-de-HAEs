@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
+import br.com.fateczl.apihae.adapter.facade.InstituionFacade;
 import br.com.fateczl.apihae.domain.entity.Institution;
-import br.com.fateczl.apihae.useCase.service.Institution.ManageInstitution;
-import br.com.fateczl.apihae.useCase.service.Institution.ShowInstitution;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -25,52 +25,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/institution")
 public class InstitutionController {
-    private final ManageInstitution manageInstitution;
-    private final ShowInstitution showInstitution;
+    private final InstituionFacade instituionFacade;
 
     @PostMapping("/create")
     public ResponseEntity<?> createInstitution(@RequestBody InstitutionCreateRequest request) {
-        manageInstitution.createInstitution(request);
+        instituionFacade.createInstitution(request);
         return ResponseEntity.ok("Instituição criada com sucesso!");
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Institution> updateInstitution(@PathVariable Integer id,
             @Valid @RequestBody InstitutionUpdateRequest request) {
-        Institution updatedInstitution = manageInstitution.updateInstitution(id, request);
-        return ResponseEntity.ok(updatedInstitution);
+        return ResponseEntity.ok(instituionFacade.updateInstitution(id, request));
     }
 
     @GetMapping("/getAvailableHaesCount")
     public ResponseEntity<Integer> getAvailableHaesCount(@RequestParam String institutionId) {
-        int count = showInstitution.getHaeQtd(institutionId);
-        return ResponseEntity.ok(count);
+        return ResponseEntity.ok(instituionFacade.getAvailableHaesCount(institutionId));
     }
 
     @PostMapping("/setAvailableHaesCount")
     public ResponseEntity<?> setAvailableHaesCount(@RequestParam int count, @RequestParam String userId,
             @RequestParam String institutionId) {
-        manageInstitution.setHaeQtd(count, userId, institutionId);
+        instituionFacade.setAvailableHaesCount(count, userId, institutionId);
         return ResponseEntity.ok("Quantidade de HAEs disponíveis atualizada para: " + count);
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<List<InstitutionResponseDTO>> getAllInstitutions() {
-        return ResponseEntity.ok(showInstitution.listAllInstitutions());
+        return ResponseEntity.ok(instituionFacade.getAllInstitutions());
     }
 
     @GetMapping("/getInstitutionById")
     public ResponseEntity<?> getInstitutionById(@RequestParam String institutionId) {
-        return ResponseEntity.ok(showInstitution.getInstitutionById(institutionId));
+        return ResponseEntity.ok(instituionFacade.getInstitutionById(institutionId));
     }
 
     @GetMapping("/getEmployeesByInstitutionId")
     public ResponseEntity<?> getEmployeesByInstitutionId(@RequestParam String institutionId) {
-        return ResponseEntity.ok(showInstitution.getEmployeesByInstitutionId(institutionId));
+        return ResponseEntity.ok(instituionFacade.getEmployeesByInstitutionId(institutionId));
     }
 
     @GetMapping("/getHaesByInstitutionId")
     public ResponseEntity<?> getHaesByInstitutionId(@RequestParam String institutionId) {
-        return ResponseEntity.ok(showInstitution.getHaesByInstitutionId(institutionId));
+        return ResponseEntity.ok(instituionFacade.getHaesByInstitutionId(institutionId));
     }
 }
