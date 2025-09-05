@@ -3,6 +3,7 @@ package br.com.fateczl.apihae.adapter.controller;
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
+import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
 import br.com.fateczl.apihae.adapter.facade.HaeFacade;
 import br.com.fateczl.apihae.domain.entity.Hae;
@@ -139,6 +140,16 @@ public class HaeController {
             @RequestParam(required = false) Boolean viewed) {
 
         return ResponseEntity.ok(haeFacade.advancedHaeSearch(institutionId, course, haeType, status, viewed));
+    }
+
+    @GetMapping("/getAllWeeklyHours")
+    public ResponseEntity<?> getAllWeeklyHours() {
+        return ResponseEntity.ok(haeFacade.getAllWeeklyHours());
+    }
+
+    @GetMapping("/getWeeklyHoursByHae/{haeId}")
+    public ResponseEntity<HaeHoursResponseDTO> getWeeklyHoursByHae(@PathVariable String haeId) {
+        return ResponseEntity.ok(haeFacade.getWeeklyHoursByHae(haeId));
     }
 
 }

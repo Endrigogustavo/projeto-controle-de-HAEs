@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
+import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
@@ -97,5 +98,13 @@ public class HaeFacade {
     public List<HaeResponseDTO> advancedHaeSearch(String institutionId, String course, HaeType type, Status status,
             Boolean viewed) {
         return showHae.searchHaes(institutionId, course, type, status, viewed);
+    }
+
+    public int getAllWeeklyHours() {
+        return showHae.getAllWeeklyHours();
+    }
+
+    public HaeHoursResponseDTO getWeeklyHoursByHae(String haeId) {
+        return showHae.getWeeklyHoursByHae(haeId);
     }
 }

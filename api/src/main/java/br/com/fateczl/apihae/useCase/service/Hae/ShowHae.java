@@ -1,6 +1,7 @@
 package br.com.fateczl.apihae.useCase.service.Hae;
 
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
+import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
@@ -179,5 +180,23 @@ public class ShowHae {
                         hae.getStartDate().getMonthValue() <= monthEnd)
                 .mapToInt(Hae::getWeeklyHours)
                 .sum();
+    }
+
+    public int getAllWeeklyHours() {
+        List<Hae> haes = haeRepository.findAll();
+        /*
+         * return haes.stream()
+                .map(hae -> new HaeHoursResponseDTO(hae.getId(), hae.getWeeklyHours()))
+                .collect(Collectors.toList());
+         */
+        return haes.stream()
+                .mapToInt(Hae::getWeeklyHours)
+                .sum();
+    }
+
+    public HaeHoursResponseDTO getWeeklyHoursByHae(String haeId) {
+        Hae hae = haeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
+        return new HaeHoursResponseDTO(hae.getId(), hae.getWeeklyHours());
     }
 }
