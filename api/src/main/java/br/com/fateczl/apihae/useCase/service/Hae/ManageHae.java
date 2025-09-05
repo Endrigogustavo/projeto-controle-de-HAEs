@@ -40,7 +40,7 @@ public class ManageHae {
         Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o código fornecido."));
 
-        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours());
+        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours(), null);
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -107,7 +107,7 @@ public class ManageHae {
             throw new IllegalArgumentException("Funcionário não é o responsável pela HAE.");
         }
 
-        validarLimiteDeHAEs(hae.getInstitution().getId(), request.getWeeklyHours());
+        validarLimiteDeHAEs(hae.getInstitution().getId(), request.getWeeklyHours(), hae.getWeeklyHours());
 
         hae.setProjectTitle(request.getProjectTitle());
         hae.setCourse(request.getCourse());
@@ -128,23 +128,7 @@ public class ManageHae {
                         Map.Entry::getKey,
                         e -> e.getValue().getTimeRange()));
         hae.setWeeklySchedule(weeklyScheduleFlattened);
-
-        double totalMinutes = 0;
-        for (String timeRange : weeklyScheduleFlattened.values()) {
-            try {
-                String[] times = timeRange.split(" - ");
-                if (times.length == 2) {
-                    LocalTime startTime = LocalTime.parse(times[0]);
-                    LocalTime endTime = LocalTime.parse(times[1]);
-                    if (endTime.isAfter(startTime)) {
-                        totalMinutes += ChronoUnit.MINUTES.between(startTime, endTime);
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Formato de hora inválido no cronograma durante a atualização: " + timeRange);
-            }
-        }
-        hae.setWeeklyHours((int) Math.round(totalMinutes / 60.0));
+        hae.setWeeklyHours(request.getWeeklyHours());
 
         hae.setStatus(Status.PENDENTE);
         hae.setCoordenatorId("Sem coordenador definido");
@@ -176,7 +160,7 @@ public class ManageHae {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Instituição não encontrada com código: " + request.getInstitutionCode()));
 
-        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours());
+        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours(), null);
 
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
@@ -191,17 +175,21 @@ public class ManageHae {
     }
 
     @Transactional
-    public void validarLimiteDeHAEs(String institutionId, int horasSolicitadas) {
+    public void validarLimiteDeHAEs(String institutionId, int horasSolicitadas, Integer horasAtuais) {
         int qtdHaeFatec = showInstitution.getHaeQtdHours(institutionId);
         int weeklyHours = showHae.getWeeklyHoursAllHaesInstitutionByCurrentSemester(institutionId);
 
-        int totalComNovasHoras = weeklyHours + horasSolicitadas;
+        if (horasAtuais != null && horasSolicitadas <= horasAtuais) {
+            return;
+        }
+
+        int horasExtra = (horasAtuais != null) ? horasSolicitadas - horasAtuais : horasSolicitadas;
+        int totalComNovasHoras = weeklyHours + horasExtra;
 
         if (totalComNovasHoras > qtdHaeFatec) {
             throw new IllegalArgumentException(
-                    "A adição dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
-                            "h). Atualmente já existem " + weeklyHours +
-                            "h cadastradas neste semestre.");
+                    "A alteração dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
+                            "h). Atualmente já existem " + weeklyHours + "h cadastradas neste semestre.");
         }
     }
 

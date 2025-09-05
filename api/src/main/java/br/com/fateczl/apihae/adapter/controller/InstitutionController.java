@@ -70,4 +70,10 @@ public class InstitutionController {
     public ResponseEntity<?> getHaesByInstitutionId(@RequestParam String institutionId) {
         return ResponseEntity.ok(instituionFacade.getHaesByInstitutionId(institutionId));
     }
+
+    @GetMapping("/getRemainingHours")
+    public ResponseEntity<Integer> getRemainingHours(@RequestParam String institutionId) {
+        int remainingHours = instituionFacade.getRemainingHours(institutionId);
+        return ResponseEntity.ok(remainingHours);
+    }
 }

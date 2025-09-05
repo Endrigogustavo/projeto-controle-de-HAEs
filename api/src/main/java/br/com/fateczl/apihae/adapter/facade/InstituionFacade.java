@@ -10,6 +10,7 @@ import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.entity.Institution;
+import br.com.fateczl.apihae.useCase.service.Hae.ShowHae;
 import br.com.fateczl.apihae.useCase.service.Institution.ManageInstitution;
 import br.com.fateczl.apihae.useCase.service.Institution.ShowInstitution;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class InstituionFacade {
     private final ManageInstitution manageInstitution;
     private final ShowInstitution showInstitution;
+    private final ShowHae showHae;
 
     public void setAvailableHaesCount(int count, String userId, String institutionId) {
         manageInstitution.setHaeQtd(count, userId, institutionId);
@@ -26,6 +28,12 @@ public class InstituionFacade {
 
     public int getAvailableHaesCount(String institutionId) {
         return showInstitution.getHaeQtdHours(institutionId);
+    }
+
+    public int getRemainingHours(String institutionId) {
+        int qtdHaeFatec = showInstitution.getHaeQtdHours(institutionId);
+        int weeklyHours = showHae.getWeeklyHoursAllHaesInstitutionByCurrentSemester(institutionId);
+        return qtdHaeFatec - weeklyHours;
     }
 
     public void createInstitution(InstitutionCreateRequest request) {
