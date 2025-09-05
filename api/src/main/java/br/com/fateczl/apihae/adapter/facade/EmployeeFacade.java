@@ -2,6 +2,8 @@ package br.com.fateczl.apihae.adapter.facade;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import br.com.fateczl.apihae.adapter.dto.request.EmployeeCreateByDiretorOrAdmRequest;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
@@ -12,6 +14,7 @@ import br.com.fateczl.apihae.useCase.service.Employee.ShowEmployee;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Component
 public class EmployeeFacade {
     private final ShowEmployee showEmployee;
     private final ManageEmployee manageEmployee;

@@ -2,6 +2,8 @@ package br.com.fateczl.apihae.adapter.facade;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
@@ -13,6 +15,7 @@ import br.com.fateczl.apihae.useCase.service.Institution.ShowInstitution;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Component
 public class InstituionFacade {
     private final ManageInstitution manageInstitution;
     private final ShowInstitution showInstitution;
@@ -22,7 +25,7 @@ public class InstituionFacade {
     }
 
     public int getAvailableHaesCount(String institutionId) {
-        return showInstitution.getHaeQtd(institutionId);
+        return showInstitution.getHaeQtdHours(institutionId);
     }
 
     public void createInstitution(InstitutionCreateRequest request) {

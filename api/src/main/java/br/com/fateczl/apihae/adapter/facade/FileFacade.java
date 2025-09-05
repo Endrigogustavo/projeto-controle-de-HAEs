@@ -3,12 +3,14 @@ package br.com.fateczl.apihae.adapter.facade;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.fateczl.apihae.useCase.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Component
 public class FileFacade {
     private final CloudinaryService cloudinaryService;
 

@@ -2,6 +2,8 @@ package br.com.fateczl.apihae.adapter.facade;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
@@ -14,6 +16,7 @@ import br.com.fateczl.apihae.useCase.service.Hae.StatusHae;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Component
 public class HaeFacade {
     private final ShowHae showHae;
     private final ManageHae manageHae;

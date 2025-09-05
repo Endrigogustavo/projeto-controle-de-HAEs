@@ -2,6 +2,8 @@ package br.com.fateczl.apihae.adapter.facade;
 
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.useCase.service.Auth.ManageAuth;
 import br.com.fateczl.apihae.useCase.service.Auth.SenderEmailAuth;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Component
 public class AuthFacade {
     private final ManageAuth manageAuth;
     private final SenderEmailAuth senderEmailAuth;
