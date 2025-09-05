@@ -40,12 +40,7 @@ public class ManageHae {
         Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o código fornecido."));
 
-        int qtdHaeFatec = showInstitution.getHaeQtd(institution.getId());
-        List<Hae> haesDoSemestre = showHae.findByCurrentSemester();
-
-        if (haesDoSemestre.size() >= qtdHaeFatec) {
-            throw new IllegalArgumentException("Limite de HAEs atingido no semestre. Não é possível criar mais HAEs.");
-        }
+        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours());
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -103,6 +98,16 @@ public class ManageHae {
         if (hae.getStatus() == Status.COMPLETO) {
             throw new IllegalStateException("Não é possível editar uma HAE com status COMPLETO.");
         }
+
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
+                        + " não encontrado. Não é possível atualizar HAE."));
+
+        if (!hae.getEmployee().equals(employee)) {
+            throw new IllegalArgumentException("Funcionário não é o responsável pela HAE.");
+        }
+
+        validarLimiteDeHAEs(hae.getInstitution().getId(), request.getWeeklyHours());
 
         hae.setProjectTitle(request.getProjectTitle());
         hae.setCourse(request.getCourse());
@@ -171,6 +176,8 @@ public class ManageHae {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Instituição não encontrada com código: " + request.getInstitutionCode()));
 
+        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours());
+
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
                 .stream()
@@ -182,4 +189,20 @@ public class ManageHae {
 
         return haeRepository.save(hae);
     }
+
+    @Transactional
+    public void validarLimiteDeHAEs(String institutionId, int horasSolicitadas) {
+        int qtdHaeFatec = showInstitution.getHaeQtdHours(institutionId);
+        int weeklyHours = showHae.getWeeklyHoursAllHaesInstitutionByCurrentSemester(institutionId);
+
+        int totalComNovasHoras = weeklyHours + horasSolicitadas;
+
+        if (totalComNovasHoras > qtdHaeFatec) {
+            throw new IllegalArgumentException(
+                    "A adição dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
+                            "h). Atualmente já existem " + weeklyHours +
+                            "h cadastradas neste semestre.");
+        }
+    }
+
 }

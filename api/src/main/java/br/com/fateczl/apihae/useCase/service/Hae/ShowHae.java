@@ -158,4 +158,26 @@ public class ShowHae {
                 .map(HaeResponseDTO::new)
                 .collect(Collectors.toList());
     }
+
+    public int getWeeklyHoursAllHaesByInstitution(String institutionId) {
+        List<Hae> haes = haeRepository.findByInstitutionId(institutionId);
+        return haes.stream()
+                .mapToInt(Hae::getWeeklyHours)
+                .sum();
+    }
+
+    public int getWeeklyHoursAllHaesInstitutionByCurrentSemester(String institutionId) {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
+        int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
+
+        List<Hae> haes = haeRepository.findByInstitutionId(institutionId);
+        return haes.stream()
+                .filter(hae -> hae.getStartDate().getYear() == year &&
+                        hae.getStartDate().getMonthValue() >= monthStart &&
+                        hae.getStartDate().getMonthValue() <= monthEnd)
+                .mapToInt(Hae::getWeeklyHours)
+                .sum();
+    }
 }

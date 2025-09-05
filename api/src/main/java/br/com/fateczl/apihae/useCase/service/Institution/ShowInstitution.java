@@ -10,16 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionCreateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
-import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.InstitutionResponseDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
-import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.factory.InstitutionFactory;
 import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
 import br.com.fateczl.apihae.driver.repository.HaeRepository;
 import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
-import br.com.fateczl.apihae.useCase.service.Employee.ShowEmployee;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,7 +26,6 @@ public class ShowInstitution {
     private final InstitutionRepository institutionRepository;
     private final EmployeeRepository employeeRepository;
     private final HaeRepository haeRepository;
-    private final ShowEmployee showEmployee;
 
     public void createInstitution(InstitutionCreateRequest request) {
         institutionRepository.findByName(request.getName()).ifPresent(inst -> {
@@ -46,32 +42,10 @@ public class ShowInstitution {
     }
 
     @Transactional(readOnly = true)
-    public int getHaeQtd(String id) throws IllegalArgumentException {
+    public int getHaeQtdHours(String id) throws IllegalArgumentException {
         Institution inst = institutionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada com ID: " + id));
         return inst.getHaeQtd();
-    }
-
-    @Transactional()
-    public void setHaeQtd(int quantidade, String userId, String institutionId) {
-        Optional.of(quantidade).filter(q -> q >= 0)
-                .orElseThrow(() -> new IllegalArgumentException("Quantidade não pode ser negativa."));
-
-        EmployeeResponseDTO employee = showEmployee.getEmployeeById(userId);
-        if (employee == null) {
-            throw new IllegalArgumentException("Usuário não encontrado.");
-        }
-
-        if (employee.getRole() != Role.DIRETOR && employee.getRole() != Role.ADMIN && employee.getRole() != Role.DEV) {
-            throw new IllegalArgumentException(
-                    "Usuário não é um diretor ou administrador da unidade, impossivel definir a quantidade de HAEs.");
-        }
-
-        Institution institution = institutionRepository.findById(institutionId)
-                .orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada com ID: " + institutionId));
-        institution.setHaeQtd(quantidade);
-        institutionRepository.save(institution);
-
     }
 
     @Transactional(readOnly = true)
@@ -126,5 +100,4 @@ public class ShowInstitution {
 
         return institutionRepository.save(institution);
     }
-
 }
