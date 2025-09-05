@@ -52,7 +52,7 @@ public class SenderEmailAuth {
 
         emailVerificationRepository.save(newVerification);
 
-        emailService.sendAccountActivationEmail(email, verificationToken, institution.getId());
+        emailService.sendAccountActivationEmail(email, verificationToken, institution.getInstitutionCode());
     }
 
     @Transactional

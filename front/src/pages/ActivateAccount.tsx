@@ -10,7 +10,7 @@ export const ActivateAccount = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get("token");
-  const institutionId = queryParams.get("institutionId");
+  const institutionCode = queryParams.get("institutionCode");
 
   const [status, setStatus] = useState<"activating" | "success" | "error">(
     "activating"
@@ -18,7 +18,7 @@ export const ActivateAccount = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (!token || !institutionId) {
+    if (!token || !institutionCode) {
       setStatus("error");
       setErrorMessage("Link de ativação inválido ou incompleto.");
       return;
@@ -26,7 +26,7 @@ export const ActivateAccount = () => {
 
     const activate = async () => {
       try {
-        const user = await authService.verifyCode(token, institutionId);
+        const user = await authService.verifyCode(token, Number(institutionCode));
 
         localStorage.setItem("email", user.email);
         localStorage.setItem("token", "session_active");
@@ -65,7 +65,7 @@ export const ActivateAccount = () => {
     };
 
     activate();
-  }, [token, institutionId, navigate]);
+  }, [token, institutionCode, navigate]);
 
   return (
     <Box

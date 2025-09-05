@@ -34,9 +34,10 @@ public class EmailService {
    * @param toEmail O e-mail do destinatário.
    * @param token   O token de ativação gerado.
    */
-  public void sendAccountActivationEmail(String toEmail, String token, String institutionId) {
+  public void sendAccountActivationEmail(String toEmail, String token, Integer institutionCode) {
     String subject = "Ativação de Conta - Sistema de HAEs FATEC";
-    String activationLink = String.format("%s?token=%s&institutionId=%s", frontendActivationUrl, token, institutionId);
+    String activationLink = String.format("%s?token=%s&institutionCode=%d", frontendActivationUrl, token,
+        institutionCode);
     String emailContent = buildActivationEmailTemplate(activationLink);
     try {
       sendEmail(toEmail, subject, emailContent);
@@ -298,8 +299,7 @@ public class EmailService {
         .formatted(
             hae.getProjectTitle(),
             hae.getNameEmployee(),
-            frontendBaseUrl
-        );
+            frontendBaseUrl);
   }
 
   private String formatWeeklySchedule(Map<String, String> schedule) {

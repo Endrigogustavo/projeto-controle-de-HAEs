@@ -4,7 +4,7 @@ import { api } from "./axios.config";
 export interface IAuthService {
   register(data: RegisterRequest): Promise<unknown>;
   login(data: LoginRequest): Promise<LoggedUser>;
-  verifyCode(token: string, institutionId: string): Promise<LoggedUser>;
+  verifyCode(token: string, institutionCode: number): Promise<LoggedUser>;
   logout(): Promise<unknown>;
   checkCookie(email: string): Promise<unknown>;
 }
@@ -32,10 +32,10 @@ const register = async (data: RegisterRequest) => {
   }
 };
 
-const verifyEmailCode = async (token: string, institutionId: string) => {
+const verifyEmailCode = async (token: string, institutionCode: number) => {
   try {
     const response = await api.get(
-      `/auth/verify-email?token=${token}&institutionId=${institutionId}`
+      `/auth/verify-email?token=${token}&institutionCode=${institutionCode}`
     );
     return response.data;
   } catch (error) {
@@ -80,8 +80,8 @@ export const authService: IAuthService = {
   login: async (data) => {
     return await login(data);
   },
-  verifyCode: async (token: string, institutionId: string) => {
-    return await verifyEmailCode(token, institutionId);
+  verifyCode: async (token: string, institutionCode: number) => {
+    return await verifyEmailCode(token, institutionCode);
   },
   logout: async () => {
     return await logout();
