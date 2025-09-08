@@ -136,11 +136,11 @@ export const DashboardDiretor = () => {
 
   const courseData = {
     labels: [
-      "Análise e Desenvolvimento de Sistemas AMS",
+      "ADS AMS",
       "Análise e Desenvolvimento de Sistemas",
       "Comercio Exterior",
       "Desenvolvimento de Produtos Plásticos",
-      "Desenvolvimento de Software Multiplataforma",
+      "DSM",
       "Gestão de Recursos Humanos",
       "Gestão Empresarial",
       "Logística",
@@ -224,8 +224,24 @@ export const DashboardDiretor = () => {
           Análise das Horas de Atividades Específicas da sua instituição.
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-7">
-          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 mb-7">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
+              Distribuição de HAEs por Status
+            </h3>
+            <div className="p-5">
+              <Doughnut
+                data={statusData}
+                options={{
+                  plugins: {
+                    legend: { display: false },
+                  },
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative ">
             <h3 className="font-semibold text-lg text-gray-700 text-center">
               Uso de HAEs no Semestre Atual
             </h3>
@@ -241,47 +257,29 @@ export const DashboardDiretor = () => {
               <span className="text-sm text-gray-500 block">de {haeLimit}</span>
             </div>
           </div>
-          {/* 2. HAEs por Semestre - Histórico */}
+
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
             <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
               HAEs por Semestre - Histórico
             </h3>
-
-            <Pie
-              data={semestreData}
-              options={{
-                plugins: {
-                  legend: { display: false },
-                },
-              }}
-            />
+            <div className="p-5">
+              <Pie
+                data={semestreData}
+                options={{
+                  plugins: {
+                    legend: { display: false },
+                  },
+                }}
+              />
+            </div>
           </div>
 
-          {/* 3. Distribuição por Status */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
-            <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
-              Distribuição por Status
-            </h3>
-
-            <Doughnut
-              data={statusData}
-              options={{
-                plugins: {
-                  legend: { display: false },
-                },
-              }}
-            />
-          </div>
-
-          {/* 4. Volume por Curso */}
-          <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex flex-col lg:col-span-3">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:col-span-1 xl:col-span-3">
             <h3 className="font-semibold text-lg text-gray-700 mb-6 text-center">
               Volume por Curso
             </h3>
-
             <div className="grid grid-cols-3 gap-2 items-start">
-              {/* Gráfico */}
-              <div className="col-span-3 xl:col-span-1 flex justify-center">
+              <div className="flex justify-center items-center col-span-3 p-5 xl:col-span-1  ">
                 <Pie
                   data={courseData}
                   options={{
