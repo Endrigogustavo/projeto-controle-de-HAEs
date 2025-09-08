@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +38,7 @@ public class ManageHae {
         Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com o código fornecido."));
 
-        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours(), null);
+        limitHaeValidation(institution.getId(), request.getWeeklyHours(), null);
 
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
@@ -107,7 +105,7 @@ public class ManageHae {
             throw new IllegalArgumentException("Funcionário não é o responsável pela HAE.");
         }
 
-        validarLimiteDeHAEs(hae.getInstitution().getId(), request.getWeeklyHours(), hae.getWeeklyHours());
+        limitHaeValidation(hae.getInstitution().getId(), request.getWeeklyHours(), hae.getWeeklyHours());
 
         hae.setProjectTitle(request.getProjectTitle());
         hae.setCourse(request.getCourse());
@@ -160,7 +158,7 @@ public class ManageHae {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Instituição não encontrada com código: " + request.getInstitutionCode()));
 
-        validarLimiteDeHAEs(institution.getId(), request.getWeeklyHours(), null);
+        limitHaeValidation(institution.getId(), request.getWeeklyHours(), null);
 
         Map<String, String> weeklyScheduleFlattened = request.getWeeklySchedule()
                 .entrySet()
@@ -175,20 +173,20 @@ public class ManageHae {
     }
 
     @Transactional
-    public void validarLimiteDeHAEs(String institutionId, int horasSolicitadas, Integer horasAtuais) {
+    public void limitHaeValidation(String institutionId, int hoursRequested, Integer currentHours) {
         int qtdHaeFatec = showInstitution.getHaeQtdHours(institutionId);
         int weeklyHours = showHae.getWeeklyHoursAllHaesInstitutionByCurrentSemester(institutionId);
 
-        if (horasAtuais != null && horasSolicitadas <= horasAtuais) {
+        if (currentHours != null && hoursRequested <= currentHours) {
             return;
         }
 
-        int horasExtra = (horasAtuais != null) ? horasSolicitadas - horasAtuais : horasSolicitadas;
-        int totalComNovasHoras = weeklyHours + horasExtra;
+        int overtime = (currentHours != null) ? hoursRequested - currentHours : hoursRequested;
+        int totalWithNewHours = weeklyHours + overtime;
 
-        if (totalComNovasHoras > qtdHaeFatec) {
+        if (totalWithNewHours > qtdHaeFatec) {
             throw new IllegalArgumentException(
-                    "A alteração dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
+                    "O lançamento dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
                             "h). Atualmente já existem " + weeklyHours + "h cadastradas neste semestre.");
         }
     }
