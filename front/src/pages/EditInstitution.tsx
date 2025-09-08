@@ -32,22 +32,22 @@ const editSchema = yup.object({
 });
 
 type FormData = {
-  institutionCode: string;
+  institutionCode: number;
   name: string;
   address: string;
-  haeQtd: string;
+  haeQtd: number;
 };
 
 export const EditInstitution = () => {
-  const { id } = useParams<{ id: string }>();
+  const { institutionCode } = useParams<{ institutionCode: string }>();
   const navigate = useNavigate();
   const { open, message, severity, showSnackbar, hideSnackbar } = useSnackbar();
 
   const [formData, setFormData] = useState<FormData>({
-    institutionCode: "",
+    institutionCode: 0,
     name: "",
     address: "",
-    haeQtd: "",
+    haeQtd: 0,
   });
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,20 +57,23 @@ export const EditInstitution = () => {
 
   useEffect(() => {
     const fetchInstitution = async () => {
-      if (!id) return;
+      if (!institutionCode) return;
       try {
+        
         const response = await api.get<InstitutionApiResponse>(
-          `/institution/getInstitutionById?institutionId=${id}`
+          `/institution/getInstitutionByInstitutionCode?institutionCode=${institutionCode}`
         );
 
         const data = response.data;
 
+
         setFormData({
-          institutionCode: String(data.institutionCode),
+          institutionCode: data.institutionCode,
           name: data.name,
           address: data.address,
-          haeQtd: String(data.haeQtd),
+          haeQtd: data.haeQtd,
         });
+
       } catch (err) {
         console.error("Erro ao carregar dados da instituição:", err);
         showSnackbar("Erro ao carregar dados da instituição.", "error");
@@ -79,7 +82,7 @@ export const EditInstitution = () => {
       }
     };
     fetchInstitution();
-  }, [id, showSnackbar]);
+  }, [institutionCode, showSnackbar]);
 
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -94,16 +97,16 @@ export const EditInstitution = () => {
     try {
       const payloadToValidate = {
         ...formData,
-        institutionCode: parseInt(formData.institutionCode, 10),
+        institutionCode: formData.institutionCode,
         name: formData.name,
-        haeQtd: parseInt(formData.haeQtd, 10),
+        haeQtd: formData.haeQtd,
       };
 
       await editSchema.validate(payloadToValidate, { abortEarly: false });
 
       setIsSubmitting(true);
 
-      await api.put(`/institution/update/${id}`, payloadToValidate);
+      await api.put(`/institution/update/${institutionCode}`, payloadToValidate);
 
       showSnackbar("Instituição atualizada com sucesso!", "success");
       setTimeout(() => navigate("/institutions"), 1500);

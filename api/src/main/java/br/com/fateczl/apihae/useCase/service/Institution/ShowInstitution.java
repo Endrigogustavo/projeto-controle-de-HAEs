@@ -63,6 +63,13 @@ public class ShowInstitution {
     }
 
     @Transactional(readOnly = true)
+    public Institution getInstitutionByInstitutionCode(Integer institutionCode) {
+        return institutionRepository.findByInstitutionCode(institutionCode)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Instituição não encontrada com código: " + institutionCode));
+    }
+
+    @Transactional(readOnly = true)
     public List<Hae> getHaesByInstitutionId(String institutionId) {
         return haeRepository.findByInstitutionId(institutionId);
     }

@@ -48,6 +48,10 @@ public class InstituionFacade {
         return showInstitution.getInstitutionById(institutionId);
     }
 
+    public Institution getInstitutionByInstitutionCode(Integer institutionCode) {
+        return showInstitution.getInstitutionByInstitutionCode(institutionCode);
+    }
+
     public List<InstitutionResponseDTO> getAllInstitutions() {
         return showInstitution.listAllInstitutions();
     }

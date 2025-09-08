@@ -61,6 +61,11 @@ public class InstitutionController {
         return ResponseEntity.ok(instituionFacade.getInstitutionById(institutionId));
     }
 
+    @GetMapping("/getInstitutionByInstitutionCode")
+    public ResponseEntity<?> getInstitutionByInstitutionCode(@RequestParam Integer institutionCode) {
+        return ResponseEntity.ok(instituionFacade.getInstitutionByInstitutionCode(institutionCode));
+    }
+
     @GetMapping("/getEmployeesByInstitutionId")
     public ResponseEntity<?> getEmployeesByInstitutionId(@RequestParam String institutionId) {
         return ResponseEntity.ok(instituionFacade.getEmployeesByInstitutionId(institutionId));

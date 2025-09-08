@@ -129,7 +129,7 @@ export const ListInstitutions = () => {
                     <td className="px-6 py-4">{inst.address}</td>
                     <td className=" py-4 text-left">
                       <button
-                        onClick={() => navigate(`/institution/edit/${inst.id}`)}
+                        onClick={() => navigate(`/institution/edit/${inst.institutionCode}`)}
                         className="btnFatec text-white uppercase hover:bg-red-900"
                       >
                         Editar

@@ -69,7 +69,7 @@ export const AppRoutes = () => {
           <Route path="/support" element={<ContactUs />} />
           <Route path="/dashboard-dev" element={<DashboardDev />} />
           <Route path="/create-institution" element={<CreateInstitution />} />
-          <Route path="/institution/edit/:id" element={<EditInstitution />} />
+          <Route path="/institution/edit/:institutionCode" element={<EditInstitution />} />
           <Route path="/institutions" element={<ListInstitutions />} />
           <Route path="/allHaes" element={<AllHaes />} />
           <Route path="/request-closure/:id" element={<RequestClosurePage />} />
