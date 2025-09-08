@@ -10,7 +10,7 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { Pie, Doughnut } from "react-chartjs-2";
+import { Pie, Doughnut, Bar } from "react-chartjs-2";
 import { Hae } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { CircularProgress } from "@mui/material";
@@ -117,7 +117,6 @@ export const DashboardDiretor = () => {
     labels: ["Pendentes", "Aprovadas", "Reprovadas", "Completas"],
     datasets: [
       {
-        label: "# de HAEs",
         data: [
           haes.filter((h) => h.status === "PENDENTE").length,
           haes.filter((h) => h.status === "APROVADO").length,
@@ -161,9 +160,9 @@ export const DashboardDiretor = () => {
           haesPorCurso["Polímeros"] || 0,
         ],
         backgroundColor: [
+          "#f97316", // laranja (Comercio Exterior)
           "#8b5cf6", // roxo
           "#1366f1", // azul índigo
-          "#f97316", // laranja (Comercio Exterior)
           "#f43f5e", // rosa/vermelho
           "#06b6d4", // ciano
           "#10b981", // verde esmeralda
@@ -187,10 +186,10 @@ export const DashboardDiretor = () => {
         label: "HAEs por Semestre",
         data: Object.values(haesPorSemestre),
         backgroundColor: [
-          "#3b82f6",
+          "#ef4444",
           "#10b981",
           "#f59e0b",
-          "#ef4444",
+          "#5e44efff",
           "#8b5cf6",
         ],
       },
@@ -224,62 +223,108 @@ export const DashboardDiretor = () => {
           Análise das Horas de Atividades Específicas da sua instituição.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 mb-7">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mb-7">
+          {/* Linha 1 - Gráfico 1 */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col col-span-1 xl:col-span-4">
             <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
               Distribuição de HAEs por Status
             </h3>
-            <div className="p-5">
-              <Doughnut
+            <div className="p-5 h-94 md:h-96">
+              <Bar
                 data={statusData}
                 options={{
-                  plugins: {
-                    legend: { display: false },
+                  indexAxis: "y",
+                  plugins: { legend: { display: false } },
+                  maintainAspectRatio: false,
+                  responsive: true,
+                  scales: {
+                    x: { display: false, grid: { display: false } },
+                    y: { display: true, grid: { display: false } },
                   },
                 }}
               />
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative ">
-            <h3 className="font-semibold text-lg text-gray-700 text-center">
-              Uso de HAEs no Semestre Atual
-            </h3>
-            <Doughnut
-              data={limitChartData}
-              options={limitChartOptions}
-              className="mb-10"
-            />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-12 md:mt-8">
-              <span className="text-3xl font-bold text-gray-800 mt-4">
-                {haesNoSemestreAtual}
-              </span>
-              <span className="text-sm text-gray-500 block">de {haeLimit}</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col col-span-1 xl:col-span-2  ">
             <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
               HAEs por Semestre - Histórico
             </h3>
-            <div className="p-5">
-              <Pie
-                data={semestreData}
-                options={{
-                  plugins: {
-                    legend: { display: false },
-                  },
-                }}
-              />
+            <div className="grid grid-cols-3 gap-2 items-start">
+              <div className="flex justify-center items-center col-span-3 p-5 xl:col-span-2">
+                <Doughnut
+                  data={semestreData}
+                  options={{
+                    plugins: { legend: { display: false, position: "right" } },
+                  }}
+                />
+              </div>
+              <div className="hidden xl:flex col-span-1 items-center justify-center h-full">
+                <ul className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                  {semestreData.labels.map((label, index) => (
+                    <li
+                      key={label}
+                      className="flex items-center whitespace-nowrap"
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{
+                          backgroundColor:
+                            semestreData.datasets[0].backgroundColor[index],
+                        }}
+                      />
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:col-span-1 xl:col-span-3">
+          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative col-span-1 xl:col-span-2 ">
+            <h3 className="font-semibold text-lg text-gray-700 text-center mb-4">
+              Uso de HAEs no Semestre Atual
+            </h3>
+
+            {/* Gráfico com altura controlada */}
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-60 md:h-60 mb-20 relative">
+                <Doughnut
+                  data={limitChartData}
+                  options={{
+                    maintainAspectRatio: false,
+                    cutout: "75%",
+                    rotation: -90, // inicia no topo
+                    circumference: 180, // mostra apenas metade (180°)
+                    plugins: {
+                      legend: { display: false },
+                    },
+                  }}
+                />
+
+                {/* Conteúdo no centro do gráfico */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                  <span className="text-3xl font-bold text-gray-800">
+                    {haesNoSemestreAtual}
+                  </span>
+                  <span className="text-sm text-gray-500 block">
+                    de {haeLimit}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Linha 3 - Gráfico 4 */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col  xl:col-span-4">
             <h3 className="font-semibold text-lg text-gray-700 mb-6 text-center">
               Volume por Curso
             </h3>
             <div className="grid grid-cols-3 gap-2 items-start">
-              <div className="flex justify-center items-center col-span-3 p-5 xl:col-span-1  ">
+              <div
+                className="flex justify-center items-center col-span-3 p-5 xl:col-span-1"
+                style={{ height: 400 }}
+              >
                 <Pie
                   data={courseData}
                   options={{
@@ -290,7 +335,6 @@ export const DashboardDiretor = () => {
                 />
               </div>
 
-              {/* Legenda */}
               <div className="hidden xl:flex col-span-2 items-center justify-center h-full">
                 <ul className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   {courseData.labels.map((label, index) => (
