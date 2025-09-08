@@ -101,17 +101,7 @@ export const DashboardDiretor = () => {
     ],
   };
 
-  const limitChartOptions = {
-    rotation: -90,
-    circumference: 180,
-    cutout: "70%",
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true },
-    },
-    backgroundColor: ["#f59e0b", "#10b981", "#ef4444", "#3b82f6"],
-  };
+
 
   const statusData = {
     labels: ["Pendentes", "Aprovadas", "Reprovadas", "Completas"],
@@ -137,7 +127,7 @@ export const DashboardDiretor = () => {
     labels: [
       "ADS AMS",
       "Análise e Desenvolvimento de Sistemas",
-      "Comercio Exterior",
+      "Comercio Exterior",  
       "Desenvolvimento de Produtos Plásticos",
       "DSM",
       "Gestão de Recursos Humanos",
