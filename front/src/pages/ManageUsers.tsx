@@ -13,7 +13,7 @@ import { AppLayout } from "@/layouts";
 
 const ROLES = ["PROFESSOR", "COORDENADOR", "ADMIN", "DIRETOR", "DEV"];
 
-export const GerenciarUsuarios = () => {
+export const ManageUsers = () => {
   const [employees, setEmployees] = useState<LoggedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState<{

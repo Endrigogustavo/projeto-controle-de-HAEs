@@ -10,7 +10,7 @@ import {
   Link as MuiLink,
 } from "@mui/material";
 
-export const ClosureRequestsPage = () => {
+export const ClosureRequests = () => {
   const { user, loading: userLoading } = useAuth();
   const [requests, setRequests] = useState<HaeResponseDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);

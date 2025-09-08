@@ -12,7 +12,7 @@ import {
 import { AppLayout } from "@/layouts";
 import { AxiosError } from "axios";
 
-export const Configuracoes = () => {
+export const Settings = () => {
   const [currentLimit, setCurrentLimit] = useState<number | null>(null);
   const [newLimit, setNewLimit] = useState<string>("");
 

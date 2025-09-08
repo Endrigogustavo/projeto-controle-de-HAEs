@@ -2,14 +2,14 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
 import {
   ActivateAccount,
-  Configuracoes,
+  Settings,
   Coordenadores,
   Dashboard,
   DashboardAdmin,
   DashboardCoordenador,
   DashboardDiretor,
   ForgotPassword,
-  GerenciarUsuarios,
+  ManageUsers,
   Login,
   MyRequests,
   Professores,
@@ -25,7 +25,7 @@ import {
   ListInstitutions,
   AllHaes,
   RequestClosurePage,
-  ClosureRequestsPage,
+  ClosureRequests,
 } from "../pages";
 import { PrivateRouteLayout } from "./layout/PrivateRouteLayout";
 
@@ -59,12 +59,12 @@ export const AppRoutes = () => {
             element={<DashboardCoordenador />}
           />
           <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-          <Route path="/gerenciar-usuarios" element={<GerenciarUsuarios />} />
+          <Route path="/gerenciar-usuarios" element={<ManageUsers />} />
           <Route path="/dashboard-diretor" element={<DashboardDiretor />} />
           <Route path="/professores" element={<Professores />} />
           <Route path="/coordenadores" element={<Coordenadores />} />
           <Route path="/haes" element={<AllHaesByInstitution />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="/configuracoes" element={<Settings />} />
           <Route path="/hae/:id" element={<ViewHae />} />
           <Route path="/support" element={<ContactUs />} />
           <Route path="/dashboard-dev" element={<DashboardDev />} />
@@ -73,7 +73,7 @@ export const AppRoutes = () => {
           <Route path="/institutions" element={<ListInstitutions />} />
           <Route path="/allHaes" element={<AllHaes />} />
           <Route path="/request-closure/:id" element={<RequestClosurePage />} />
-          <Route path="/closure-requests" element={<ClosureRequestsPage />} />
+          <Route path="/closure-requests" element={<ClosureRequests />} />
         </Route>
       </Routes>
     </BrowserRouter>
