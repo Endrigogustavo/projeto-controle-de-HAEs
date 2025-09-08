@@ -25,6 +25,7 @@ type FormData = {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   course: string;
   institution: string;
 };
@@ -54,9 +55,7 @@ export const Register = () => {
   useEffect(() => {
     const fetchInstitutions = async () => {
       try {
-        const response = await api.get<Institution[]>(
-          "/institution/getAll"
-        );
+        const response = await api.get<Institution[]>("/institution/getAll");
         setInstitutions(response.data);
       } catch (error) {
         console.error("Erro ao buscar instituições:", error);
@@ -186,6 +185,12 @@ export const Register = () => {
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+            />
+            <PasswordField
+              label="Confirmar Senha"
+              {...register("confirmPassword")}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
             />
 
             <button
