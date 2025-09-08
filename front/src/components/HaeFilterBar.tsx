@@ -92,16 +92,30 @@ export const HaeFilterBar: React.FC<HaeFilterBarProps> = ({
       </FormControl>
       <FormControl size="small" fullWidth>
         <InputLabel>Visualização</InputLabel>
-        <Select value={filters.viewed} label="Visualização" onChange={(e) => handleChange('viewed', e.target.value)}>
-          <MenuItem value=""><em>Todos</em></MenuItem>
-          {VIEWED_OPTIONS.map(option => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+        <Select
+          value={filters.viewed}
+          label="Visualização"
+          onChange={(e) => handleChange("viewed", e.target.value)}
+        >
+          <MenuItem value="">
+            <em>Todos</em>
+          </MenuItem>
+          {VIEWED_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
 
       <Button
-        variant="outlined"
         onClick={onResetFilters}
-        sx={{ flexShrink: 0 }}
+        sx={{
+          flexShrink: 0,
+          bgcolor: "#c10007",
+          color: "white",
+          "&:hover": { bgcolor: "#a30006" },
+        }}
       >
         Limpar Filtros
       </Button>

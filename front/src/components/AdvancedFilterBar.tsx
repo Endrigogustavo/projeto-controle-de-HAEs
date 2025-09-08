@@ -60,11 +60,8 @@ export const AdvancedFilterBar: React.FC<AdvancedFilterBarProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
-      <Typography variant="subtitle1" className="font-semibold mb-3">
-        Filtros de Pesquisa
-      </Typography>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 mt-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-center mt-2">
         <FormControl size="small" fullWidth className="lg:col-span-2">
           <InputLabel>Instituição</InputLabel>
           <Select
@@ -139,12 +136,15 @@ export const AdvancedFilterBar: React.FC<AdvancedFilterBarProps> = ({
         </FormControl>
 
         <Button
-          variant="outlined"
           onClick={onResetFilters}
-          sx={{ height: "40px" }}
+          sx={{
+            bgcolor: "#c10007",
+            color: "white",
+            "&:hover": { bgcolor: "#a30006" },
+          }}
           className="w-full"
         >
-          Limpar
+          Limpar Filtros
         </Button>
       </div>
     </div>

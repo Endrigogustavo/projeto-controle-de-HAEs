@@ -76,10 +76,8 @@ export const AllHaes = () => {
   return (
     <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
-        <Typography variant="h4" className="subtitle font-semibold mb-2">
-          Todas as HAEs do Sistema
-        </Typography>
-        <Typography className="text-gray-600 mb-6">
+       <h2 className="subtitle font-semibold">Todas as HAEs do Sistema</h2>
+        <Typography className="text-gray-600" mt={1}>
           Use os filtros abaixo para encontrar HAEs específicas em todo o
           sistema.
         </Typography>

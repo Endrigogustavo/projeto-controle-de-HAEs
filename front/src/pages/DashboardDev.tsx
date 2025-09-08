@@ -49,7 +49,7 @@ export const DashboardDev = () => {
   return (
     <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
-        <h2 className="subtitle">Painel do Desenvolvedor</h2>
+        <h2 className="subtitle font-semibold">Painel do Desenvolvedor</h2>
         <p className="text-gray-600 mb-6">
           Visão geral e monitoramento do sistema.
         </p>
