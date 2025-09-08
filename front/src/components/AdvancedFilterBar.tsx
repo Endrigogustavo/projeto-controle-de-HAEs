@@ -5,7 +5,6 @@ import {
   Select,
   MenuItem,
   Button,
-  Typography,
 } from "@mui/material";
 import {
   COURSE_OPTIONS,

@@ -19,7 +19,11 @@ export const SidebarItem = ({
     `}
   >
     <span className="text-white mb-0.5">{icon}</span>
-    <Link to={to} className="w-full">
+    <Link
+      to={to}
+      className="w-full t "
+      style={{ fontSize: window.innerWidth > 1280 ? "1rem" : "0.75rem" }}
+    >
       {text}
     </Link>
   </li>

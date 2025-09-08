@@ -40,7 +40,7 @@ export const ListInstitutions = () => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col md:grid md:grid-cols-[20%_80%] md:grid-rows-[auto_1fr]">
+    <div className="h-screen flex flex-col md:grid md:grid-cols-[22%_78%] md:grid-rows-[auto_1fr]">
       <div className="hidden md:block row-span-2">
         <Sidebar />
       </div>

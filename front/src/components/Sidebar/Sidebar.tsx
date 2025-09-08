@@ -242,17 +242,16 @@ export const Sidebar = () => {
 
   return (
     <aside>
-      <div className="h-screen bg-gray-fatec flex flex-col items-center p-1  ">
+      <div className="h-screen  bg-gray-fatec flex flex-col items-center  ">
         <img
           src="/fatec_zona_leste_icon_branco.png"
           alt="Logo da Fatec da Zona Leste"
-          className="w-50 p-4"
+          className="xl:w-50 w-25 p-4"
         />
         <nav className="w-full h-full items-center">
           <ul className="flex flex-col gap-2.5  ">{renderNavLinks()}</ul>
         </nav>
 
-        <div className="flex-1" />
         <button
           onClick={onLogout}
           className="btnFatec mb-4 px-3 py-2 text-white uppercase bg-red-800 hover:bg-red-900"

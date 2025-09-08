@@ -224,7 +224,7 @@ export const DashboardDiretor = () => {
           Análise das Horas de Atividades Específicas da sua instituição.
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-7">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-7">
           <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 relative ">
             <h3 className="font-semibold text-lg text-gray-700 text-center">
               Uso de HAEs no Semestre Atual
@@ -241,35 +241,77 @@ export const DashboardDiretor = () => {
               <span className="text-sm text-gray-500 block">de {haeLimit}</span>
             </div>
           </div>
+          {/* 2. HAEs por Semestre - Histórico */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
+              HAEs por Semestre - Histórico
+            </h3>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-            <h3 className="font-semibold text-lg text-gray-700 mb-4">
-              HAEs por Semestre - Historico
-            </h3>
-            <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-              <Pie data={semestreData} />
-            </div>
+            <Pie
+              data={semestreData}
+              options={{
+                plugins: {
+                  legend: { display: false },
+                },
+              }}
+            />
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-            <h3 className="font-semibold text-lg text-gray-700 mb-4">
-              Volume por Curso
-            </h3>
-            <div
-              className="flex justify-center items-center mt-14"
-              style={{ height: 250, width: 250 }}
-            >
-              <Pie
-                data={courseData}
-                options={{ plugins: { legend: { display: false } } }}
-              />
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col items-center">
-            <h3 className="font-semibold text-lg text-gray-700 mb-4">
+
+          {/* 3. Distribuição por Status */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+            <h3 className="font-semibold text-lg text-gray-700 mb-4 text-center">
               Distribuição por Status
             </h3>
-            <div className="w-full max-w-xs flex-grow flex justify-center items-center">
-              <Doughnut data={statusData} />
+
+            <Doughnut
+              data={statusData}
+              options={{
+                plugins: {
+                  legend: { display: false },
+                },
+              }}
+            />
+          </div>
+
+          {/* 4. Volume por Curso */}
+          <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex flex-col lg:col-span-3">
+            <h3 className="font-semibold text-lg text-gray-700 mb-6 text-center">
+              Volume por Curso
+            </h3>
+
+            <div className="grid grid-cols-3 gap-2 items-start">
+              {/* Gráfico */}
+              <div className="col-span-3 xl:col-span-1 flex justify-center">
+                <Pie
+                  data={courseData}
+                  options={{
+                    plugins: {
+                      legend: { display: false },
+                    },
+                  }}
+                />
+              </div>
+
+              {/* Legenda */}
+              <div className="hidden xl:flex col-span-2 items-center justify-center h-full">
+                <ul className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                  {courseData.labels.map((label, index) => (
+                    <li
+                      key={label}
+                      className="flex items-center whitespace-nowrap"
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{
+                          backgroundColor:
+                            courseData.datasets[0].backgroundColor[index],
+                        }}
+                      />
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
