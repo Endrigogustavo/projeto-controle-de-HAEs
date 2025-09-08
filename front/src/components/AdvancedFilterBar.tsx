@@ -143,7 +143,7 @@ export const AdvancedFilterBar: React.FC<AdvancedFilterBarProps> = ({
           }}
           className="w-full"
         >
-          Limpar Filtros
+          Limpar
         </Button>
       </div>
     </div>

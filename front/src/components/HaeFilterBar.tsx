@@ -117,7 +117,7 @@ export const HaeFilterBar: React.FC<HaeFilterBarProps> = ({
           "&:hover": { bgcolor: "#a30006" },
         }}
       >
-        Limpar Filtros
+        Limpar
       </Button>
     </div>
   );
