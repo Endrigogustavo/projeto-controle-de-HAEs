@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
-public class InstituionFacade {
+public class InstitutionFacade {
     private final ManageInstitution manageInstitution;
     private final ShowInstitution showInstitution;
     private final ShowHae showHae;
