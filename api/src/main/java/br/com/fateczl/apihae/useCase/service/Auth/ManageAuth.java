@@ -9,30 +9,29 @@ import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.entity.PasswordResetToken;
 import br.com.fateczl.apihae.domain.enums.Role;
-import br.com.fateczl.apihae.driver.repository.EmailVerificationRepository;
-import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.PasswordResetTokenRepository;
-
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 import br.com.fateczl.apihae.domain.factory.EmployeeFactory;
-import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import br.com.fateczl.apihae.useCase.Interface.IEmailVerificationRepository;
+import br.com.fateczl.apihae.useCase.Interface.IEmployeeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IInstitutionRepository;
+import br.com.fateczl.apihae.useCase.Interface.IPasswordResetTokenRepository;
 
 @Service
 @RequiredArgsConstructor
 public class ManageAuth {
     
-    private final EmployeeRepository employeeRepository;
-    private final EmailVerificationRepository emailVerificationRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final IEmployeeRepository iEmployeeRepository;
+    private final IEmailVerificationRepository iEmailVerificationRepository;
+    private final IPasswordResetTokenRepository iPasswordResetTokenRepository;
     private final BasicTextEncryptor textEncryptor;
-    private final InstitutionRepository institutionRepository;
+    private final IInstitutionRepository iInstitutionRepository;
 
     @Transactional(readOnly = true)
     public Employee login(String email, String plainPassword) {
-        Employee employee = employeeRepository.findByEmail(email)
+        Employee employee = iEmployeeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Credenciais inválidas."));
 
         String decryptedStoredPassword = textEncryptor.decrypt(employee.getPassword());
@@ -44,20 +43,20 @@ public class ManageAuth {
 
     @Transactional
     public Employee verifyEmailCode(String token, Integer institutionCode) {
-        EmailVerification verification = emailVerificationRepository.findByCode(token)
+        EmailVerification verification = iEmailVerificationRepository.findByCode(token)
                 .filter(verificationFilter -> verificationFilter.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElseThrow(() -> new IllegalArgumentException("Token de ativação inválido ou expirado."));
 
         String email = verification.getEmail();
 
-        employeeRepository.findByEmail(email).ifPresent(existingEmployee -> {
-            emailVerificationRepository.delete(verification);
+        iEmployeeRepository.findByEmail(email).ifPresent(existingEmployee -> {
+            iEmailVerificationRepository.delete(verification);
             throw new IllegalArgumentException("Email já associado com uma conta registrada.");
         });
 
         Employee newEmployee = EmployeeFactory.fromEmailVerification(verification, email);
 
-        Institution institution = institutionRepository.findByInstitutionCode(institutionCode)
+        Institution institution = iInstitutionRepository.findByInstitutionCode(institutionCode)
                 .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
         newEmployee.setInstitution(institution);
 
@@ -67,28 +66,28 @@ public class ManageAuth {
             newEmployee.setRole(Role.PROFESSOR);
         }
 
-        Employee savedEmployee = employeeRepository.save(newEmployee);
-        emailVerificationRepository.delete(verification);
+        Employee savedEmployee = iEmployeeRepository.save(newEmployee);
+        iEmailVerificationRepository.delete(verification);
 
         return savedEmployee;
     }
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+        PasswordResetToken resetToken = iPasswordResetTokenRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado."));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            passwordResetTokenRepository.delete(resetToken);
+            iPasswordResetTokenRepository.delete(resetToken);
             throw new IllegalArgumentException("Token inválido ou expirado.");
         }
 
         Employee employee = resetToken.getEmployee();
         String encryptedPassword = textEncryptor.encrypt(newPassword);
         employee.setPassword(encryptedPassword);
-        employeeRepository.save(employee);
+        iEmployeeRepository.save(employee);
 
-        passwordResetTokenRepository.delete(resetToken);
+        iPasswordResetTokenRepository.delete(resetToken);
     }
 
 }

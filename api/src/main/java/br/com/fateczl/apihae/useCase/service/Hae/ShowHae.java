@@ -7,8 +7,8 @@ import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.HaeType;
 import br.com.fateczl.apihae.domain.enums.Status;
-import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IEmployeeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IHaeRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 @Service
 public class ShowHae {
 
-    private final HaeRepository haeRepository;
-    private final EmployeeRepository employeeRepository;
+    private final IHaeRepository iHaeRepository;
+    private final IEmployeeRepository iEmployeeRepository;
 
     @Transactional(readOnly = true)
     public HaeDetailDTO getHaeById(String id) {
-        Hae hae = haeRepository.findById(id)
+        Hae hae = iHaeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + id));
 
         String coordenatorName = "Sem coordenador definido";
 
         if (hae.getCoordenatorId() != null && !hae.getCoordenatorId().equals("Sem coordenador definido")) {
-            coordenatorName = employeeRepository.findById(hae.getCoordenatorId())
+            coordenatorName = iEmployeeRepository.findById(hae.getCoordenatorId())
                     .map(Employee::getName)
                     .orElse("Coordenador não encontrado");
         }
@@ -44,26 +44,26 @@ public class ShowHae {
 
     @Transactional(readOnly = true)
     public List<Hae> getHaesByEmployeeId(String employeeId) {
-        if (!employeeRepository.existsById(employeeId)) {
+        if (!iEmployeeRepository.existsById(employeeId)) {
             throw new IllegalArgumentException("Empregado com ID " + employeeId + " não encontrado.");
         }
-        return haeRepository.findByEmployeeId(employeeId);
+        return iHaeRepository.findByEmployeeId(employeeId);
     }
 
     @Transactional(readOnly = true)
     public List<Hae> getHaesByEmployeeIdWithLimit(String employeeId) {
-        if (!employeeRepository.existsById(employeeId)) {
+        if (!iEmployeeRepository.existsById(employeeId)) {
             throw new IllegalArgumentException("Empregado com ID " + employeeId + " não encontrado.");
         }
-        return haeRepository.findTop5ByEmployeeIdOrderByCreatedAtDesc(employeeId);
+        return iHaeRepository.findTop5ByEmployeeIdOrderByCreatedAtDesc(employeeId);
     }
 
     @Transactional(readOnly = true)
     public List<HaeResponseDTO> getHaesByProfessorId(String professorId) {
-        if (!employeeRepository.existsById(professorId)) {
+        if (!iEmployeeRepository.existsById(professorId)) {
             throw new IllegalArgumentException("Professor com ID " + professorId + " não encontrado.");
         }
-        List<Hae> haes = haeRepository.findByEmployeeId(professorId);
+        List<Hae> haes = iHaeRepository.findByEmployeeId(professorId);
 
         return haes.stream()
                 .map(HaeResponseDTO::new)
@@ -72,7 +72,7 @@ public class ShowHae {
 
     @Transactional(readOnly = true)
     public List<HaeResponseDTO> getAllHaes() {
-        List<Hae> haes = haeRepository.findAll();
+        List<Hae> haes = iHaeRepository.findAll();
         return haes.stream()
                 .map(HaeResponseDTO::new)
                 .collect(Collectors.toList());
@@ -80,7 +80,7 @@ public class ShowHae {
 
     @Transactional(readOnly = true)
     public List<HaeResponseDTO> getHaesByCourse(String course) {
-        List<Hae> haes = haeRepository.findByCourse(course);
+        List<Hae> haes = iHaeRepository.findByCourse(course);
         return haes.stream()
                 .map(HaeResponseDTO::new)
                 .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class ShowHae {
 
     @Transactional(readOnly = true)
     public List<Hae> getHaesByType(HaeType haeType) {
-        return haeRepository.findByProjectType(haeType);
+        return iHaeRepository.findByProjectType(haeType);
     }
 
     public List<Hae> findByCurrentSemester() {
@@ -96,11 +96,11 @@ public class ShowHae {
         int year = today.getYear();
         int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
         int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
-        return haeRepository.findBySemestre(year, monthStart, monthEnd);
+        return iHaeRepository.findBySemestre(year, monthStart, monthEnd);
     }
 
     public List<HaeResponseDTO> getHaesByInstitutionId(String institutionId) {
-        List<Hae> haes = haeRepository.findByInstitutionId(institutionId);
+        List<Hae> haes = iHaeRepository.findByInstitutionId(institutionId);
 
         return haes.stream()
                 .map(HaeResponseDTO::new)
@@ -112,13 +112,13 @@ public class ShowHae {
         int year = today.getYear();
         int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
         int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
-        List<Hae> countSemesterHae = haeRepository.findBySemestre(year, monthStart, monthEnd);
+        List<Hae> countSemesterHae = iHaeRepository.findBySemestre(year, monthStart, monthEnd);
         return countSemesterHae.size();
     }
 
     @Transactional(readOnly = true)
     public List<HaeResponseDTO> getHaeByStatus(Status status) {
-        List<Hae> haes = haeRepository.findByStatus(status);
+        List<Hae> haes = iHaeRepository.findByStatus(status);
 
         return haes.stream()
                 .map(HaeResponseDTO::new)
@@ -153,7 +153,7 @@ public class ShowHae {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
 
-        List<Hae> haes = haeRepository.findAll(spec);
+        List<Hae> haes = iHaeRepository.findAll(spec);
 
         return haes.stream()
                 .map(HaeResponseDTO::new)
@@ -161,7 +161,7 @@ public class ShowHae {
     }
 
     public int getWeeklyHoursAllHaesByInstitution(String institutionId) {
-        List<Hae> haes = haeRepository.findByInstitutionId(institutionId);
+        List<Hae> haes = iHaeRepository.findByInstitutionId(institutionId);
         return haes.stream()
                 .mapToInt(Hae::getWeeklyHours)
                 .sum();
@@ -173,7 +173,7 @@ public class ShowHae {
         int monthStart = (today.getMonthValue() <= 6) ? 1 : 7;
         int monthEnd = (today.getMonthValue() <= 6) ? 6 : 12;
 
-        List<Hae> haes = haeRepository.findByInstitutionId(institutionId);
+        List<Hae> haes = iHaeRepository.findByInstitutionId(institutionId);
         return haes.stream()
                 .filter(hae -> hae.getStartDate().getYear() == year &&
                         hae.getStartDate().getMonthValue() >= monthStart &&
@@ -183,7 +183,7 @@ public class ShowHae {
     }
 
     public int getAllWeeklyHours() {
-        List<Hae> haes = haeRepository.findAll();
+        List<Hae> haes = iHaeRepository.findAll();
         /*
          * return haes.stream()
                 .map(hae -> new HaeHoursResponseDTO(hae.getId(), hae.getWeeklyHours()))
@@ -195,7 +195,7 @@ public class ShowHae {
     }
 
     public HaeHoursResponseDTO getWeeklyHoursByHae(String haeId) {
-        Hae hae = haeRepository.findById(haeId)
+        Hae hae = iHaeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado com ID: " + haeId));
         return new HaeHoursResponseDTO(hae.getId(), hae.getWeeklyHours());
     }

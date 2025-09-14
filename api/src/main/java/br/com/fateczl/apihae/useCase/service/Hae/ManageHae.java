@@ -7,9 +7,9 @@ import br.com.fateczl.apihae.domain.entity.Institution;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
 import br.com.fateczl.apihae.domain.factory.HaeFactory;
-import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
-import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import br.com.fateczl.apihae.useCase.Interface.IEmployeeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IHaeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IInstitutionRepository;
 import br.com.fateczl.apihae.useCase.service.EmailService;
 import br.com.fateczl.apihae.useCase.service.Institution.ShowInstitution;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +26,11 @@ import static br.com.fateczl.apihae.useCase.util.DataUtils.getSemestre;
 @Service
 public class ManageHae {
 
-    private final HaeRepository haeRepository;
-    private final EmployeeRepository employeeRepository;
+    private final IHaeRepository iHaeRepository;
+    private final IEmployeeRepository iEmployeeRepository;
     private final EmailService emailService;
     private final ShowInstitution showInstitution;
-    private final InstitutionRepository institutionRepository;
+    private final IInstitutionRepository institutionRepository;
     private final ShowHae showHae;
 
     @Transactional
@@ -40,14 +40,14 @@ public class ManageHae {
 
         limitHaeValidation(institution.getId(), request.getWeeklyHours(), null);
 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
+        Employee employee = iEmployeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
                         + " não encontrado. Não é possível criar HAE."));
 
         LocalDate newHaeStartDate = request.getStartDate();
         String newHaeSemestre = getSemestre(newHaeStartDate);
 
-        List<Hae> existingHaes = haeRepository.findByEmployeeId(request.getEmployeeId());
+        List<Hae> existingHaes = iHaeRepository.findByEmployeeId(request.getEmployeeId());
 
         boolean hasUnfinishedPastHae = existingHaes.stream().anyMatch(hae -> {
             String existingHaeSemestre = getSemestre(hae.getStartDate());
@@ -67,11 +67,11 @@ public class ManageHae {
                         e -> e.getValue().getTimeRange()));
 
         Hae newHae = HaeFactory.createHae(request, employee, institution, weeklyScheduleFlattened);
-        Hae savedHae = haeRepository.save(newHae);
+        Hae savedHae = iHaeRepository.save(newHae);
 
         emailService.sendAlertProfessorHaeStatusEmail(employee.getEmail(), savedHae);
 
-        employeeRepository.findByCourseAndRole(savedHae.getCourse(), Role.COORDENADOR)
+        iEmployeeRepository.findByCourseAndRole(savedHae.getCourse(), Role.COORDENADOR)
                 .ifPresentOrElse(
                         coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), savedHae),
                         () -> System.err.println("Aviso: Nenhum coordenador encontrado para o curso '"
@@ -82,22 +82,22 @@ public class ManageHae {
 
     @Transactional
     public void deleteHae(String id) {
-        if (!haeRepository.existsById(id)) {
+        if (!iHaeRepository.existsById(id)) {
             throw new IllegalArgumentException("HAE não encontrado com ID: " + id);
         }
-        haeRepository.deleteById(id);
+        iHaeRepository.deleteById(id);
     }
 
     @Transactional
     public Hae updateHae(String id, HaeRequest request) {
-        Hae hae = haeRepository.findById(id)
+        Hae hae = iHaeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + id));
 
         if (hae.getStatus() == Status.COMPLETO) {
             throw new IllegalStateException("Não é possível editar uma HAE com status COMPLETO.");
         }
 
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
+        Employee employee = iEmployeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário com ID " + request.getEmployeeId()
                         + " não encontrado. Não é possível atualizar HAE."));
 
@@ -133,9 +133,9 @@ public class ManageHae {
         hae.setViewed(false);
         hae.setUpdatedAt(LocalDateTime.now());
 
-        Hae updatedHae = haeRepository.save(hae);
+        Hae updatedHae = iHaeRepository.save(hae);
 
-        employeeRepository.findByCourseAndRole(hae.getCourse(), Role.COORDENADOR)
+        iEmployeeRepository.findByCourseAndRole(hae.getCourse(), Role.COORDENADOR)
                 .ifPresentOrElse(
                         coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae),
                         () -> System.err.println("Aviso: Nenhum coordenador encontrado para o curso '"
@@ -146,12 +146,12 @@ public class ManageHae {
 
     @Transactional
     public Hae createHaeAsCoordinator(String coordinatorId, String employeeId, HaeRequest request) {
-        Employee coordinator = employeeRepository.findById(coordinatorId)
+        Employee coordinator = iEmployeeRepository.findById(coordinatorId)
                 .filter(emp -> emp.getRole() == Role.COORDENADOR)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "O empregado com ID " + coordinatorId + " não é um coordenador."));
 
-        Employee employee = employeeRepository.findById(employeeId)
+        Employee employee = iEmployeeRepository.findById(employeeId)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado com ID: " + employeeId));
 
         Institution institution = institutionRepository.findByInstitutionCode(request.getInstitutionCode())
@@ -169,7 +169,7 @@ public class ManageHae {
 
         Hae hae = HaeFactory.createByCoordinator(employee, request, institution, coordinator, weeklyScheduleFlattened);
 
-        return haeRepository.save(hae);
+        return iHaeRepository.save(hae);
     }
 
     @Transactional

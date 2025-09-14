@@ -3,9 +3,9 @@ package br.com.fateczl.apihae.useCase.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import br.com.fateczl.apihae.adapter.repository.HaeRepository;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Status;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -11,7 +11,7 @@ import br.com.fateczl.apihae.adapter.dto.request.InstitutionUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.factory.InstitutionFactory;
-import br.com.fateczl.apihae.driver.repository.InstitutionRepository;
+import br.com.fateczl.apihae.useCase.Interface.IInstitutionRepository;
 import br.com.fateczl.apihae.useCase.service.Employee.ShowEmployee;
 import lombok.RequiredArgsConstructor;
 
@@ -19,21 +19,21 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ManageInstitution {
 
-    private final InstitutionRepository institutionRepository;
+    private final IInstitutionRepository iInstitutionRepository;
     private final ShowEmployee showEmployee;
 
     public void createInstitution(InstitutionCreateRequest request) {
-        institutionRepository.findByName(request.getName()).ifPresent(inst -> {
+        iInstitutionRepository.findByName(request.getName()).ifPresent(inst -> {
             throw new IllegalArgumentException("Nome de instituição já em uso.");
         });
 
-        institutionRepository.findByInstitutionCode(request.getInstitutionCode()).ifPresent(inst -> {
+        iInstitutionRepository.findByInstitutionCode(request.getInstitutionCode()).ifPresent(inst -> {
             throw new IllegalArgumentException("Código de instituição já em uso.");
         });
 
         Institution institution = InstitutionFactory.create(request);
 
-        institutionRepository.save(institution);
+        iInstitutionRepository.save(institution);
     }
 
     @Transactional()
@@ -51,26 +51,26 @@ public class ManageInstitution {
                     "Usuário não é um diretor ou administrador da unidade, impossivel definir a quantidade de HAEs.");
         }
 
-        Institution institution = institutionRepository.findById(institutionId)
+        Institution institution = iInstitutionRepository.findById(institutionId)
                 .orElseThrow(() -> new IllegalArgumentException("Unidade não encontrada com ID: " + institutionId));
         institution.setHaeQtd(quantidade);
-        institutionRepository.save(institution);
+        iInstitutionRepository.save(institution);
 
     }
 
     @Transactional()
     public Institution updateInstitution(Integer id, InstitutionUpdateRequest request) {
-        Institution institution = institutionRepository.findByInstitutionCode(id)
+        Institution institution = iInstitutionRepository.findByInstitutionCode(id)
                 .orElseThrow(() -> new IllegalArgumentException("Instituição não encontrada com código: " + id));
 
-        institutionRepository.findByName(request.getName())
+        iInstitutionRepository.findByName(request.getName())
                 .filter(existing -> !existing.getId().equals(institution.getId()))
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException(
                             "O nome '" + request.getName() + "' já está em uso por outra instituição.");
                 });
 
-        Optional<Institution> existingByCode = institutionRepository
+        Optional<Institution> existingByCode = iInstitutionRepository
                 .findByInstitutionCode(request.getInstitutionCode())
                 .filter(existing -> !existing.getId().equals(institution.getId()));
 
@@ -83,7 +83,7 @@ public class ManageInstitution {
         institution.setHaeQtd(request.getHaeQtd());
         institution.setInstitutionCode(request.getInstitutionCode());
 
-        return institutionRepository.save(institution);
+        return iInstitutionRepository.save(institution);
     }
 
 }

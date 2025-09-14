@@ -4,8 +4,8 @@ import br.com.fateczl.apihae.adapter.dto.response.EmployeeResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.EmployeeSummaryDTO;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.enums.Role;
-import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IEmployeeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IHaeRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 @Service
 public class ShowEmployee {
 
-    private final EmployeeRepository employeeRepository;
-    private final HaeRepository haeRepository;
+    private final IEmployeeRepository iEmployeeRepository;
+    private final IHaeRepository iHaeRepository;
 
     @Transactional(readOnly = true)
     public List<EmployeeResponseDTO> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        
+        List<Employee> employees = iEmployeeRepository.findAll();
+
         return employees.stream()
             .map(EmployeeResponseDTO::new)
             .collect(Collectors.toList());
@@ -32,10 +32,10 @@ public class ShowEmployee {
 
     @Transactional(readOnly = true)
     public List<EmployeeSummaryDTO> getEmployeeSummaries(Role role) {
-        List<Employee> professors = employeeRepository.findAllByRole(role);
+        List<Employee> professors = iEmployeeRepository.findAllByRole(role);
 
         return professors.stream().map(professor -> {
-            int haeCount = haeRepository.countByEmployeeId(professor.getId());
+            int haeCount = iHaeRepository.countByEmployeeId(professor.getId());
 
             return new EmployeeSummaryDTO(
                     professor.getId(),
@@ -48,19 +48,19 @@ public class ShowEmployee {
 
     @Transactional(readOnly = true)
     public EmployeeResponseDTO getEmployeeByEmail(String email) {
-        Employee employee = employeeRepository.findByEmail(email)
+        Employee employee = iEmployeeRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com email " + email));
         return ConvertDTOEmployee.convertToDto(employee);
     }
 
     @Transactional(readOnly = true)
     public EmployeeResponseDTO getEmployeeById(String id) {
-        Employee employee = employeeRepository.findById(id)
+        Employee employee = iEmployeeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado com ID: " + id));
         return ConvertDTOEmployee.convertToDto(employee);
     }
 
     public List<Employee> getEmployeesByInstitutionId(String institutionId) {
-        return employeeRepository.findByInstitutionId(institutionId);
+        return iEmployeeRepository.findByInstitutionId(institutionId);
     }
 }

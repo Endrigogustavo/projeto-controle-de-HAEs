@@ -4,19 +4,19 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Role;
 import br.com.fateczl.apihae.domain.enums.Status;
-import br.com.fateczl.apihae.driver.repository.EmployeeRepository;
-import br.com.fateczl.apihae.driver.repository.HaeRepository;
-
+import br.com.fateczl.apihae.useCase.Interface.IEmployeeRepository;
+import br.com.fateczl.apihae.useCase.Interface.IHaeRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 public class StatusHae {
-    private final HaeRepository haeRepository;
-    private final EmployeeRepository employeeRepository;
+    private final IHaeRepository haeRepository;
+    private final IEmployeeRepository employeeRepository;
 
     @Transactional
     public void wasViewed(String haeId) {
