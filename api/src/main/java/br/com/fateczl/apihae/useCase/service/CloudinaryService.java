@@ -3,9 +3,9 @@ package br.com.fateczl.apihae.useCase.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
-import br.com.fateczl.apihae.adapter.repository.HaeRepository;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.enums.Status;
+import br.com.fateczl.apihae.useCase.Interface.IHaeRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class CloudinaryService {
 
     private final Cloudinary cloudinary;
-    private final HaeRepository haeRepository;
+    private final IHaeRepository haeRepository;
 
     public String uploadFile(MultipartFile file, String haeId) throws IOException {
         String resourceType = file.getContentType() != null && file.getContentType().startsWith("image")
@@ -36,9 +36,12 @@ public class CloudinaryService {
         Hae hae = haeRepository.findById(haeId)
                 .orElseThrow(() -> new IllegalArgumentException("HAE não encontrado."));
 
-        List<String> comprovanteDocs = new ArrayList<>();
-        comprovanteDocs.add(uploadResult.get("secure_url").toString());
-        hae.setComprovanteDoc(comprovanteDocs);
+      
+        if (hae.getComprovanteDoc() == null) {
+            hae.setComprovanteDoc(new ArrayList<>());
+        }
+        
+        hae.getComprovanteDoc().add(uploadResult.get("secure_url").toString());
         hae.setStatus(Status.FECHAMENTO_SOLICITADO);
         haeRepository.save(hae);
 
