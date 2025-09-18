@@ -23,6 +23,7 @@ import {
   VerifiedUserOutlined,
   ArrowBack,
   WidgetsOutlined,
+  EventAvailable,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
 import { HaeDetailDTO } from "@/types/hae";
@@ -146,6 +147,20 @@ export const ViewHae = () => {
     );
   }
 
+  const approvedStatus = ["APROVADO", "COMPLETO", "FECHAMENTO_SOLICITADO"];
+
+  const formatDateTime = (dateString: string | null | undefined): string => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Data inválida";
+      return date.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+    } catch (error) {
+      console.error("Erro ao formatar data e hora:", error);
+      return dateString;
+    }
+  };
+
   return (
     <AppLayout>
       <main className="col-start-2 row-start-2 p-4 md:p-8 overflow-auto bg-gray-50 pt-20 md:pt-4 h-full">
@@ -174,6 +189,15 @@ export const ViewHae = () => {
                   value={hae.coordenatorName}
                 />
               )}
+
+            {approvedStatus.includes(hae.status) && (
+              <DetailItem
+                icon={<EventAvailable />}
+                label="Data da Aprovação"
+                value={formatDateTime(hae.updatedAt)}
+              />
+            )}
+
             <DetailItem
               icon={<SchoolOutlined />}
               label="Curso"

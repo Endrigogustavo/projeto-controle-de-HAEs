@@ -7,8 +7,8 @@ import br.com.fateczl.apihae.domain.enums.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +37,7 @@ public class HaeDetailDTO {
     private Boolean viewed;
     private DimensaoHae dimensao;
     private String coordenatorName;
+    private LocalDateTime updatedAt;
 
     public HaeDetailDTO(Hae hae, String coordenatorName) {
         this.id = hae.getId();
@@ -57,5 +58,6 @@ public class HaeDetailDTO {
         this.viewed = hae.getViewed();
         this.dimensao = hae.getDimensao();
         this.coordenatorName = coordenatorName;
+        this.updatedAt = hae.getUpdatedAt();
     }
 }

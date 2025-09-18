@@ -59,4 +59,5 @@ export interface HaeDetailDTO {
   viewed: boolean;
   coordenatorName: string;
   dayOfWeek: string[];
+  updatedAt: string;
 }
