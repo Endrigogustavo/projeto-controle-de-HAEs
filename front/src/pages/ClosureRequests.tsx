@@ -2,18 +2,31 @@ import { useEffect, useState } from "react";
 import { api } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
 import { AppLayout } from "@/layouts";
-import { HaeResponseDTO } from "@/types/hae";
+import { HaeResponseDTO, HaeDetailDTO } from "@/types/hae";
 import {
   CircularProgress,
   Typography,
   Paper,
-  Link as MuiLink,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
+  Chip,
 } from "@mui/material";
+import {
+  VisibilityOutlined,
+  CheckCircleOutlined,
+  CancelOutlined,
+} from "@mui/icons-material";
 
 export const ClosureRequests = () => {
   const { user, loading: userLoading } = useAuth();
   const [requests, setRequests] = useState<HaeResponseDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedHae, setSelectedHae] = useState<HaeDetailDTO | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   const fetchRequests = async () => {
     if (!user || (user.role !== "COORDENADOR" && user.role !== "DEV")) return;
@@ -41,19 +54,192 @@ export const ClosureRequests = () => {
     }
   }, [user, userLoading]);
 
+  const handleViewDetails = async (haeId: string) => {
+    setIsLoadingDetails(true);
+    setIsDialogOpen(true);
+    try {
+      const response = await api.get<HaeDetailDTO>(`/hae/getHaeById/${haeId}`);
+      setSelectedHae(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar detalhes da HAE:", error);
+      alert("Não foi possível carregar os detalhes da HAE.");
+      setIsDialogOpen(false);
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedHae(null);
+  };
+
   const handleUpdateStatus = async (
     haeId: string,
     newStatus: "COMPLETO" | "APROVADO"
   ) => {
     if (!user) return;
+    
+    const confirmMessage = newStatus === "COMPLETO" 
+      ? "Tem certeza que deseja APROVAR este fechamento? A HAE será marcada como CONCLUÍDA."
+      : "Tem certeza que deseja REJEITAR este fechamento? A HAE voltará para o status APROVADO.";
+    
+    if (!window.confirm(confirmMessage)) return;
+    
     try {
       const payload = { newStatus, coordenadorId: user.id };
       await api.put(`/hae/change-status/${haeId}`, payload);
       setRequests((prev) => prev.filter((req) => req.id !== haeId));
+      handleCloseDialog();
+      alert(newStatus === "COMPLETO" 
+        ? "Fechamento aprovado com sucesso! HAE concluída."
+        : "Fechamento rejeitado. HAE voltou para o status APROVADO."
+      );
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       alert("Não foi possível processar a solicitação.");
     }
+  };
+
+  const renderClosureDetails = () => {
+    if (!selectedHae) return null;
+
+    const { projectType } = selectedHae;
+
+    return (
+      <div className="space-y-4 mt-4">
+        <Divider />
+        <Typography variant="h6" className="font-semibold text-gray-800">
+          Informações do Fechamento
+        </Typography>
+
+        {projectType === "TCC" && (
+          <div className="space-y-3">
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Papel do Professor:
+              </Typography>
+              <Chip 
+                label={selectedHae.tccRole === "orientou" ? "Orientou" : "Apenas Ajudou"} 
+                color="primary" 
+                size="small" 
+                className="mt-1"
+              />
+            </div>
+            
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Quantidade de Alunos:
+              </Typography>
+              <Typography variant="body2">{selectedHae.tccStudentCount || "Não informado"}</Typography>
+            </div>
+
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Nomes dos Alunos:
+              </Typography>
+              <Typography variant="body2" className="whitespace-pre-wrap">
+                {selectedHae.tccStudentNames || "Não informado"}
+              </Typography>
+            </div>
+
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Alunos Aprovados:
+              </Typography>
+              <Typography variant="body2" className="whitespace-pre-wrap">
+                {selectedHae.tccApprovedStudents || "Não informado"}
+              </Typography>
+            </div>
+
+            {selectedHae.tccRole === "orientou" && selectedHae.tccProjectInfo && (
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Informações do(s) Projeto(s):
+                </Typography>
+                <Typography variant="body2" className="whitespace-pre-wrap">
+                  {selectedHae.tccProjectInfo}
+                </Typography>
+              </div>
+            )}
+          </div>
+        )}
+
+        {projectType === "Estagio" && (
+          <div className="space-y-3">
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Informações dos Alunos Atendidos:
+              </Typography>
+              <Typography variant="body2" className="whitespace-pre-wrap">
+                {selectedHae.estagioStudentInfo || "Não informado"}
+              </Typography>
+            </div>
+
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Alunos Aprovados/Não Aprovados:
+              </Typography>
+              <Typography variant="body2" className="whitespace-pre-wrap">
+                {selectedHae.estagioApprovedStudents || "Não informado"}
+              </Typography>
+            </div>
+          </div>
+        )}
+
+        {projectType === "ApoioDirecao" && (
+          <div className="space-y-3">
+            <div>
+              <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                Tipo de Apoio:
+              </Typography>
+              <Chip 
+                label={selectedHae.apoioType === "geral" ? "Geral" : "Curso"} 
+                color="secondary" 
+                size="small" 
+                className="mt-1"
+              />
+            </div>
+
+            {selectedHae.apoioType === "geral" && selectedHae.apoioGeralDescription && (
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Descrição do que foi feito:
+                </Typography>
+                <Typography variant="body2" className="whitespace-pre-wrap">
+                  {selectedHae.apoioGeralDescription}
+                </Typography>
+                <Typography variant="caption" className="text-gray-500">
+                  {selectedHae.apoioGeralDescription.length} caracteres
+                </Typography>
+              </div>
+            )}
+
+            {selectedHae.apoioType === "curso" && (
+              <>
+                <div>
+                  <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                    Alunos Aprovados:
+                  </Typography>
+                  <Typography variant="body2" className="whitespace-pre-wrap">
+                    {selectedHae.apoioApprovedStudents || "Não informado"}
+                  </Typography>
+                </div>
+
+                <div>
+                  <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                    Alunos que Receberão Certificado:
+                  </Typography>
+                  <Typography variant="body2" className="whitespace-pre-wrap">
+                    {selectedHae.apoioCertificateStudents || "Não informado"}
+                  </Typography>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   if (userLoading || isLoading) {
@@ -83,49 +269,148 @@ export const ClosureRequests = () => {
               <Paper
                 key={hae.id}
                 elevation={2}
-                className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                className="p-6 hover:shadow-lg transition-shadow"
               >
-                <div className="flex-1 min-w-0">
-                  <Typography variant="h6" className="truncate">
-                    {hae.projectTitle}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Professor: {hae.professorName}
-                  </Typography>
-                  {hae.comprovanteDoc && hae.comprovanteDoc[0] ? (
-                    <MuiLink
-                      href={hae.comprovanteDoc[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold break-all"
-                    >
-                      Visualizar Comprovante
-                    </MuiLink>
-                  ) : (
-                    <Typography variant="body2" color="error">
-                      Sem comprovante
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <Typography variant="h6" className="font-semibold text-gray-800 mb-2">
+                      {hae.projectTitle}
                     </Typography>
-                  )}
-                </div>
-                <div className="flex gap-2 self-end md:self-center flex-shrink-0">
-                  <button
-                    className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
-                    onClick={() => handleUpdateStatus(hae.id, "APROVADO")}
-                  >
-                    Rejeitar
-                  </button>
-                  <button
-                    className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
-                    onClick={() => handleUpdateStatus(hae.id, "COMPLETO")}
-                  >
-                    Aprovar Fechamento
-                  </button>
+                    <div className="space-y-1">
+                      <Typography variant="body2" color="textSecondary">
+                        <strong>Professor:</strong> {hae.professorName}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        <strong>Curso:</strong> {hae.course}
+                      </Typography>
+                      <Typography variant="body2" className="mt-2">
+                        {hae.projectDescription.substring(0, 150)}
+                        {hae.projectDescription.length > 150 && "..."}
+                      </Typography>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
+                    <button
+                      className="btnFatec bg-blue-600 text-white uppercase hover:bg-blue-900 flex items-center justify-center gap-2"
+                      onClick={() => handleViewDetails(hae.id)}
+                    >
+                      <VisibilityOutlined fontSize="small" sx={{ fill: "white" }} />
+                      Ver Detalhes
+                    </button>
+                    
+                    <button
+                      className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800 flex items-center justify-center gap-2"
+                      onClick={() => handleUpdateStatus(hae.id, "APROVADO")}
+                    >
+                      <CancelOutlined fontSize="small" sx={{ fill: "white" }} />
+                      Rejeitar
+                    </button>
+                    
+                    <button
+                      className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900 flex items-center justify-center gap-2"
+                      onClick={() => handleUpdateStatus(hae.id, "COMPLETO")}
+                    >
+                      <CheckCircleOutlined fontSize="small" sx={{ fill: "white" }} />
+                      Aprovar Fechamento
+                    </button>
+                  </div>
                 </div>
               </Paper>
             ))}
           </div>
         )}
       </main>
+
+      <Dialog 
+        open={isDialogOpen} 
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle className="bg-red-800 text-white">
+          <Typography variant="h6" className="font-semibold text-white">
+            Detalhes da Solicitação de Fechamento
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent className="mt-4">
+          {isLoadingDetails ? (
+            <div className="flex justify-center items-center py-10">
+              <CircularProgress />
+            </div>
+          ) : selectedHae ? (
+            <div className="space-y-4">
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Título do Projeto:
+                </Typography>
+                <Typography variant="body1">{selectedHae.projectTitle}</Typography>
+              </div>
+
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Professor:
+                </Typography>
+                <Typography variant="body1">{selectedHae.professorName}</Typography>
+              </div>
+
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Tipo de HAE:
+                </Typography>
+                <Typography variant="body1">
+                  {selectedHae.projectType === "TCC" 
+                    ? "Trabalho de Conclusão de Curso" 
+                    : selectedHae.projectType === "Estagio" 
+                    ? "Estágio" 
+                    : "Apoio à Direção"}
+                </Typography>
+              </div>
+
+              <div>
+                <Typography variant="subtitle2" className="font-semibold text-gray-700">
+                  Descrição do Projeto:
+                </Typography>
+                <Typography variant="body2" className="whitespace-pre-wrap">
+                  {selectedHae.projectDescription}
+                </Typography>
+              </div>
+
+              {renderClosureDetails()}
+            </div>
+          ) : (
+            <Typography color="error">Erro ao carregar detalhes</Typography>
+          )}
+        </DialogContent>
+        
+        <DialogActions className="p-4">
+          <button
+            className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
+            onClick={handleCloseDialog}
+          >
+            Fechar
+          </button>
+          
+          {selectedHae && (
+            <>
+              <button
+                className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
+                onClick={() => handleUpdateStatus(selectedHae.id, "APROVADO")}
+              >
+                Rejeitar Fechamento
+              </button>
+              
+              <button
+                className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
+                onClick={() => handleUpdateStatus(selectedHae.id, "COMPLETO")}
+              >
+                Aprovar Fechamento
+              </button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
     </AppLayout>
   );
 };
