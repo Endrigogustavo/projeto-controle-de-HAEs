@@ -2,6 +2,7 @@ package br.com.fateczl.apihae.adapter.controller;
 
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeStatusUpdateRequest;
+import br.com.fateczl.apihae.adapter.dto.request.HaeClosureRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
@@ -150,6 +151,12 @@ public class HaeController {
     @GetMapping("/getWeeklyHoursByHae/{haeId}")
     public ResponseEntity<HaeHoursResponseDTO> getWeeklyHoursByHae(@PathVariable String haeId) {
         return ResponseEntity.ok(haeFacade.getWeeklyHoursByHae(haeId));
+    }
+
+    @Operation(summary = "Solicitar fechamento de HAE", description = "Envia as informações de fechamento de uma HAE baseado no tipo")
+    @PostMapping("/request-closure/{haeId}")
+    public ResponseEntity<Object> requestClosure(@PathVariable String haeId, @Valid @RequestBody HaeClosureRequest request) {
+        return ResponseEntity.ok(haeFacade.requestClosure(haeId, request));
     }
 
 }
