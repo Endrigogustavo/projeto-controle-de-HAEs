@@ -74,3 +74,23 @@ export interface HaeDetailDTO {
   apoioApprovedStudents?: string;
   apoioCertificateStudents?: string;
 }
+
+export interface HaeClosureRecordDTO {
+  id: string;
+  coordenadorId: string;
+  coordenadorName: string | null;
+  approvedAt: string;
+  
+  // Campos de informações de fechamento
+  tccRole?: string;
+  tccStudentCount?: number;
+  tccStudentNames?: string;
+  tccApprovedStudents?: string;
+  tccProjectInfo?: string;
+  estagioStudentInfo?: string;
+  estagioApprovedStudents?: string;
+  apoioType?: string;
+  apoioGeralDescription?: string;
+  apoioApprovedStudents?: string;
+  apoioCertificateStudents?: string;
+}
