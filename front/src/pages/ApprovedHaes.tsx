@@ -81,10 +81,6 @@ export const ApprovedHaes = () => {
 		navigate(`/view-closure-request/${haeId}`);
 	};
 
-	const handleViewDetails = (haeId: string) => {
-		navigate(`/hae/${haeId}`);
-	};
-
 	return (
 		<AppLayout>
 			<main className="col-start-2 row-start-2 p-4 md:p-6 overflow-auto pt-20 md:pt-4">
