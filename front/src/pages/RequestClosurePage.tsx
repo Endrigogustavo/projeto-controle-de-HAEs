@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
+  Snackbar,
 } from "@mui/material";
 import { AxiosError } from "axios";
 import { HaeDetailDTO } from "@/types/hae.d";
@@ -46,6 +47,15 @@ export const RequestClosurePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<ClosureFormData>({});
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   useEffect(() => {
     const fetchHaeDetails = async () => {
@@ -66,7 +76,7 @@ export const RequestClosurePage = () => {
     fetchHaeDetails();
   }, [id]);
 
-  const handleInputChange = (field: keyof ClosureFormData, value: any) => {
+  const handleInputChange = (field: keyof ClosureFormData, value: ClosureFormData[keyof ClosureFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -155,8 +165,12 @@ export const RequestClosurePage = () => {
 
     try {
       await api.post(`/hae/request-closure/${id}`, formData);
-      alert("Solicitação de fechamento enviada com sucesso!");
-      navigate("/myrequests");
+      setSnackbar({
+        open: true,
+        message: "Solicitação de fechamento enviada com sucesso!",
+        severity: "success",
+      });
+      setTimeout(() => navigate("/myrequests"), 2000);
     } catch (err) {
       console.error("Erro ao solicitar fechamento:", err);
       let errorMessage = "Falha ao enviar a solicitação. Tente novamente.";
@@ -383,6 +397,21 @@ export const RequestClosurePage = () => {
             </button>
           </div>
         </div>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </main>
     </AppLayout>
   );
