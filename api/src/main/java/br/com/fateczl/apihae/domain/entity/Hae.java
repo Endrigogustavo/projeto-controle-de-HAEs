@@ -125,6 +125,40 @@ public class Hae {
     @JsonBackReference
     private Institution institution;
 
+    // Closure information fields
+    @Column(name = "tccRole", nullable = true)
+    private String tccRole;
+
+    @Column(name = "tccStudentCount", nullable = true)
+    private Integer tccStudentCount;
+
+    @Column(name = "tccStudentNames", columnDefinition = "TEXT", nullable = true)
+    private String tccStudentNames;
+
+    @Column(name = "tccApprovedStudents", columnDefinition = "TEXT", nullable = true)
+    private String tccApprovedStudents;
+
+    @Column(name = "tccProjectInfo", columnDefinition = "TEXT", nullable = true)
+    private String tccProjectInfo;
+
+    @Column(name = "estagioStudentInfo", columnDefinition = "TEXT", nullable = true)
+    private String estagioStudentInfo;
+
+    @Column(name = "estagioApprovedStudents", columnDefinition = "TEXT", nullable = true)
+    private String estagioApprovedStudents;
+
+    @Column(name = "apoioType", nullable = true)
+    private String apoioType;
+
+    @Column(name = "apoioGeralDescription", columnDefinition = "TEXT", nullable = true)
+    private String apoioGeralDescription;
+
+    @Column(name = "apoioApprovedStudents", columnDefinition = "TEXT", nullable = true)
+    private String apoioApprovedStudents;
+
+    @Column(name = "apoioCertificateStudents", columnDefinition = "TEXT", nullable = true)
+    private String apoioCertificateStudents;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
