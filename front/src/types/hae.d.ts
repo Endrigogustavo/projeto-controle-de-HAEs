@@ -60,4 +60,17 @@ export interface HaeDetailDTO {
   coordenatorName: string;
   dayOfWeek: string[];
   updatedAt: string;
+  
+  // Closure information fields
+  tccRole?: string;
+  tccStudentCount?: number;
+  tccStudentNames?: string;
+  tccApprovedStudents?: string;
+  tccProjectInfo?: string;
+  estagioStudentInfo?: string;
+  estagioApprovedStudents?: string;
+  apoioType?: string;
+  apoioGeralDescription?: string;
+  apoioApprovedStudents?: string;
+  apoioCertificateStudents?: string;
 }
