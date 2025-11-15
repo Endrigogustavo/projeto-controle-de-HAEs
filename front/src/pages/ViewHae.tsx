@@ -24,9 +24,11 @@ import {
   ArrowBack,
   WidgetsOutlined,
   EventAvailable,
+  HistoryOutlined,
+  CheckCircleOutlined,
 } from "@mui/icons-material";
 import { useAuth } from "@/hooks/useAuth";
-import { HaeDetailDTO } from "@/types/hae";
+import { HaeDetailDTO, HaeClosureRecordDTO } from "@/types/hae";
 import { AppLayout } from "@/layouts";
 import { StatusBadge } from "@/components";
 import { AxiosError } from "axios";
@@ -73,6 +75,7 @@ export const ViewHae = () => {
   const { id } = useParams<{ id: string }>();
   const { user, loading: isLoadingUser } = useAuth();
   const [hae, setHae] = useState<HaeDetailDTO | null>(null);
+  const [closureRecords, setClosureRecords] = useState<HaeClosureRecordDTO[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -96,9 +99,22 @@ export const ViewHae = () => {
     }
   }, [id]);
 
+  const fetchClosureRecords = useCallback(async () => {
+    if (!id) return;
+    try {
+      const response = await api.get<HaeClosureRecordDTO[]>(`/hae/closure-records/${id}`);
+      setClosureRecords(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar histórico de fechamento:", err);
+      // Não mostrar erro para o usuário se não houver registros
+      setClosureRecords([]);
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchHae();
-  }, [fetchHae]);
+    fetchClosureRecords();
+  }, [fetchHae, fetchClosureRecords]);
 
   const handleStatusChange = async (newStatus: HaeDetailDTO["status"]) => {
     if (!user?.id) {
@@ -119,6 +135,7 @@ export const ViewHae = () => {
         severity: "success",
       });
       fetchHae();
+      fetchClosureRecords(); // Atualizar histórico após mudança de status
     } catch (err) {
       let errorMessage = "Ocorreu um erro na operação.";
       if (err instanceof AxiosError) {
@@ -312,6 +329,104 @@ export const ViewHae = () => {
                 }
                 className="col-span-full"
               />
+            )}
+
+            {/* Histórico de Fechamento */}
+            {closureRecords.length > 0 && (
+              <div className="pt-6">
+                <Divider />
+                <div className="pt-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <HistoryOutlined className="text-gray-500" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Histórico de Fechamento
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    {closureRecords.map((record) => (
+                      <div
+                        key={record.id}
+                        className="bg-gray-50 border border-gray-200 rounded-lg p-4"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <CheckCircleOutlined className="text-green-600" />
+                            <div>
+                              <p className="font-semibold text-gray-800">
+                                Fechamento Aprovado
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                Aprovado por: {record.coordenadorName || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            {formatDateTime(record.approvedAt)}
+                          </p>
+                        </div>
+                        
+                        {/* Informações específicas por tipo */}
+                        {hae.projectType === "TCC" && (
+                          <div className="mt-3 space-y-2 text-sm">
+                            {record.tccRole && (
+                              <p><span className="font-semibold">Função:</span> {record.tccRole}</p>
+                            )}
+                            {record.tccStudentCount && (
+                              <p><span className="font-semibold">Quantidade de Alunos:</span> {record.tccStudentCount}</p>
+                            )}
+                            {record.tccStudentNames && (
+                              <p><span className="font-semibold">Nomes dos Alunos:</span> {record.tccStudentNames}</p>
+                            )}
+                            {record.tccApprovedStudents && (
+                              <p><span className="font-semibold">Alunos Aprovados:</span> {record.tccApprovedStudents}</p>
+                            )}
+                            {record.tccProjectInfo && (
+                              <div>
+                                <p className="font-semibold mb-1">Informações do Projeto:</p>
+                                <p className="whitespace-pre-wrap text-gray-700">{record.tccProjectInfo}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {hae.projectType === "Estagio" && (
+                          <div className="mt-3 space-y-2 text-sm">
+                            {record.estagioStudentInfo && (
+                              <div>
+                                <p className="font-semibold mb-1">Informações do Aluno:</p>
+                                <p className="whitespace-pre-wrap text-gray-700">{record.estagioStudentInfo}</p>
+                              </div>
+                            )}
+                            {record.estagioApprovedStudents && (
+                              <p><span className="font-semibold">Alunos Aprovados:</span> {record.estagioApprovedStudents}</p>
+                            )}
+                          </div>
+                        )}
+
+                        {hae.projectType === "ApoioDirecao" && (
+                          <div className="mt-3 space-y-2 text-sm">
+                            {record.apoioType && (
+                              <p><span className="font-semibold">Tipo de Apoio:</span> {record.apoioType}</p>
+                            )}
+                            {record.apoioGeralDescription && (
+                              <div>
+                                <p className="font-semibold mb-1">Descrição Geral:</p>
+                                <p className="whitespace-pre-wrap text-gray-700">{record.apoioGeralDescription}</p>
+                              </div>
+                            )}
+                            {record.apoioApprovedStudents && (
+                              <p><span className="font-semibold">Alunos Aprovados:</span> {record.apoioApprovedStudents}</p>
+                            )}
+                            {record.apoioCertificateStudents && (
+                              <p><span className="font-semibold">Alunos com Certificado:</span> {record.apoioCertificateStudents}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
 
             {isCoordinator && (
