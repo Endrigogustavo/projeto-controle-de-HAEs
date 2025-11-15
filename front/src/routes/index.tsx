@@ -26,6 +26,8 @@ import {
   AllHaes,
   RequestClosurePage,
   ClosureRequests,
+  ApprovedHaes,
+  ViewClosureRequest,
 } from "../pages";
 import { PrivateRouteLayout } from "./layout/PrivateRouteLayout";
 
@@ -74,6 +76,8 @@ export const AppRoutes = () => {
           <Route path="/allHaes" element={<AllHaes />} />
           <Route path="/request-closure/:id" element={<RequestClosurePage />} />
           <Route path="/closure-requests" element={<ClosureRequests />} />
+          <Route path="/approved-haes" element={<ApprovedHaes />} />
+          <Route path="/view-closure-request/:id" element={<ViewClosureRequest />} />
         </Route>
       </Routes>
     </BrowserRouter>

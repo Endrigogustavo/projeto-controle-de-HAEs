@@ -93,6 +93,12 @@ export const Sidebar = () => {
               active={isActive("/closure-requests")}
             />
             <SidebarItem
+              to="/approved-haes"
+              icon={<ListAltOutlined sx={{ fill: "white" }} />}
+              text="HAEs Aprovadas"
+              active={isActive("/approved-haes")}
+            />
+            <SidebarItem
               to="/support"
               icon={<AlternateEmail sx={{ fill: "white" }} />}
               text="Entre Em Contato"
@@ -161,6 +167,12 @@ export const Sidebar = () => {
               icon={<PeopleOutline sx={{ fill: "white" }} />}
               text="Visualizar Coordenadores"
               active={isActive("/coordenadores")}
+            />
+            <SidebarItem
+              to="/approved-haes"
+              icon={<ListAltOutlined sx={{ fill: "white" }} />}
+              text="HAEs Aprovadas"
+              active={isActive("/approved-haes")}
             />
             <SidebarItem
               to="/configuracoes"
@@ -232,6 +244,12 @@ export const Sidebar = () => {
               icon={<BusinessOutlined sx={{ fill: "white" }} />}
               text="Gerenciar Instituições"
               active={isActive("/institutions")}
+            />
+            <SidebarItem
+              to="/approved-haes"
+              icon={<ListAltOutlined sx={{ fill: "white" }} />}
+              text="HAEs Aprovadas"
+              active={isActive("/approved-haes")}
             />
           </>
         );
