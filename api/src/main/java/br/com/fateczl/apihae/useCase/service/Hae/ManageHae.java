@@ -1,6 +1,7 @@
 package br.com.fateczl.apihae.useCase.service.Hae;
 
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.request.HaeClosureRequest;
 import br.com.fateczl.apihae.domain.entity.Employee;
 import br.com.fateczl.apihae.domain.entity.Hae;
 import br.com.fateczl.apihae.domain.entity.Institution;
@@ -189,6 +190,53 @@ public class ManageHae {
                     "O lançamento dessa HAE ultrapassa o limite de horas permitidas (" + qtdHaeFatec +
                             "h). Atualmente já existem " + weeklyHours + "h cadastradas neste semestre.");
         }
+    }
+
+    @Transactional
+    public Hae requestClosure(String haeId, HaeClosureRequest request) {
+        Hae hae = iHaeRepository.findById(haeId)
+                .orElseThrow(() -> new IllegalArgumentException("HAE não encontrada com ID: " + haeId));
+
+        if (hae.getStatus() != Status.APROVADO) {
+            throw new IllegalStateException("Apenas HAEs com status APROVADO podem solicitar fechamento.");
+        }
+
+        // Populate closure fields based on HAE type
+        switch (hae.getProjectType()) {
+            case TCC:
+                hae.setTccRole(request.getTccRole());
+                hae.setTccStudentCount(request.getTccStudentCount());
+                hae.setTccStudentNames(request.getTccStudentNames());
+                hae.setTccApprovedStudents(request.getTccApprovedStudents());
+                hae.setTccProjectInfo(request.getTccProjectInfo());
+                break;
+
+            case Estagio:
+                hae.setEstagioStudentInfo(request.getEstagioStudentInfo());
+                hae.setEstagioApprovedStudents(request.getEstagioApprovedStudents());
+                break;
+
+            case ApoioDirecao:
+                hae.setApoioType(request.getApoioType());
+                hae.setApoioGeralDescription(request.getApoioGeralDescription());
+                hae.setApoioApprovedStudents(request.getApoioApprovedStudents());
+                hae.setApoioCertificateStudents(request.getApoioCertificateStudents());
+                break;
+
+            default:
+                throw new IllegalArgumentException("Tipo de HAE não reconhecido: " + hae.getProjectType());
+        }
+
+        hae.setStatus(Status.FECHAMENTO_SOLICITADO);
+        hae.setUpdatedAt(LocalDateTime.now());
+
+        Hae updatedHae = iHaeRepository.save(hae);
+
+        // Notify coordinator about closure request
+        iEmployeeRepository.findByCourseAndRole(hae.getCourse(), Role.COORDENADOR)
+                .ifPresent(coordinator -> emailService.sendAlertCoordenadorEmail(coordinator.getEmail(), hae));
+
+        return updatedHae;
     }
 
 }
