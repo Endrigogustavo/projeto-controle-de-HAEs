@@ -38,6 +38,19 @@ public class HaeDetailDTO {
     private DimensaoHae dimensao;
     private String coordenatorName;
     private LocalDateTime updatedAt;
+    
+    // Closure information fields
+    private String tccRole;
+    private Integer tccStudentCount;
+    private String tccStudentNames;
+    private String tccApprovedStudents;
+    private String tccProjectInfo;
+    private String estagioStudentInfo;
+    private String estagioApprovedStudents;
+    private String apoioType;
+    private String apoioGeralDescription;
+    private String apoioApprovedStudents;
+    private String apoioCertificateStudents;
 
     public HaeDetailDTO(Hae hae, String coordenatorName) {
         this.id = hae.getId();
@@ -59,5 +72,18 @@ public class HaeDetailDTO {
         this.dimensao = hae.getDimensao();
         this.coordenatorName = coordenatorName;
         this.updatedAt = hae.getUpdatedAt();
+        
+        // Populate closure fields
+        this.tccRole = hae.getTccRole();
+        this.tccStudentCount = hae.getTccStudentCount();
+        this.tccStudentNames = hae.getTccStudentNames();
+        this.tccApprovedStudents = hae.getTccApprovedStudents();
+        this.tccProjectInfo = hae.getTccProjectInfo();
+        this.estagioStudentInfo = hae.getEstagioStudentInfo();
+        this.estagioApprovedStudents = hae.getEstagioApprovedStudents();
+        this.apoioType = hae.getApoioType();
+        this.apoioGeralDescription = hae.getApoioGeralDescription();
+        this.apoioApprovedStudents = hae.getApoioApprovedStudents();
+        this.apoioCertificateStudents = hae.getApoioCertificateStudents();
     }
 }
