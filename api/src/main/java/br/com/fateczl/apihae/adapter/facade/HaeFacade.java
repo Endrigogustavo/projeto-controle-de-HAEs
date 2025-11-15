@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeClosureRequest;
+import br.com.fateczl.apihae.adapter.dto.response.HaeClosureRecordDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
@@ -111,5 +112,9 @@ public class HaeFacade {
 
     public Hae requestClosure(String haeId, HaeClosureRequest request) {
         return manageHae.requestClosure(haeId, request);
+    }
+
+    public List<HaeClosureRecordDTO> getClosureRecordsByHaeId(String haeId) {
+        return showHae.getClosureRecordsByHaeId(haeId);
     }
 }

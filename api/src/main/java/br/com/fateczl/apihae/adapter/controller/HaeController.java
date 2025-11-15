@@ -3,6 +3,7 @@ package br.com.fateczl.apihae.adapter.controller;
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeStatusUpdateRequest;
 import br.com.fateczl.apihae.adapter.dto.request.HaeClosureRequest;
+import br.com.fateczl.apihae.adapter.dto.response.HaeClosureRecordDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
@@ -157,6 +158,12 @@ public class HaeController {
     @PostMapping("/request-closure/{haeId}")
     public ResponseEntity<Object> requestClosure(@PathVariable String haeId, @Valid @RequestBody HaeClosureRequest request) {
         return ResponseEntity.ok(haeFacade.requestClosure(haeId, request));
+    }
+
+    @Operation(summary = "Buscar histórico de fechamento de HAE", description = "Retorna todos os registros de fechamento aprovado de uma HAE")
+    @GetMapping("/closure-records/{haeId}")
+    public ResponseEntity<List<HaeClosureRecordDTO>> getClosureRecords(@PathVariable String haeId) {
+        return ResponseEntity.ok(haeFacade.getClosureRecordsByHaeId(haeId));
     }
 
 }
