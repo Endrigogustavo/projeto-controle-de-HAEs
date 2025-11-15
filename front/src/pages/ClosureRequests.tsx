@@ -13,6 +13,8 @@ import {
   DialogActions,
   Divider,
   Chip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   VisibilityOutlined,
@@ -27,6 +29,33 @@ export const ClosureRequests = () => {
   const [selectedHae, setSelectedHae] = useState<HaeDetailDTO | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info";
+  }>({ open: false, message: "", severity: "success" });
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    haeId: string;
+    action: "COMPLETO" | "APROVADO";
+  }>({ open: false, haeId: "", action: "APROVADO" });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleOpenConfirmDialog = (haeId: string, action: "COMPLETO" | "APROVADO") => {
+    setConfirmDialog({ open: true, haeId, action });
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setConfirmDialog({ open: false, haeId: "", action: "APROVADO" });
+  };
+
+  const handleConfirmAction = async () => {
+    await handleUpdateStatus(confirmDialog.haeId, confirmDialog.action);
+    handleCloseConfirmDialog();
+  };
 
   const fetchRequests = async () => {
     if (!user || (user.role !== "COORDENADOR" && user.role !== "DEV")) return;
@@ -62,7 +91,11 @@ export const ClosureRequests = () => {
       setSelectedHae(response.data);
     } catch (error) {
       console.error("Erro ao buscar detalhes da HAE:", error);
-      alert("Não foi possível carregar os detalhes da HAE.");
+      setSnackbar({
+        open: true,
+        message: "Não foi possível carregar os detalhes da HAE.",
+        severity: "error",
+      });
       setIsDialogOpen(false);
     } finally {
       setIsLoadingDetails(false);
@@ -80,24 +113,25 @@ export const ClosureRequests = () => {
   ) => {
     if (!user) return;
     
-    const confirmMessage = newStatus === "COMPLETO" 
-      ? "Tem certeza que deseja APROVAR este fechamento? A HAE será marcada como CONCLUÍDA."
-      : "Tem certeza que deseja REJEITAR este fechamento? A HAE voltará para o status APROVADO.";
-    
-    if (!window.confirm(confirmMessage)) return;
-    
     try {
       const payload = { newStatus, coordenadorId: user.id };
       await api.put(`/hae/change-status/${haeId}`, payload);
       setRequests((prev) => prev.filter((req) => req.id !== haeId));
       handleCloseDialog();
-      alert(newStatus === "COMPLETO" 
-        ? "Fechamento aprovado com sucesso! HAE concluída."
-        : "Fechamento rejeitado. HAE voltou para o status APROVADO."
-      );
+      setSnackbar({
+        open: true,
+        message: newStatus === "COMPLETO" 
+          ? "Fechamento aprovado com sucesso! HAE concluída."
+          : "Fechamento rejeitado. HAE voltou para o status APROVADO.",
+        severity: "success",
+      });
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
-      alert("Não foi possível processar a solicitação.");
+      setSnackbar({
+        open: true,
+        message: "Não foi possível processar a solicitação.",
+        severity: "error",
+      });
     }
   };
 
@@ -301,7 +335,7 @@ export const ClosureRequests = () => {
                     
                     <button
                       className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800 flex items-center justify-center gap-2"
-                      onClick={() => handleUpdateStatus(hae.id, "APROVADO")}
+                      onClick={() => handleOpenConfirmDialog(hae.id, "APROVADO")}
                     >
                       <CancelOutlined fontSize="small" sx={{ fill: "white" }} />
                       Rejeitar
@@ -309,7 +343,7 @@ export const ClosureRequests = () => {
                     
                     <button
                       className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900 flex items-center justify-center gap-2"
-                      onClick={() => handleUpdateStatus(hae.id, "COMPLETO")}
+                      onClick={() => handleOpenConfirmDialog(hae.id, "COMPLETO")}
                     >
                       <CheckCircleOutlined fontSize="small" sx={{ fill: "white" }} />
                       Aprovar Fechamento
@@ -396,14 +430,14 @@ export const ClosureRequests = () => {
             <>
               <button
                 className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
-                onClick={() => handleUpdateStatus(selectedHae.id, "APROVADO")}
+                onClick={() => handleOpenConfirmDialog(selectedHae.id, "APROVADO")}
               >
                 Rejeitar Fechamento
               </button>
               
               <button
                 className="btnFatec text-white uppercase bg-red-800 hover:bg-red-900"
-                onClick={() => handleUpdateStatus(selectedHae.id, "COMPLETO")}
+                onClick={() => handleOpenConfirmDialog(selectedHae.id, "COMPLETO")}
               >
                 Aprovar Fechamento
               </button>
@@ -411,6 +445,62 @@ export const ClosureRequests = () => {
           )}
         </DialogActions>
       </Dialog>
+  
+      <Dialog
+        open={confirmDialog.open}
+        onClose={handleCloseConfirmDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle className="bg-red-800 text-white">
+          <Typography variant="h6" className="font-semibold text-white">
+            Confirmar Ação
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent className="mt-4">
+          <Typography variant="body1">
+            {confirmDialog.action === "COMPLETO"
+              ? "Tem certeza que deseja APROVAR este fechamento? A HAE será marcada como CONCLUÍDA."
+              : "Tem certeza que deseja REJEITAR este fechamento? A HAE voltará para o status APROVADO."}
+          </Typography>
+        </DialogContent>
+        
+        <DialogActions className="p-4">
+          <button
+            className="btnFatec bg-gray-600 text-white uppercase hover:bg-gray-800"
+            onClick={handleCloseConfirmDialog}
+          >
+            Cancelar
+          </button>
+          
+          <button
+            className={`btnFatec text-white uppercase ${
+              confirmDialog.action === "COMPLETO"
+                ? "bg-red-800 hover:bg-red-900"
+                : "bg-gray-600 hover:bg-gray-800"
+            }`}
+            onClick={handleConfirmAction}
+          >
+            Confirmar
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </AppLayout>
   );
 };
