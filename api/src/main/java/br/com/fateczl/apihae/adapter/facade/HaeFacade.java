@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import br.com.fateczl.apihae.adapter.dto.request.HaeRequest;
+import br.com.fateczl.apihae.adapter.dto.request.HaeClosureRequest;
 import br.com.fateczl.apihae.adapter.dto.response.HaeDetailDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeHoursResponseDTO;
 import br.com.fateczl.apihae.adapter.dto.response.HaeResponseDTO;
@@ -106,5 +107,9 @@ public class HaeFacade {
 
     public HaeHoursResponseDTO getWeeklyHoursByHae(String haeId) {
         return showHae.getWeeklyHoursByHae(haeId);
+    }
+
+    public Hae requestClosure(String haeId, HaeClosureRequest request) {
+        return manageHae.requestClosure(haeId, request);
     }
 }
